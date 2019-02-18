@@ -1,0 +1,137 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: A simple GCP example network.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+
+inputs:
+
+  username:
+    description: OS_USERNAME as specified in Openstack RC file.
+    default: { get_secret: username }
+
+  password:
+    description: Openstack user password.
+    default: { get_secret: password }
+
+  tenant_name:
+    description: OS_TENANT_NAME as specified in Openstack RC file.
+    default: { get_secret: tenant_name }
+
+  auth_url:
+    description: OS_AUTH_URL as specified in Openstack RC file.
+    default: { get_secret: auth_url }
+
+  region:
+    description: OS_REGION_NAME as specified in Openstack RC file.
+    default: { get_secret: region }
+
+  external_network_name:
+    description: Openstack tenant external network name.
+
+  nameservers:
+    default: [8.8.4.4, 8.8.8.8]
+
+  public_subnet_cidr:
+    default: 10.10.0.0/24
+
+  public_subnet_allocation_pools:
+    default:
+    - start: 10.10.0.2
+      end: 10.10.0.254
+
+  private_subnet_cidr:
+    default: 10.10.1.0/24
+
+  private_subnet_allocation_pools:
+    default:
+    - start: 10.10.1.2
+      end: 10.10.1.254
+
+dsl_definitions:
+
+  client_config: &client_config
+    username: { get_input: username }
+    password: { get_input: password }
+    tenant_name: { get_input: tenant_name }
+    auth_url: { get_input: auth_url }
+    region: { get_input: region }
+
+node_templates:
+
+  external_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id: { get_input: external_network_name }
+
+  public_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+
+  private_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+
+  public_network_router:
+    type: cloudify.openstack.nodes.Router
+    properties:
+      openstack_config: *client_config
+    relationships:
+    - type: cloudify.relationships.connected_to
+      target: external_network
+
+  public_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      openstack_config: *client_config
+      subnet:
+        ip_version: 4
+        cidr: { get_input: public_subnet_cidr }
+        dns_nameservers: { get_input: nameservers }
+        allocation_pools: { get_input: public_subnet_allocation_pools }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: public_network
+    - type: cloudify.openstack.subnet_connected_to_router
+      target: public_network_router
+
+  private_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      openstack_config: *client_config
+      subnet:
+        ip_version: 4
+        cidr: { get_input: private_subnet_cidr }
+        dns_nameservers: { get_input: nameservers }
+        allocation_pools: { get_input: private_subnet_allocation_pools }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: private_network
+    - type: cloudify.openstack.subnet_connected_to_router
+      target: public_network_router
+
+outputs:
+
+  external_network:
+    value: { get_attribute: [ external_network, external_id ] }
+
+  public_network_router:
+    value: { get_attribute: [ public_network_router, external_id ] }
+
+  public_network:
+    value: { get_attribute: [ public_network, external_id ] }
+
+  private_network:
+    value: { get_attribute: [ private_network, external_id ] }
+
+  public_subnet:
+    value: { get_attribute: [ public_subnet, external_id ] }
+
+  private_subnet:
+    value: { get_attribute: [ private_subnet, external_id ] }

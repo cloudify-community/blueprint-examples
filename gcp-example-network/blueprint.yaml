@@ -1,0 +1,99 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: A simple GCP example network.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-gcp-plugin
+
+inputs:
+
+  client_x509_cert_url:
+    type: string
+    default: { get_secret: client_x509_cert_url }
+
+  client_email:
+    type: string
+    default: { get_secret: client_email }
+
+  client_id:
+    type: string
+    default: { get_secret: client_id }
+
+  project_id:
+    type: string
+    default: { get_secret: project_id }
+
+  private_key_id:
+    type: string
+    default: { get_secret: private_key_id }
+
+  private_key:
+    type: string
+    default: { get_secret: private_key }
+
+  zone:
+    default: { get_secret: zone }
+
+  region:
+    default: { get_secret: region }
+
+  subnet_cidr:
+    default: 10.11.12.0/22
+
+  resource_prefix:
+    default: cfy
+
+  resource_suffix:
+    default: ex0
+
+dsl_definitions:
+
+  client_config: &client_config
+    auth:
+      type: service_account
+      auth_uri: https://accounts.google.com/o/oauth2/auth
+      token_uri: https://accounts.google.com/o/oauth2/token
+      auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+      client_x509_cert_url: { get_input: client_x509_cert_url }
+      client_email: { get_input: client_email }
+      client_id: { get_input: client_id }
+      project_id: { get_input: project_id }
+      private_key_id: { get_input: private_key_id }
+      private_key: { get_input: private_key }
+    project: { get_input: project_id }
+    zone: { get_input: zone }
+
+node_templates:
+
+  network:
+    type: cloudify.gcp.nodes.Network
+    properties:
+      gcp_config: *client_config
+      name: { concat: [ { get_input: resource_prefix }, 'network', { get_input: resource_suffix } ] }
+      auto_subnets: false
+
+  subnet:
+    type: cloudify.gcp.nodes.SubNetwork
+    properties:
+      gcp_config: *client_config
+      name: { concat: [ { get_input: resource_prefix }, 'subnet', { get_input: resource_suffix } ] }
+      subnet: { get_input: subnet_cidr }
+      region: { get_input: region }
+    relationships:
+    - type: cloudify.gcp.relationships.contained_in_network
+      target: network
+
+outputs:
+
+  network:
+    value: { get_property: [ network, name ] }
+
+  subnet:
+    value: { get_property: [ subnet, name ] }
+
+  zone:
+    value: { get_input: zone }
+
+  region:
+    value: { get_input: region }
