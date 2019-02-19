@@ -25,7 +25,7 @@ class TestExamples(TestCase):
             '/'.join(
                 path.abspath(
                     path.dirname(__file__)
-                ).split('/')[1:-2]
+                ).split('/')[1:-1],
             )
         )
 
@@ -34,6 +34,7 @@ class TestExamples(TestCase):
         """Successfully uploading a
         blueprint indicates that it is valid according to the DSL.
         """
+        print blueprint_path
         result = system('cfy blueprints upload {0}'.format(blueprint_path))
         return True if result is 0 else False
 

@@ -48,6 +48,9 @@ jobs:
                 sleep 2
             done
       - run:
+          name: install plugins bundle
+          command: cfy plugins bundle-upload
+      - run:
           name: execute test
           command: nosetests -s tests/test_examples.py
 
