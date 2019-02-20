@@ -30,17 +30,3 @@ You must have these secrets on your Cloudify Manager `tenant`:
   * `location`: Any valid Azure location, such as `eastus`.
 
 **You may override the secrets' values via deployment inputs when you create the deployment.**
-
-
-## Installation
-
-1. On your Cloudify Manager, navigate to `Local Blueprints` and select `Upload`. [Right-click and copy URL](https://github.com/cloudify-community/blueprint-examples/archive/master.zip). Paste where it says `Enter blueprint url`. Provide a blueprint name, such as `azure-example-blueprint` in the field labeled `blueprint name`. Select `azure-example-network/blueprint.yaml` from `Blueprint filename` menu.
-
-1. After the new blueprint has been created, click the `Deploy` button.
-
-1. Navigate to `Deployments`, find your new deployment, select `Install` from the `workflow`'s menu. _Reminder, at this stage, you may provide your own values for any of the default `deployment inputs`._
-
-
-## Uninstallation
-
-Navigate to the deployment and select `Uninstall`. When the uninstall workflow is finished, select `Delete deployment`.

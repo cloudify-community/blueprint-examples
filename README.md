@@ -2,7 +2,28 @@
 
 **Try out a [free lab](https://cloudify.co/HostedCloudify)!**
 
-## Contribution Guide
+
+## User guide
+
+Each of these blueprints is tested on the version of Cloudify and with the latest version of our official Cloudify plugins. If you have not installed the required plugins, you can do so now from the CLI, by running `cfy plugins bundle-upload`.
+
+### Install
+
+To install one of these blueprints, follow these steps:
+
+1. Go to the [releases](https://github.com/cloudify-community/blueprint-examples/releases) page. Find the latest package for your version of Cloudify.
+1. Copy the link to the zip file for the blueprint that you want to install.
+1. On your Cloudify Manager, navigate to `Local Blueprints` and select `Upload`. Paste the link where it says `Enter blueprint url`. Provide a blueprint name, such as `aws-example-blueprint` in the field labeled `blueprint name`. Select `blueprint.yaml` from `Blueprint filename` menu.
+1. After the new blueprint has been created, click the `Deploy` button.
+1. Navigate to `Deployments`, find your new deployment, select `Install` from the `workflow`'s menu. _Reminder, at this stage, you may provide your own values for any of the default `deployment inputs`._
+
+
+### Uninstall
+
+Navigate to the deployment and select `Uninstall`. When the uninstall workflow is finished, select `Delete deployment`.
+
+
+# Contribution guide
 
 Do you have a blueprint that you have written and would like to share with Cloudify's user community? If so, follow these simple instructions:
 
