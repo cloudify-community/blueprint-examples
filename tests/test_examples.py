@@ -35,8 +35,11 @@ class TestExamples(TestCase):
         """Successfully uploading a
         blueprint indicates that it is valid according to the DSL.
         """
-        print blueprint_path
-        result = system('cfy blueprints upload {0}'.format(blueprint_path))
+        blueprint_id = '{0}-{1}'.format(
+            path.dirname(blueprint_path).split('/')[-1:][0],
+            path.basename(blueprint_path).split('.yaml')[0])
+        result = system('cfy blueprints upload {0} -b {1}'.format(
+            blueprint_path, blueprint_id))
         return True if result is 0 else False
 
     def test_aws_example_network(self):
