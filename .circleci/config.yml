@@ -86,4 +86,4 @@ workflows:
             - blueprint-validation
           filters:
             branches:
-              only: /([0-9\.]*\-build)/
+              only: master

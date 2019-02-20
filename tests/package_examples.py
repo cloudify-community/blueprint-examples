@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from contextlib import closing
-from os import environ, path, walk
+from os import environ, path, walk, remove
+import shutil
 from tempfile import NamedTemporaryFile
 import zipfile
 
@@ -36,12 +36,16 @@ SUPPORTED_EXAMPLES = (
     ('openstack-example-network', 'blueprint.yaml'),
 )
 
+CURRENT_CLOUDIFY_GENERATION = '4.5.0'
+RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
+This is package number {1} to be released for this version of Cloudify.
+Always try to use the latest package for your version of Cloudify."""
+
 
 class NewRelease(object):
 
     def __init__(self):
-        self.version = self._get_version()
-        self.client = Github(environ['TOKEN'])
+        self.client = Github(environ['RELEASE_BUILD_TOKEN'])
         self.repo = \
             self.client.get_repo(
                 '{org}/{repo}'.format(
@@ -50,27 +54,54 @@ class NewRelease(object):
                 )
             )
         self.commit = self.repo.get_commit(environ['CIRCLE_SHA1'])
-        self.release = self.create()
+        self._version = None
+        self._release = self._create()
 
-    def create(self):
+    @property
+    def version(self):
+        if not self._version:
+            version = self._get_last_version()
+            if CURRENT_CLOUDIFY_GENERATION > version:
+                version = CURRENT_CLOUDIFY_GENERATION
+            try:
+                self._version = '{0}-{1}'.format(
+                    version.split('-')[0],
+                    str(int(version.split('-')[1]) + 1))
+            except IndexError:
+                self._version = '{0}-{1}'.format(version, str(0))
+        return self._version
+
+    @property
+    def release(self):
+        return self._release
+
+    @property
+    def name(self):
+        gen, iteration = self.version.split('-')
+        return 'Cloudify v{0} Blueprint Examples ' \
+               'Bundle no. {1}'.format(gen, iteration)
+
+    @property
+    def message(self):
+        gen, iteration = self.version.split('-')
+        return RELEASE_MESSAGE.format(gen, iteration)
+
+    def _create(self):
         return self.repo.create_git_release(
             tag=self.version,
-            name=self.version,
-            message=self.version,
+            name=self.name,
+            message=self.message,
             target_commitish=self.commit)
 
     def upload(self, asset_path, basename):
         asset_label = '{0}-{1}.{2}'.format(basename, self.version, ASSET_TYPE)
         self.release.upload_asset(asset_path, asset_label)
 
-    @staticmethod
-    def _get_version():
+    def _get_last_version(self):
         try:
-            return environ['CIRCLE_BRANCH'].split('-build')[0]
-        except IndexError:
-            raise Exception(
-                'Cannot get version from branch name: {0}'.format(
-                    environ['CIRCLE_BRANCH']))
+            return str(self.repo.get_releases()[0].tag_name)
+        except (IndexError, KeyError):
+            return None
 
 
 class BlueprintArchive(object):
@@ -82,18 +113,21 @@ class BlueprintArchive(object):
     def __init__(self, name, source_directory):
         self.name = name
         self.source = source_directory
-        self._destination_file = NamedTemporaryFile()
-        self.destination = self._destination_file.name
-        self._zip()
+        self._dest = NamedTemporaryFile(delete=False)
+        self.destination = path.join(
+            path.dirname(self._dest.name), '{0}.zip'.format(self.name))
+        self._create_archive()
+        shutil.move(self._dest.name, self.destination)
 
-    def _zip(self):
-        with closing(zipfile.ZipFile(self.destination, 'w')) as zip_file:
-            for root, _, files in walk(self.source):
-                for filename in files:
-                    file_path = path.join(root, filename)
-                    source_dir = path.dirname(self.source)
-                    zip_file.write(
-                        file_path, path.relpath(file_path, source_dir))
+    def _create_archive(self):
+        zip_file = zipfile.ZipFile(self._dest.name, 'w')
+        for root, _, files in walk(self.source):
+            for filename in files:
+                file_path = path.join(root, filename)
+                source_dir = path.dirname(self.source)
+                zip_file.write(
+                    file_path, path.relpath(file_path, source_dir))
+        zip_file.close()
 
 
 if __name__ == "__main__":
@@ -103,6 +137,7 @@ if __name__ == "__main__":
     for blueprint_id, blueprint_file_name in SUPPORTED_EXAMPLES:
         new_archive = BlueprintArchive(
             blueprint_id,
-            path.join(CWD, blueprint_id, blueprint_file_name)
+            path.join(CWD, blueprint_id)
         )
         new_release.upload(new_archive.destination, new_archive.name)
+        remove(new_archive.destination)
