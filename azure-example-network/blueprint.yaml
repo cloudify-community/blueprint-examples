@@ -11,19 +11,19 @@ inputs:
 
   subscription_id:
     type: string
-    default: { get_secret: subscription_id }
+    default: { get_secret: azure_subscription_id }
 
   tenant_id:
     type: string
-    default: { get_secret: tenant_id }
+    default: { get_secret: azure_tenant_id }
 
   client_id:
     type: string
-    default: { get_secret: client_id }
+    default: { get_secret: azure_client_id }
 
   client_secret:
     type: string
-    default: { get_secret: client_secret }
+    default: { get_secret: azure_client_secret }
 
   endpoint_resource:
     default: https://management.core.windows.net/
@@ -43,7 +43,7 @@ inputs:
     default: https://login.microsoftonline.com
 
   location:
-    default: { get_secret: location }
+    default: { get_secret: azure_location }
 
   retry_after:
     default: 5

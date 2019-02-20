@@ -22,11 +22,11 @@ Upload the required plugins:
 
 If you do not provide your own `deployment inputs` below, you must add these secrets to your Cloudify Manager `tenant`:
 
-  * `client_x509_cert_url`: A GCP Service Account Client Cert URL.
-  * `client_email`: A GCP Service Account client email.
-  * `client_id`: A GCP Service Account Client ID.
-  * `project_id`: A GCP Project ID.
-  * `private_key_id`: A GCP Project Private Key ID.
-  * `private_key`: A GCP project Private Key. **Hint: Create this secret from a file:** `cfy secrets create private_key -f ./path/to/private-key`.
-  * `region`: A GCP Region such as `us-east1`.
-  * `zone`: A GCP Zone such as `us-east1-b`.
+  * `gcp_client_x509_cert_url`: A GCP Service Account Client Cert URL.
+  * `gcp_client_email`: A GCP Service Account client email.
+  * `gcp_client_id`: A GCP Service Account Client ID.
+  * `gcp_project_id`: A GCP Project ID.
+  * `gcp_private_key_id`: A GCP Project Private Key ID.
+  * `gcp_private_key`: A GCP project Private Key. **Hint: Create this secret from a file:** `cfy secrets create private_key -f ./path/to/private-key`.
+  * `gcp_region`: A GCP Region such as `us-east1`.
+  * `gcp_zone`: A GCP Zone such as `us-east1-b`.

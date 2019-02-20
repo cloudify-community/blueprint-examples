@@ -1,0 +1,128 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+  - install-script.yaml
+
+inputs:
+
+  region:
+    type: string
+    description: The Openstack region.
+
+  external_network_name:
+    type: string
+    description: A network that provisions floating IPs.
+
+  image:
+    type: string
+    description: The UUID of an Ubuntu Trusty 14.04 image in your Openstack account.
+
+  flavor:
+    type: string
+    description: The UUID of small flavor in your Openstack account.
+
+  network_id:
+    type: string
+    description: A name for your new Openstack Network.
+    default: cloudify-hello-world-network
+
+  subnet_id:
+    type: string
+    description: A name for your new Openstack Subnet.
+    default: cloudify-hello-world-subnet
+
+dsl_definitions:
+
+  openstack_config: &openstack_config
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    tenant_name: { get_secret: openstack_tenant_name }
+    auth_url: { get_secret: openstack_auth_url }
+    region: { get_input: region }
+
+node_templates:
+
+  vm:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      openstack_config: *openstack_config
+      agent_config:
+        install_method: none
+      server:
+        key_name: ''
+        image: { get_input: image }
+        flavor: { get_input: flavor }
+        userdata: { get_input: install_script }
+      management_network_name: ''
+    relationships:
+    - type: cloudify.openstack.server_connected_to_port
+      target: port
+
+  port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *openstack_config
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: network
+    - type: cloudify.relationships.depends_on
+      target: subnet
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: security_group
+    - type: cloudify.openstack.port_connected_to_floating_ip
+      target: ip
+
+  subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      openstack_config: *openstack_config
+      resource_id: { get_input: subnet_id }
+      subnet:
+        ip_version: 4
+        cidr: 10.10.4.0/24
+        dns_nameservers: [8.8.4.4, 8.8.8.8]
+        allocation_pools:
+        - start: 10.10.4.2
+          end: 10.10.4.254
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: network
+    - type: cloudify.openstack.subnet_connected_to_router
+      target: router
+
+  network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *openstack_config
+      resource_id: { get_input: network_id }
+
+  router:
+    type: cloudify.openstack.nodes.Router
+    properties:
+      openstack_config: *openstack_config
+      external_network: { get_input: external_network_name }
+
+  security_group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      openstack_config: *openstack_config
+      security_group:
+        description: generic security group
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 80
+
+  ip:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      openstack_config: *openstack_config
+      floatingip:
+        floating_network_name: { get_input: external_network_name }
+
+outputs:
+
+  application_endpoint:
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://', { get_attribute: [ ip, floating_ip_address ] }, ':80' ] }

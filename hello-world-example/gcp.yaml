@@ -1,0 +1,104 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-gcp-plugin
+  - install-script.yaml
+
+inputs:
+
+  region:
+    type: string
+    description: The GCP region to deploy the application in, such as europe-west1.
+
+  network_name:
+    type: string
+    description: The name of your GCP Virtual Network.
+    default: hellovnet
+
+  subnet_name:
+    type: string
+    description: The name of your GCP Virtual Network.
+    default: hellosubnet
+
+  image:
+    type: string
+    description: A Ubuntu Trusty 14.04 image.
+    default: https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1404-trusty-v20170517
+
+  instance_type:
+    type: string
+    description: A small GCP machine type.
+    default: n1-standard-1
+
+dsl_definitions:
+
+  client_config: &gcp_config
+    auth:
+      type: service_account
+      auth_uri: https://accounts.google.com/o/oauth2/auth
+      token_uri: https://accounts.google.com/o/oauth2/token
+      auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
+      client_x509_cert_url: { get_secret: gcp_client_x509_cert_url }
+      client_email: { get_secret: gcp_client_email }
+      client_id: { get_secret: gcp_client_id }
+      project_id: { get_secret: gcp_project_id }
+      private_key_id: { get_secret: gcp_private_key_id }
+      private_key: { get_secret: gcp_private_key }
+    project: { get_secret: gcp_project_id }
+    zone: { get_secret: gcp_zone }
+
+node_templates:
+
+  host:
+    type: cloudify.gcp.nodes.Instance
+    properties:
+      gcp_config: *gcp_config
+      agent_config:
+        install_method: none
+      image_id: { get_input: image }
+      instance_type: { get_input: instance_type }
+      zone: { get_secret: gcp_zone }
+      external_ip: true
+      startup_script:
+        type: string
+        script: { get_input: install_script }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: subnet
+
+  firewall:
+    type: cloudify.gcp.nodes.FirewallRule
+    properties:
+      gcp_config: *gcp_config
+      allowed:
+        tcp:
+          - 80
+      sources:
+        - 0.0.0.0/0
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: network
+
+  subnet:
+    type: cloudify.gcp.nodes.SubNetwork
+    properties:
+      name: { get_input: subnet_name }
+      region: { get_input: region }
+      subnet: 10.11.12.0/22
+      gcp_config: *gcp_config
+    relationships:
+    - type: cloudify.gcp.relationships.contained_in_network
+      target: network
+
+  network:
+    type: cloudify.gcp.nodes.Network
+    properties:
+      name: { get_input: network_name }
+      gcp_config: *gcp_config
+
+outputs:
+
+  application_endpoint:
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://', { get_attribute: [ host, networkInterfaces, 0, accessConfigs, 0, natIP ] }, ':80' ] }

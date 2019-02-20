@@ -10,23 +10,23 @@ inputs:
 
   username:
     description: OS_USERNAME as specified in Openstack RC file.
-    default: { get_secret: username }
+    default: { get_secret: openstack_username }
 
   password:
     description: Openstack user password.
-    default: { get_secret: password }
+    default: { get_secret: openstack_password }
 
   tenant_name:
     description: OS_TENANT_NAME as specified in Openstack RC file.
-    default: { get_secret: tenant_name }
+    default: { get_secret: openstack_tenant_name }
 
   auth_url:
     description: OS_AUTH_URL as specified in Openstack RC file.
-    default: { get_secret: auth_url }
+    default: { get_secret: openstack_auth_url }
 
   region:
     description: OS_REGION_NAME as specified in Openstack RC file.
-    default: { get_secret: region }
+    default: { get_secret: openstack_region }
 
   external_network_name:
     description: Openstack tenant external network name.

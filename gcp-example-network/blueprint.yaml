@@ -10,33 +10,33 @@ inputs:
 
   client_x509_cert_url:
     type: string
-    default: { get_secret: client_x509_cert_url }
+    default: { get_secret: gcp_client_x509_cert_url }
 
   client_email:
     type: string
-    default: { get_secret: client_email }
+    default: { get_secret: gcp_client_email }
 
   client_id:
     type: string
-    default: { get_secret: client_id }
+    default: { get_secret: gcp_client_id }
 
   project_id:
     type: string
-    default: { get_secret: project_id }
+    default: { get_secret: gcp_project_id }
 
   private_key_id:
     type: string
-    default: { get_secret: private_key_id }
+    default: { get_secret: gcp_private_key_id }
 
   private_key:
     type: string
-    default: { get_secret: private_key }
+    default: { get_secret: gcp_private_key }
 
   zone:
-    default: { get_secret: zone }
+    default: { get_secret: gcp_zone }
 
   region:
-    default: { get_secret: region }
+    default: { get_secret: gcp_region }
 
   subnet_cidr:
     default: 10.11.12.0/22

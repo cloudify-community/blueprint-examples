@@ -28,11 +28,10 @@ _Check the blueprint for the exact version of the plugin._
 
 If you do not provide your own `deployment inputs` below, you must add these secrets to your Cloudify Manager `tenant`:
 
-  * `username`
-  * `password`
-  * `tenant_name`
-  * `url`
-  * `region`, such as `RegionOne`.
-
+  * `openstack_username`
+  * `openstack_password`
+  * `openstack_tenant_name`
+  * `openstack_auth_url`
+  * `openstack_region`, such as `RegionOne`.
 
 Find the name of your Openstack Floating IP Network. You will need this value for the `external_network_name` input when you create your deployment.

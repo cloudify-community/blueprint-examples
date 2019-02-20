@@ -17,13 +17,13 @@ inputs:
     default: { get_secret: aws_secret_access_key }
 
   region_name:
-    default: { get_secret: region_name }
+    default: { get_secret: aws_region_name }
 
   ec2_region_endpoint:
     default: { get_secret: ec2_region_endpoint }
 
   availability_zone:
-    default: { get_secret: availability_zone }
+    default: { get_secret: aws_availability_zone }
 
   vpc_cidr:
     default: 10.11.0.0/16
