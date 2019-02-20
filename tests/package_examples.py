@@ -34,6 +34,7 @@ SUPPORTED_EXAMPLES = (
     ('azure-example-network', 'blueprint.yaml'),
     ('gcp-example-network', 'blueprint.yaml'),
     ('openstack-example-network', 'blueprint.yaml'),
+    ('hello-world-example', 'aws.yaml')
 )
 
 CURRENT_CLOUDIFY_GENERATION = '4.5.0'
@@ -43,6 +44,7 @@ Always try to use the latest package for your version of Cloudify."""
 
 
 class NewRelease(object):
+    """Handles Creating Releases and uploading artifacts."""
 
     def __init__(self):
         self.client = Github(environ['RELEASE_BUILD_TOKEN'])
@@ -105,10 +107,7 @@ class NewRelease(object):
 
 
 class BlueprintArchive(object):
-    """If you want to create zip:
-    bp = BlueprintPackage('hello_world', '~/Desktop/my_blueprint_folder')
-    bp.zip()
-    """
+    """Handles creating zip archives of blueprints."""
 
     def __init__(self, name, source_directory):
         self.name = name
@@ -131,10 +130,13 @@ class BlueprintArchive(object):
 
 
 if __name__ == "__main__":
+    """Create a new release in Github and
+    upload zip archives of all the blueprints.
+    """
 
     new_release = NewRelease()
 
-    for blueprint_id, blueprint_file_name in SUPPORTED_EXAMPLES:
+    for blueprint_id, _ in SUPPORTED_EXAMPLES:
         new_archive = BlueprintArchive(
             blueprint_id,
             path.join(CWD, blueprint_id)

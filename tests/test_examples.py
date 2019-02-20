@@ -18,6 +18,7 @@ from unittest import TestCase
 
 
 class TestExamples(TestCase):
+    """These tests cover blueprint validation."""
 
     @property
     def cwd(self):
@@ -57,3 +58,10 @@ class TestExamples(TestCase):
         blueprint_path = path.join(
             self.cwd, 'openstack-example-network', 'blueprint.yaml')
         self.assertTrue(self.upload_blueprint(blueprint_path))
+
+    def test_hello_world_example(self):
+        for blueprint_file_name in \
+                ['aws.yaml', 'azure.yaml', 'gcp.yaml', 'openstack.yaml']:
+            blueprint_path = path.join(
+                self.cwd, 'hello-world-example', blueprint_file_name)
+            self.assertTrue(self.upload_blueprint(blueprint_path))
