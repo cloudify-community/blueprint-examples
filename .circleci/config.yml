@@ -1,0 +1,89 @@
+version: 2
+
+checkout:
+  post:
+    - >
+      if [ -n "$CI_PULL_REQUEST" ]; then
+        PR_ID=${CI_PULL_REQUEST##*/}
+        git fetch origin +refs/pull/$PR_ID/merge:
+        git checkout -qf FETCH_HEAD
+      fi
+
+jobs:
+
+  blueprint-validation:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==4.5.5
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/4.5.5/ga-release/cloudify-docker-manager-4.5.5ga.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-4.5.5ga.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-4.5.5ga.tar
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host docker-cfy-manager:latest
+      - run:
+          name: init CLI profile
+          command: |
+            counter=0
+            until [ $counter -ge 10 ]
+            do
+                cfy profiles use localhost -u admin -p admin -t default_tenant && break
+                counter=$[$counter+1]
+                sleep 2
+            done
+      - run:
+          name: install plugins bundle
+          command: cfy plugins bundle-upload
+      - run:
+          name: execute test
+          command: nosetests -s tests/test_examples.py
+
+  blueprint-packaging:
+    docker:
+      - image: circleci/python:2.7.15-stretch
+    steps:
+      - checkout
+      - run:
+          name: Download pip
+          command: curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+      - run:
+          name: Install pip
+          command: sudo python get-pip.py
+      - run:
+          name: Install virtualenv
+          command: pip install --user virtualenv
+      - run:
+          name: Init virtualenv
+          command: virtualenv env
+      - run:
+          name: install tox
+          command: pip install --user pygithub
+      - run: python tests/package_examples.py
+
+workflows:
+  version: 2
+  tests:
+    jobs:
+      - blueprint-validation
+      - blueprint-packaging:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master

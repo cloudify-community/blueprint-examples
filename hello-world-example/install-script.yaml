@@ -1,0 +1,55 @@
+inputs:
+
+  install_script:
+    type: string
+    default: |
+      #!/bin/bash
+      apt-get update
+      apt-get install apache2 apache2-doc apache2-utils -y
+      service apache2 restart
+      a2dissite 000-default.conf
+      mkdir -p /var/www/example.com/{logs,public_html}
+      touch /var/www/example.com/logs/access.log /var/www/example.com/logs/error.log
+      cat <<EOF > /var/www/example.com/public_html/index.html
+      <html>
+          <header>
+              <title>Cloudify Hello World</title>
+          </header>
+          <style>
+          html, body {
+              height: 100%;
+          }
+
+          html {
+              display: table;
+              margin: auto;
+          }
+          body {
+            display: table-cell;
+            vertical-align: middle;
+            background-color: black;
+            text-align: center;
+          }
+          h1 {
+            color:white;
+          }
+          </style>
+      <body>
+          <h1>Hello, World!</h1>
+          <img src="image.png">
+      </body>
+      </html>
+      EOF
+      curl -o /var/www/example.com/public_html/image.png https://cloudify.co/wp-content/uploads/2018/01/cloudify_logo-wh-trans.png
+      cat <<EOF > /etc/apache2/sites-available/example.com.conf
+      <VirtualHost *:80>
+            ServerAdmin webmaster@example.com
+            ServerName example.com
+            ServerAlias www.example.com
+            DocumentRoot /var/www/example.com/public_html/
+            ErrorLog /var/www/example.com/logs/error.log
+            CustomLog /var/www/example.com/logs/access.log combined
+      </VirtualHost>
+      EOF
+      a2ensite example.com.conf
+      service apache2 restart
