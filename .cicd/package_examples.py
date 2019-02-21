@@ -20,6 +20,8 @@ import zipfile
 
 from github import Github
 
+from __init__ import SUPPORTED_EXAMPLES
+
 ASSET_TYPE = 'zip'
 CWD = '/{0}'.format(
     '/'.join(
@@ -27,14 +29,6 @@ CWD = '/{0}'.format(
             path.dirname(__file__)
         ).split('/')[1:-1]
     )
-)
-
-SUPPORTED_EXAMPLES = (
-    ('aws-example-network', 'blueprint.yaml'),
-    ('azure-example-network', 'blueprint.yaml'),
-    ('gcp-example-network', 'blueprint.yaml'),
-    ('openstack-example-network', 'blueprint.yaml'),
-    ('hello-world-example', 'aws.yaml')
 )
 
 CURRENT_CLOUDIFY_GENERATION = '4.5.0'

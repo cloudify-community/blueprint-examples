@@ -25,7 +25,7 @@ Navigate to the deployment and select `Uninstall`. When the uninstall workflow i
 
 # Contribution guide
 
-Do you have a blueprint that you have written and would like to share with Cloudify's user community? If so, follow these simple instructions:
+If you have a blueprint that you have written and would like to share with Cloudify's user community, follow these instructions:
 
 Contribution steps:
 
@@ -34,8 +34,15 @@ Contribution steps:
 1. [Add your blueprint](https://help.github.com/articles/adding-a-file-to-a-repository/) to the forked repository. Make sure that it has its own folder like all the other blueprints (e.g. the aws-example-network).
 1. [Create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/) from the branch in your forked repository to the master branch in this repository (cloudify-community/blueprint-examples).
 
-When you create your pull request, please give us the following information:
+When you create your pull request, include the following information:
 
-1. Include a README.md file in your blueprint folder that describes what the blueprint does, what prerequisites are needed, including steps to fulfill those prerequisites.
-1. Tell us who you are - are you a student, an enthusiast, or an employee at your company. Do you have permission to distribute this work?
-1. Please provide tests if there is complex logic in any of the scripts in the blueprint.
+1. Provide us with the appropriate contact info, so that other users from the community can contact you for support questions related to your contribution.
+1. Tell us who you are. Do you have permission to distribute this work?
+1. Include a README.md file in your blueprint folder that describes what the blueprint does, what prerequisites are needed, including instructions to fulfill those prerequisites.
+1. **With regards to testing**, these blueprints only need to pass regular DSL validation testing. However, in order to accept your PR, we will need to install your example blueprint and verify that the blueprint works as intended. Please include all necessary instructions and be prepared to answer additional questions.
+1. Please feel free to email us at community@cloudify.co for further information.
+
+# Support
+
+1. We will support all of the examples that we wrote, and will do our best to answer questions on all community examples. However, in some cases, we may ask you to directly contact the contributor of the example in question.
+1. Feel free to submit PRs to fix issues that you run into during deployment of any of the examples.

@@ -24,7 +24,7 @@ jobs:
           at: workspace
       - run:
           name: install cloudify
-          command: pip install -U cloudify==4.5.5
+          command: pip install -U cloudify==4.5.5 pytest
       - run:
           name: download manager docker image
           command: wget http://repository.cloudifysource.org/cloudify/4.5.5/ga-release/cloudify-docker-manager-4.5.5ga.tar
@@ -52,7 +52,7 @@ jobs:
           command: cfy plugins bundle-upload
       - run:
           name: execute test
-          command: nosetests -s tests/test_examples.py
+          command: pytest -s .cicd/test_examples.py
 
   blueprint-packaging:
     docker:
@@ -74,7 +74,7 @@ jobs:
       - run:
           name: install tox
           command: pip install --user pygithub
-      - run: python tests/package_examples.py
+      - run: python .cicd/package_examples.py
 
 workflows:
   version: 2
