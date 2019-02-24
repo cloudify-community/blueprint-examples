@@ -15,18 +15,13 @@
 
 from os import path, system
 import pytest
-from __init__ import SUPPORTED_EXAMPLES
+from __init__ import blueprint_list, get_cloudify_version, VersionsException
 
 
-CWD = '/{0}'.format(
-    '/'.join(path.abspath(path.dirname(__file__)).split('/')[1:-1],))
 UPLOAD_BLUEPRINT = 'cfy blueprints upload {0} -b {1}'
-params = ['{0}/{1}/{2}'.format(CWD, dirname, filename)
-          for dirname, filelist in SUPPORTED_EXAMPLES
-          for filename in filelist]
 
 
-@pytest.fixture(scope='function', params=params)
+@pytest.fixture(scope='function', params=blueprint_list)
 def validate_blueprint(request):
     blueprint_id = '{0}-{1}'.format(
         path.dirname(request.param).split('/')[-1:][0],
@@ -35,4 +30,16 @@ def validate_blueprint(request):
 
 
 def test_blueprints(validate_blueprint):
+    """All blueprints must pass DSL validation."""
     assert validate_blueprint == 0
+
+
+def test_versions():
+    """All blueprints in this branch should be the same Cloudify version.
+    """
+    try:
+        assert get_cloudify_version() is not None
+    except VersionsException as e:
+        pytest.fail(
+            "Failed to verify that branch "
+            "versions are the same: {0}.".format(str(e)))
