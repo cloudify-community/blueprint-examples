@@ -24,7 +24,7 @@ jobs:
           at: workspace
       - run:
           name: install cloudify
-          command: pip install -U cloudify==4.5.5 pytest
+          command: pip install -U cloudify==4.5.5 pytest pyyaml==3.10
       - run:
           name: download manager docker image
           command: wget http://repository.cloudifysource.org/cloudify/4.5.5/ga-release/cloudify-docker-manager-4.5.5ga.tar
@@ -73,7 +73,7 @@ jobs:
           command: virtualenv env
       - run:
           name: install tox
-          command: pip install --user pygithub
+          command: pip install --user pygithub pyyaml==3.10
       - run: python .cicd/package_examples.py
 
 workflows:
