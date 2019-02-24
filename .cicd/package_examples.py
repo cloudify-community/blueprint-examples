@@ -13,34 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from os import environ, path, walk, remove
 import shutil
+import sys
 from tempfile import NamedTemporaryFile
 import zipfile
 
 from github import Github
 
+from __init__ import CWD, SUPPORTED_EXAMPLES, blueprint_list, get_cloudify_version
+
 ASSET_TYPE = 'zip'
-CWD = '/{0}'.format(
-    '/'.join(
-        path.abspath(
-            path.dirname(__file__)
-        ).split('/')[1:-1]
-    )
-)
-
-SUPPORTED_EXAMPLES = (
-    ('aws-example-network', 'blueprint.yaml'),
-    ('azure-example-network', 'blueprint.yaml'),
-    ('gcp-example-network', 'blueprint.yaml'),
-    ('openstack-example-network', 'blueprint.yaml'),
-    ('hello-world-example', 'aws.yaml')
-)
-
-CURRENT_CLOUDIFY_GENERATION = '4.5.0'
 RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
 This is package number {1} to be released for this version of Cloudify.
 Always try to use the latest package for your version of Cloudify."""
+
+logging.basicConfig(level=logging.INFO)
 
 
 class NewRelease(object):
@@ -57,14 +46,29 @@ class NewRelease(object):
             )
         self.commit = self.repo.get_commit(environ['CIRCLE_SHA1'])
         self._version = None
-        self._release = self._create()
+
+        if self.create_new_release():
+            self._release = self._create()
+        else:
+            self._release = None
+
+    def create_new_release(self, create_new_release=False):
+        if create_new_release:
+            return True
+        for commit_file in self.commit.files:
+            if commit_file in blueprint_list:
+                return True
+        logging.info(
+            'No changes to blueprint files, not creating new release.')
+        return False
 
     @property
     def version(self):
         if not self._version:
+            blueprints_version = get_cloudify_version()
             version = self._get_last_version()
-            if CURRENT_CLOUDIFY_GENERATION > version:
-                version = CURRENT_CLOUDIFY_GENERATION
+            if blueprints_version > version:
+                version = blueprints_version
             try:
                 self._version = '{0}-{1}'.format(
                     version.split('-')[0],
@@ -96,7 +100,11 @@ class NewRelease(object):
             target_commitish=self.commit)
 
     def upload(self, asset_path, basename):
+        logging.info('Attempting upload new archive {0}:{1}.'.format(
+            asset_path, basename))
         asset_label = '{0}-{1}.{2}'.format(basename, self.version, ASSET_TYPE)
+        if not self.release:
+            return
         self.release.upload_asset(asset_path, asset_label)
 
     def _get_last_version(self):
@@ -134,9 +142,16 @@ if __name__ == "__main__":
     upload zip archives of all the blueprints.
     """
 
+    logging.info('Attempting to create new release.')
     new_release = NewRelease()
 
-    for blueprint_id, _ in SUPPORTED_EXAMPLES:
+    if not new_release.release:
+        logging.info('No new release to upload new archives to.')
+        sys.exit()
+
+    for blueprint_id, blueprint_data in SUPPORTED_EXAMPLES:
+        logging.info('Attempting to create new archive {0}:{1}.'.format(
+            blueprint_id, blueprint_data))
         new_archive = BlueprintArchive(
             blueprint_id,
             path.join(CWD, blueprint_id)
