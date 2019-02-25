@@ -10,13 +10,15 @@ The VNFs network is provisioned in a pre-step to the VNFs creation, so the netwo
 
 To connect each VNF to it's desired network connectivity, there is a need to connect to the running network deployment, this is achieved by using DeploymentProxy (which can be used by importing cloudify-utilities plugin). With that, the different network specifications can be set across the different VNFs, which is exposed via the DeploymentProxy node in the blueprints (also you can set in that node definition it will create the network if needed and create deployment chaining).
 
-## Pre-requisites
+## Prerequisites
 
 * Cloudify Manager 4.5.5
+
 * These plugins should exist on your manager. (E.g. You can just run `cfy plugins bundle-upload`, which will satisfy all plugin requirements.):
   * [cloudify-fabric-plugin](https://github.com/cloudify-cosmo/cloudify-fabric-plugin/releases), version 1.5.1 or higher.
   * [cloudify-openstack-plugin](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases), version 2.14.0 or higher.
   * [cloudify-utilities-plugin](https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases), version 1.12.0 or higher.
+
 * These secrets should exist on your manager:
   * `openstack_username`: Your Openstack username.
   * `openstack_password`: Your Openstack password.
@@ -24,21 +26,25 @@ To connect each VNF to it's desired network connectivity, there is a need to con
   * `openstack_auth_url`: The v2.0 or v3 authorization endpoint URL for your Openstack API service.
   * `agent_key_private`: The content of an RSA private key. (E.g. You can upload this key from a file: `cfy secrets create agent_key_private -f ~/.ssh/id_rsa`).
   * `agent_key_public`: The content of an RSA public key. (E.g. You can upload this key from a file: `cfy secrets create agent_key_private -f ~/.ssh/id_rsa.pub`).
+
 * You should also have the following information handy:
   * The ID of an Openstack image that has HAProxy installed on it.
   * The ID of an Openstack image that has httpd installed on it.
   * The ID of an Openstack image that has pfSense installed on it.
   * The ID of an Openstack flavors that satisfy the performance needs of these software components.
+
 * Import the same content as `agent_key_public` to a new Keypair in Openstack named `agent_key_public`.
 
 ## Installation
 
-After you have satisfied all of the pre-requisities (uploaded plugins, created secrets, gathered inputs), initiate the following steps:
+After you have satisfied all of the prerequisites (uploaded plugins, created secrets, gathered inputs), initiate the following steps:
 
 1. Upload to the Cloudify manager all the required blueprints:
-    * `common/openstack.yaml` as `connected-host-openstack`.
-    * `httpd/openstack.yaml` as `httpd`.
-    * `haproxy/openstack.yaml` as `haproxy`.
-    * `pfsense/openstack.yaml` as `pfsense`.
-    * `service/service-chaining.yaml` as `open-source-vnf`.
-1. Create a deployment with the `open-source-vnf` blueprint with the relevant inputs.
+    * `connected-host/openstack.yaml` as `connected-host-openstack`.
+    * `network-topology/openstack.yaml` as `network-topology-openstack`.
+    * `httpd/openstack.yaml` as `httpd-openstack`.
+    * `haproxy/openstack.yaml` as `haproxy-openstack`.
+    * `pfsense/openstack.yaml` as `pfsense-openstack`.
+    * `service/service-chaining.yaml` as `service-chaining`.
+
+1. Create a deployment with the `service-chaining` blueprint with the relevant inputs.
