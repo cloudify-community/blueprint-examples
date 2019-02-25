@@ -13,41 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from collections import OrderedDict
+from json import load as load_json
 from os import path
+from urlparse import urlparse
 from yaml import load as yaml_load, YAMLError
 
 CWD = '/{0}'.format(
     '/'.join(path.abspath(path.dirname(__file__)).split('/')[1:-1],))
+SUPPORTED_EXAMPLES_FILE = path.join(CWD, '.cicd/supported_examples.json')
+
+
+def get_supported_examples():
+    with open(SUPPORTED_EXAMPLES_FILE, 'r') as outfile:
+        return load_json(outfile, object_pairs_hook=OrderedDict)
+
 
 # This structure tells us which files to support.
-SUPPORTED_EXAMPLES = (
-    ('aws-example-network',
-        ['blueprint.yaml']),
-    ('azure-example-network',
-        ['blueprint.yaml']),
-    ('gcp-example-network',
-        ['blueprint.yaml']),
-    ('openstack-example-network',
-        ['blueprint.yaml']),
-    ('hello-world-example',
-        ['aws.yaml', 'azure.yaml', 'gcp.yaml', 'openstack.yaml']),
-    ('open-source-vnf/connected_host',
-        ['openstack.yaml']),
-    ('open-source-vnf/network_topology',
-        ['openstack.yaml']),
-    ('open-source-vnf/httpd',
-        ['openstack.yaml']),
-    ('open-source-vnf/haproxy',
-        ['openstack.yaml']),
-    ('open-source-vnf/pfsense',
-        ['openstack.yaml']),
-    ('open-source-vnf/service',
-        ['service-chaining.yaml']),
-)
+SUPPORTED_EXAMPLES = get_supported_examples()
 
 # Let's make a list of supported blueprint files.
 blueprint_list = ['{0}/{1}/{2}'.format(CWD, dirname, filename)
-                  for dirname, filelist in SUPPORTED_EXAMPLES
+                  for dirname, filelist in SUPPORTED_EXAMPLES.items()
                   for filename in filelist]
 
 
@@ -62,19 +49,27 @@ def get_cloudify_version():
     """
 
     cloudify_version = None
+    # Loop through each blueprint file.
     for blueprint_file in blueprint_list:
+        # Load the blueprint YAML as a dictionary.
         with open(blueprint_file, 'r') as stream:
             try:
                 blueprint_yaml = yaml_load(stream)
-                next_version = \
-                    blueprint_yaml['imports'][0].split('/')[-2:-1][0]
-                if cloudify_version and next_version != cloudify_version:
-                    raise VersionsException(
-                        'Cloudify version mismatch: {0}/{1} from {2}'.format(
-                            cloudify_version, next_version, blueprint_file))
-                cloudify_version = next_version
-            except (YAMLError, IndexError, KeyError) as e:
+            except YAMLError as e:
                 raise VersionsException(
                     'Problem with the file: {0}...{1}'.format(
                         blueprint_file, str(e)))
+
+        # Loop through the imports
+        for blueprint_import in blueprint_yaml['imports']:
+            import_url = urlparse(blueprint_import)
+            if import_url.netloc != 'cloudify.co':
+                # It's not a cloudify.co import.
+                continue
+            next_version = import_url.path.split('/')[-2:-1]
+            if cloudify_version and next_version != cloudify_version:
+                raise VersionsException(
+                    'Cloudify version mismatch: {0}/{1} from {2}'.format(
+                        cloudify_version, next_version, blueprint_file))
+            cloudify_version = next_version
     return cloudify_version
