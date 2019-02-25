@@ -48,3 +48,18 @@ After you have satisfied all of the prerequisites (uploaded plugins, created sec
     * `service/service-chaining.yaml` as `service-chaining`.
 
 1. Create a deployment with the `service-chaining` blueprint with the relevant inputs.
+
+1. Collect the following details:
+    * `host_string` of the HAProxy host.
+    * `user` of the HAProxy host, if it is different from the default of `centos`.
+    * `rest_endpoint` of the pfSense host.
+    * `api_key` of the pfSense host.
+    * `api_secret` of the pfSense host.
+
+1. Install the HAProxy service configuration.
+    1. Upload `haproxy/application.yaml` as `haproxy-app`.
+    1. Create deployment with `haproxy-app` and inputs `host_string` and `user`.
+
+1. Install the pfSense service configuration.
+    1. Upload `pfsense/application.yaml` as `pfsense-app`.
+    1. Create deployment with `pfsense-app` and inputs `rest_endpoint` and `api_key` and `api_secret`.
