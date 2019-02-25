@@ -1,0 +1,53 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint contains a special type for an Openstack host that is used by other blueprints in this opensource VNF series.
+  This blueprint is uploaded to the Cloudify Manager and then imported using the blueprint catalog namespace.
+  For more information on this feature, see: https://docs.cloudify.co/4.5.5/developer/blueprints/spec-imports/#importing-catalog-blueprints.
+
+dsl_definitions:
+
+  openstack_config: &openstack_config
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    tenant_name: { get_secret: openstack_tenant_name }
+    auth_url: { get_secret: openstack_auth_url }
+    region: { get_input: region }
+
+imports:
+
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+
+inputs:
+
+  image:
+    description: An OpenStack Image ID.
+    type: string
+
+  flavor:
+    description: An OpenStack Flavor ID.
+
+  private_key_name:
+    description: Private key pair name on OpenStack.
+    default: agent_key_public
+
+  region:
+    type: string
+    default: ''
+
+node_types:
+
+  host:
+    derived_from: cloudify.openstack.nodes.Server
+    properties:
+      openstack_config:
+        default: *openstack_config
+      agent_config:
+        default:
+          install_method: none
+      server:
+        default:
+          key_name: { get_input: private_key_name }
+          image: { get_input: image }
+          flavor: { get_input: flavor }

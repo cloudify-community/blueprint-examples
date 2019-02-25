@@ -1,0 +1,12 @@
+haproxy--haproxy--flavor: 3
+haproxy--haproxy--image_name: e3c0cb01-7227-43c7-8a35-dfeef94248fb
+haproxy--haproxy--private_key_name: <your private key name>
+haproxy--network_deployment_name: <Deployment name of the network infrstructure>
+httpd--httpd--flavor: 2
+httpd--httpd--image_name: 70de1e0f-2951-4eae-9a8f-05afd97cd036
+httpd--httpd--private_key_name: <your private key name>
+httpd--network_deployment_name: <Deployment name of the network infrstructure>
+pfsense--pfsense--flavor: 2
+pfsense--pfsense--image_name: c7b633df-35c5-4446-aedb-576a8f75ba68
+pfsense--pfsense--private_key_name: <Path to the private key in the Cloudify manager>
+pfsense--network_deployment_name: <Deployment name of the network infrstructure>

@@ -21,12 +21,28 @@ CWD = '/{0}'.format(
 
 # This structure tells us which files to support.
 SUPPORTED_EXAMPLES = (
-    ('aws-example-network', ['blueprint.yaml']),
-    ('azure-example-network', ['blueprint.yaml']),
-    ('gcp-example-network', ['blueprint.yaml']),
-    ('openstack-example-network', ['blueprint.yaml']),
+    ('aws-example-network',
+        ['blueprint.yaml']),
+    ('azure-example-network',
+        ['blueprint.yaml']),
+    ('gcp-example-network',
+        ['blueprint.yaml']),
+    ('openstack-example-network',
+        ['blueprint.yaml']),
     ('hello-world-example',
-        ['aws.yaml', 'azure.yaml', 'gcp.yaml', 'openstack.yaml'])
+        ['aws.yaml', 'azure.yaml', 'gcp.yaml', 'openstack.yaml']),
+    ('open-source-vnf/connected_host',
+        ['openstack.yaml']),
+    ('open-source-vnf/network_topology',
+        ['openstack.yaml']),
+    ('open-source-vnf/httpd',
+        ['openstack.yaml']),
+    ('open-source-vnf/haproxy',
+        ['openstack.yaml']),
+    ('open-source-vnf/pfsense',
+        ['openstack.yaml']),
+    ('open-source-vnf/service',
+        ['service-chaining.yaml']),
 )
 
 # Let's make a list of supported blueprint files.

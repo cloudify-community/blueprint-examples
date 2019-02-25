@@ -1,0 +1,89 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint installs an Openstack host. It requires the Openstack network topology and Openstack common host.
+  Upload the blueprint in common/openstack.yaml and give it the blueprint ID connected_host.
+  Install the blueprint in network_topology/openstack.yaml.
+  Provide the name of that deployment in the network deployment name below.
+
+dsl_definitions:
+
+  openstack_config: &openstack_config
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    tenant_name: { get_secret: openstack_tenant_name }
+    auth_url: { get_secret: openstack_auth_url }
+    region: { get_input: region }
+
+imports:
+
+  - pfsense--blueprint:connected-host-openstack
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  network_deployment_name:
+    description: deployment name of the VNF network
+
+  region:
+    type: string
+    default: ''
+
+node_templates:
+
+  pfsense:
+    type: pfsense--host
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: mgmt_network
+      - type: cloudify.relationships.connected_to
+        target: private_network
+      - type: cloudify.relationships.connected_to
+        target: public_network
+
+  private_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *openstack_config
+      use_external_resource: true
+      resource_id: { get_attribute: [ openstack, deployment, outputs, private_network ] }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: openstack
+
+  mgmt_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *openstack_config
+      use_external_resource: true
+      resource_id: { get_attribute: [ openstack, deployment, outputs, mgmt_network ] }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: openstack
+
+  public_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *openstack_config
+      use_external_resource: true
+      resource_id: { get_attribute: [ openstack, deployment, outputs, public_network ] }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: openstack
+
+  openstack:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: network_deployment_name }
+          external_resource: true
+        deployment:
+          id: { get_input: network_deployment_name }
+          outputs:
+            external_network: external_network
+            public_network: public_network
+            mgmt_network: mgmt_network
+            private_network: private_network
+          external_resource: true
+        reexecute: false

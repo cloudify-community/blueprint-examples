@@ -1,0 +1,12 @@
+rest_calls:
+  - path: /fauxapi/v1/?action=config_patch
+    method: POST
+    headers:
+      Content-type: application/json
+      fauxapi-auth: '{{ fauxapi_auth }}'
+    raw_payload: resources/config.json
+    payload_format: raw
+    response_format: json
+    recoverable_codes: [400]
+    response_expectation:
+      - ['message', 'ok']
