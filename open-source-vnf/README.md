@@ -45,7 +45,7 @@ After you have satisfied all of the prerequisites (uploaded plugins, created sec
     * `httpd/openstack.yaml` as `httpd-openstack`.
     * `haproxy/openstack.yaml` as `haproxy-openstack`.
     * `pfsense/openstack.yaml` as `pfsense-openstack`.
-    * `service/service-chaining.yaml` as `service-chaining`.
+    * `service/openstack.yaml` as `service-openstack`.
 
 1. Create a deployment with the `service-chaining` blueprint with the relevant inputs.
 

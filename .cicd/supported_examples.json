@@ -14,5 +14,5 @@
   "open-source-vnf/httpd": ["openstack.yaml"],
   "open-source-vnf/haproxy": ["openstack.yaml"],
   "open-source-vnf/pfsense": ["openstack.yaml"],
-  "open-source-vnf/service": ["service-chaining.yaml"]
+  "open-source-vnf/service": ["openstack.yaml"]
 }
