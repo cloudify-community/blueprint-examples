@@ -1,0 +1,18 @@
+{
+  "aws-example-network": ["blueprint.yaml"],
+  "azure-example-network": ["blueprint.yaml"],
+  "gcp-example-network": ["blueprint.yaml"],
+  "openstack-example-network": ["blueprint.yaml"],
+  "hello-world-example": [
+    "aws.yaml",
+    "azure.yaml",
+    "gcp.yaml",
+    "openstack.yaml"
+  ],
+  "open-source-vnf/connected-host": ["openstack.yaml"],
+  "open-source-vnf/network-topology": ["openstack.yaml"],
+  "open-source-vnf/httpd": ["openstack.yaml"],
+  "open-source-vnf/haproxy": ["openstack.yaml"],
+  "open-source-vnf/pfsense": ["openstack.yaml"],
+  "open-source-vnf/service": ["openstack.yaml"]
+}

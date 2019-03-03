@@ -149,7 +149,7 @@ if __name__ == "__main__":
         logging.info('No new release to upload new archives to.')
         sys.exit()
 
-    for blueprint_id, blueprint_data in SUPPORTED_EXAMPLES:
+    for blueprint_id, blueprint_data in SUPPORTED_EXAMPLES.items():
         logging.info('Attempting to create new archive {0}:{1}.'.format(
             blueprint_id, blueprint_data))
         new_archive = BlueprintArchive(

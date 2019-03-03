@@ -1,0 +1,6 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - haproxy--blueprint:haproxy-openstack
+  - pfsense--blueprint:pfsense-openstack
+  - httpd--blueprint:httpd-openstack

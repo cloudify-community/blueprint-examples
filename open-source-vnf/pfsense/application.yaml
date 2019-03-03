@@ -1,0 +1,48 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This Blueprint configures an existing pfSense instance.
+  Users need to provide a config file (json with the values to update)
+  and make sure it's here: resources/config.json.
+  FauxAPI is a REST API interface for pfSense (https://github.com/ndejong/pfsense_fauxapi)
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint of the pfSense instance
+
+  api_key:
+    description: >
+      The api key for the REST service
+
+  api_secret:
+    description: >
+      The api secret for the REST service
+
+node_templates:
+
+  config_patch:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/create_faux_auth_token.sh
+          inputs:
+            api_key: { get_input: api_key }
+            api_secret: { get_input: api_secret }
+          executor: central_deployment_agent
+        start:
+          inputs:
+            template_file: templates/config_patch_template.yaml
+            params:
+              fauxapi_auth: { get_attribute: [config_patch, fauxapi_auth] }
