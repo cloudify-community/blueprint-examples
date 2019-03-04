@@ -1,0 +1,4 @@
+delete ltm virtual sg-virtual
+delete ltm pool sg-pool
+delete ltm node app-node-1
+quit
