@@ -1,0 +1,17 @@
+config system global
+    set hostname "fortigate-vm"
+end
+config system interface
+    edit "port1"
+        set mode dhcp
+        set alias "mgmt"
+    next
+    edit "port2"
+        set mode dhcp
+        set alias "wan"
+    next
+    edit "port3"
+        set mode dhcp
+        set alias "lan"
+    next
+end

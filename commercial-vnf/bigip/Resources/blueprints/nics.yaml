@@ -1,0 +1,151 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Create 3 NICs from mgmt, wan and public subnets.
+
+imports:
+  - existing_networks.yaml
+
+dsl_definitions:
+
+  client_config: &client_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+
+node_templates:
+
+  # Management NIC
+  mgmt_nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_mgmt_n', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      primary: true
+    relationships:
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: mgmt_ip_configuration
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: network_security_group
+
+  mgmt_ip_configuration:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_mgmt_ic', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: mgmt_subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: mgmt_ip_address
+
+  mgmt_ip_address:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      azure_config:  *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_mgmt_ia', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        publicIPAllocationMethod: Static
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  # Public NIC
+  public_nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_public_n', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      primary: false
+    relationships:
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: public_ip_configuration
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: network_security_group
+
+  public_ip_configuration:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_public_ic', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: public_subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: public_ip_address
+
+  public_ip_address:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      azure_config:  *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_public_ia', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        publicIPAllocationMethod: Static
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  # WAN NIC
+  wan_nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_wan_n', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      primary: false
+    relationships:
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: wan_ip_configuration
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: network_security_group
+
+  wan_ip_configuration:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      use_external_resource: false
+      name: { concat: [ { get_input: resource_prefix }, 'bigip_wan_ic', { get_input: resource_suffix } ] }
+      location: { get_secret: azure_location }
+      retry_after: { get_input: retry_after }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: wan_subnet
