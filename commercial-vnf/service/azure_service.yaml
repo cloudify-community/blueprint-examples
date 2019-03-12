@@ -22,7 +22,7 @@ inputs:
 
   lb_public_port:
     description: >
-      Load balancer public network port on which service is exposed 
+      Load balancer public network port on which service is exposed
     type: integer
     default: 8080
 
@@ -88,7 +88,7 @@ node_templates:
           inputs:
             terminal_auth: *terminal_auth
             calls:
-              - template: Resources/templates/ltm_config.txt
+              - template: Resources/templates/azure/ltm_config.txt
                 params:
                   APP_NODE_1_IP: { get_capability: [ {get_input: fg_prov_deployment_name}, wan_ip ] }
                   APP_NODE_1_PORT: { get_input: wan_port }
@@ -98,7 +98,7 @@ node_templates:
           inputs:
             terminal_auth: *terminal_auth
             calls:
-              - template: Resources/templates/ltm_config_stop.txt
+              - template: Resources/templates/azure/ltm_config_stop.txt
     relationships:
       - type: cloudify.relationships.depends_on
         target: fg_port_forwarding

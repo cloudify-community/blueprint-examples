@@ -28,7 +28,8 @@ inputs:
 
   resource_prefix:
     description: Prefix of every resource created at this deployment on Azure.
-    default: cfy
+    # default: cfy
+    default: jaroslaw
 
   resource_suffix:
     description: Suffix of every resource created at this deployment on Azure.
@@ -118,6 +119,38 @@ node_templates:
                 - { get_secret: httpd_username }
             content: { get_secret: httpd_website }
 
+  keypair:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        public_key_path:
+          concat:
+            - "/etc/cloudify/.ssh/"
+            - { get_input: resource_prefix }
+            - "_httpd_keypair"
+            - { get_input: resource_suffix }
+            - ".pub"
+        private_key_path:
+          concat:
+            - "/etc/cloudify/.ssh/"
+            - { get_input: resource_prefix }
+            - "_httpd_keypair"
+            - { get_input: resource_suffix }
+            - ".pem"
+        openssh_format: true
+      use_secret_store: false
+      key_name:
+        concat:
+          - { get_input: resource_prefix }
+          - "_httpd_keypair"
+          - { get_input: resource_suffix }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
   vm:
     type: cloudify.azure.nodes.compute.VirtualMachine
     properties:
@@ -134,7 +167,16 @@ node_templates:
           customData: { get_attribute: [ cloud_config, cloud_config ] }
           computerName: { get_property: [SELF, name] }
           adminUsername: { get_secret: httpd_username }
-          adminPassword: { get_secret: httpd_password }
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+                - path:
+                    concat:
+                      - "/home/"
+                      - { get_secret: httpd_username }
+                      - "/.ssh/authorized_keys"
+                  keyData: { get_attribute: [ keypair, public_key_export ] }
+            disablePasswordAuthentication: True
       agent_config:
         install_method: none
       azure_config: *azure_config
@@ -149,6 +191,8 @@ node_templates:
         target: mgmt_nic
       - type: cloudify.relationships.depends_on
         target: cloud_config
+      - type: cloudify.relationships.depends_on
+        target: keypair
 
 # mgmt
   mgmt_security_group:
@@ -294,3 +338,5 @@ capabilities:
     value: { get_attribute: [vm, public_ip] }
   lan_ip:
     value: { get_attribute: [lan_nic, ip] }
+  private_key_content:
+    value: { get_attribute: [keypair, private_key_export] }
