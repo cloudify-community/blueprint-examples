@@ -1,0 +1,1 @@
+sh -c '/config/check_mcpd_status.sh'

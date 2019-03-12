@@ -1,0 +1,110 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Creates port forwading on Fortigate and load balancing rule on BIG-IP LTM to allow traffic forwarding
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+  f5_prov_deployment_name:
+    description: Name of BIG IP Provisioning deployment, used to get managemnt and Public IPs from BIG IP
+    default: VNFM-F5-Prov-Openstack-vm
+
+  fg_prov_deployment_name:
+    description:
+    default: VNFM-Fortigate-Prov-Openstack-vm
+
+  httpd_prov_deployment_name:
+    description: Name of HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP
+    default: VNFM-HTTPD-Prov-Openstack-vm
+
+  lb_public_port:
+    description: >
+      Load balancer public network port on which service is exposed
+    type: integer
+    default: 8080
+
+  wan_port:
+    type: string
+    description: >
+      Port on which service is going to be exposed
+    default: '8080'
+
+dsl_definitions:
+
+  terminal_auth: &terminal_auth
+    user: root
+    password: default
+    ip: { get_capability: [ {get_input: f5_prov_deployment_name}, mgmt_public_ip ] }
+    promt_check:
+      - '#'
+      - '$'
+    errors:
+      - "Command fail."
+
+node_templates:
+
+  # Fortigate port forwarding from HTTPD LAN IP to Fortigate WAN IP
+  fg_port_forwarding:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &fg_terminal_auth
+              user: admin
+              password: ''
+              ip: { get_capability: [ { get_input: fg_prov_deployment_name }, vm_public_ip_address] }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: exit
+        start:
+          inputs:
+            terminal_auth: *fg_terminal_auth
+            calls:
+              - template: Resources/templates/fortigate-portforward-start.txt
+                params:
+                  PORTFORWARD_IP: { get_capability: [ { get_input: httpd_prov_deployment_name }, lan_ip] }
+                  PORTFORWARD_PORT: { get_input: wan_port }
+                  EXTERNAL_IP: { get_capability: [ { get_input: fg_prov_deployment_name }, wan_ip] }
+        stop:
+          inputs:
+            terminal_auth: *fg_terminal_auth
+            calls:
+              - template: Resources/templates/fortigate-portforward-stop.txt
+
+  # BIG IP load balancing rule from Fortigate WAN interface to BIG IP Public interface
+  ltm_config:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/ltm_config.txt
+                params:
+                  APP_NODE_1_IP: { get_capability: [ {get_input: fg_prov_deployment_name}, wan_ip ] }
+                  APP_NODE_1_PORT: { get_input: wan_port }
+                  DESTINATION_IP: { get_capability: [ {get_input: f5_prov_deployment_name}, public_ip ] }
+                  DESTINATION_PORT: { get_input: lb_public_port }
+        stop:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/ltm_config_stop.txt
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: fg_port_forwarding
+
+
+outputs:
+  web_server:
+    description: Web server endpoint exposed on BIG IP Public interface
+    value: { concat: [ { get_capability: [ {get_input: f5_prov_deployment_name}, public_public_ip ] }, ':', {get_input: lb_public_port} ] }

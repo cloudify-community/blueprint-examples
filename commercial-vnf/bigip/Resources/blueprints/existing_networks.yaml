@@ -23,7 +23,8 @@ inputs:
 
   resource_prefix:
     description: Prefix of every resource created at this deployment on Azure.
-    default: cfy
+    default: jaroslaw
+    # default: cfy
 
   resource_suffix:
     description: Suffix of every resource created at this deployment on Azure.

@@ -1,0 +1,2 @@
+tmsh revoke /sys license
+tmsh quit

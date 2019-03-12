@@ -1,0 +1,198 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  resource_prefix:
+    description: Prefix of every resource created at this deployment on Openstack.
+    default: cfy
+
+  resource_suffix:
+    description: Suffix of every resource created at this deployment on Openstack.
+    default: 0
+
+  openstack_network_deployment_name:
+    type: string
+    default: VNFM-Networking-Prov-Openstack-networks
+
+  flavor_id:
+    type: string
+    default: 3
+
+  image_id:
+    type: string
+    default: 84c8bc76-af89-4005-b068-b6f5b4550e23
+
+  vnf_vm_name:
+    type: string
+    default: fortigate
+
+  fortigate_license_filename:
+    type: string
+    description: Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension.
+    default: FGVM02TM19000054.lic
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    username: { get_secret: keystone_username }
+    password: { get_secret: keystone_password }
+    tenant_name: { get_secret: keystone_tenant_name }
+    auth_url: { get_secret: keystone_url }
+    region: { get_secret: keystone_region }
+
+node_templates:
+
+  mgmt_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
+
+  wan_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, wan_network] }
+
+  lan_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, lan_network] }
+
+  network_security_group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      openstack_config: *client_config
+      use_external_resource: true
+      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, network_security_group] }
+
+  mgmt_floating_ip_address:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      openstack_config: *client_config
+      use_external_resource: false
+      floatingip:
+        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+
+  mgmt_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *client_config
+      port:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_fg_mgmt_port"
+            - { get_input: resource_suffix }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: mgmt_network
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: network_security_group
+    - type: cloudify.openstack.port_connected_to_floating_ip
+      target: mgmt_floating_ip_address
+
+  wan_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *client_config
+      port:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_fg_wan_port"
+            - { get_input: resource_suffix }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: wan_network
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: network_security_group
+
+  lan_port:
+    type: cloudify.openstack.nodes.Port
+    properties:
+      openstack_config: *client_config
+      port:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_fg_lan_port"
+            - { get_input: resource_suffix }
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: lan_network
+    - type: cloudify.openstack.port_connected_to_security_group
+      target: network_security_group
+
+  image:
+    type: cloudify.openstack.nodes.Image
+    properties:
+      image:
+        container_format: "bare"
+        disk_format: "qcow2"
+      openstack_config: *client_config
+      use_external_resource: True
+      create_if_missing: False
+      resource_id: { get_input: image_id }
+
+  # Cloud config for fortigate, responsible for license file upload which is being applied at installation
+  cloud_config:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        write_files:
+          - path: { get_input: fortigate_license_filename }
+            owner: root:root
+            permissions: '0444'
+            content: { get_secret: fortigate_license }
+
+  vm:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      openstack_config: *client_config
+      agent_config:
+        install_method: none
+      management_network_name: { get_attribute: [ mgmt_network, external_name ] }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            args:
+              name:
+                concat:
+                  - { get_input: resource_prefix }
+                  - "_fg_vm"
+                  - { get_input: resource_suffix }
+              image: { get_property: [ image, resource_id ] }
+              flavor: { get_input: flavor_id }
+              userdata: { get_attribute: [ cloud_config, cloud_config ] }
+    relationships:
+    - type: cloudify.openstack.server_connected_to_port
+      target: mgmt_port
+    - type: cloudify.openstack.server_connected_to_port
+      target: wan_port
+    - type: cloudify.openstack.server_connected_to_port
+      target: lan_port
+    - type: cloudify.relationships.depends_on
+      target: image
+    - type: cloudify.relationships.depends_on
+      target: cloud_config
+
+capabilities:
+
+  vm_public_ip_address:
+    value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address] }
+  wan_ip:
+    value: { get_attribute: [wan_port, fixed_ip_address] }
+  lan_ip:
+    value: { get_attribute: [lan_port, fixed_ip_address] }

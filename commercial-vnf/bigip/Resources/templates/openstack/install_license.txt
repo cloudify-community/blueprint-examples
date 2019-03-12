@@ -1,0 +1,2 @@
+tmsh install /sys license registration-key {{REG_KEY}}
+tmsh quit
