@@ -1,0 +1,351 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-azure-plugin
+  - plugin:cloudify-fabric-plugin
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-kubernetes-plugin
+  - includes/cloud-init.yaml
+  - includes/application.yaml
+  - includes/kube-config.yaml
+
+inputs:
+
+  subscription_id:
+    type: string
+    default: { get_secret: azure_subscription_id }
+
+  tenant_id:
+    type: string
+    default: { get_secret: azure_tenant_id }
+
+  client_id:
+    type: string
+    default: { get_secret: azure_client_id }
+
+  client_secret:
+    type: string
+    default: { get_secret: azure_client_secret }
+
+  location:
+    type: string
+    description: Your Azure Region.
+
+  image:
+    default:
+      publisher: OpenLogic
+      offer: CentOS
+      sku: '7-CI'
+      version: latest
+
+  size:
+    default: Standard_A3
+
+  resource_prefix:
+    default: kube_
+
+  resource_suffix:
+    default: '0'
+
+  agent_user:
+    description: The user name of the agent on the instance created from the image.
+    default: centos
+
+  public_subnet_cidr:
+    type: string
+    default: 10.10.0.0/24
+
+dsl_definitions:
+
+  azure_config: &client_config
+    subscription_id: { get_input: subscription_id }
+    tenant_id: { get_input: tenant_id }
+    client_id: { get_input: client_id }
+    client_secret: { get_input: client_secret }
+    endpoints_active_directory: https://login.microsoftonline.com
+    endpoints_resource_manager: https://management.azure.com
+    endpoint_resource: https://management.core.windows.net/
+    endpoint_verify: true
+    scale_name_separator: "_"
+    scale_name_suffix_chars: "1234567890"
+    certificate: ""
+    thumbprint: ""
+
+node_types:
+
+  k8s-cluster: &k8s-cluster
+    derived_from: cloudify.azure.nodes.compute.VirtualMachine
+    properties:
+      azure_config:
+        default: *client_config
+      agent_config:
+        default:
+          install_method: none
+          key: { get_secret: agent_key_private }
+          user: { get_input: agent_user }
+      use_public_ip:
+        default: true
+      os_family:
+        default: linux
+      retry_after:
+        default: 60
+      location:
+        default: { get_input: location }
+      storage_endpoint:
+        default: core.windows.net
+
+  kube-master: *k8s-cluster
+
+  kube-node: *k8s-cluster
+
+node_templates:
+
+  resource-group:
+    type: cloudify.azure.nodes.ResourceGroup
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+
+  network:
+    type: cloudify.azure.nodes.network.VirtualNetwork
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  security-group:
+    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        securityRules:
+          - name: tcp_access
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 0-65535
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 100
+              access: Allow
+              direction: Inbound
+          - name: udp_access
+            properties:
+              description: UDP access
+              protocol: Udp
+              sourcePortRange: '*'
+              destinationPortRange: 0-65535
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 200
+              access: Allow
+              direction: Inbound
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  availability-set:
+    type: cloudify.azure.nodes.compute.AvailabilitySet
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  storage-account:
+    type: cloudify.azure.nodes.storage.StorageAccount
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        accountType: Standard_LRS
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  public-subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        addressPrefix: { get_input: public_subnet_cidr }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_virtual_network
+        target: network
+
+  kube-node-ip:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        publicIPAllocationMethod: Static
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  kube-node-ip-config:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: public-subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: kube-node-ip
+
+  kube-node-nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: security-group
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: kube-node-ip-config
+
+  kube-node:
+    type: kube-node
+    properties:
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: size }
+        storageProfile:
+          imageReference: { get_input: image }
+        osProfile:
+          customData:  { get_attribute: [ cloudify-host-cloud-config, cloud_config ] }
+          adminUsername: { get_input: agent_user }
+          adminPassword: ''
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+              - keydata: { get_secret: agent_key_public }
+                path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
+            disablePasswordAuthentication: true
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.connected_to_storage_account
+        target: storage-account
+      - type: cloudify.azure.relationships.connected_to_availability_set
+        target: availability-set
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: kube-node-nic
+      - type: cloudify.relationships.depends_on
+        target: cloudify-host-cloud-config
+
+  kube-master-ip:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        publicIPAllocationMethod: Static
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+
+  kube-master-ip-config:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: public-subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: kube-master-ip
+
+  kube-master-nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      location: { get_input: location }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: security-group
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: kube-master-ip-config
+
+  kube-master:
+    type: kube-master
+    properties:
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: size }
+        storageProfile:
+          imageReference: { get_input: image }
+        osProfile:
+          customData:  { get_attribute: [ cloudify-host-cloud-config, cloud_config ] }
+          adminUsername: { get_input: agent_user }
+          adminPassword: ''
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+              - keydata: { get_secret: agent_key_public }
+                path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
+            disablePasswordAuthentication: true
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource-group
+      - type: cloudify.azure.relationships.connected_to_storage_account
+        target: storage-account
+      - type: cloudify.azure.relationships.connected_to_availability_set
+        target: availability-set
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: kube-master-nic
+      - type: cloudify.relationships.depends_on
+        target: cloudify-host-cloud-config
+
+groups:
+
+  kube-master-group:
+    members:
+    - kube-config
+    - kube-master
+    - kube-master-nic
+    - kube-master-ip
+    - kube-master-ip-config
+
+  kube-node-group:
+    members:
+    - kube-node
+    - kube-node-nic
+    - kube-node-ip
+    - kube-node-ip-config
+
+policies:
+
+  kube-master-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-master-group]
+
+  kube-node-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-node-group]

@@ -1,0 +1,417 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-aws-plugin
+  - plugin:cloudify-fabric-plugin
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-kubernetes-plugin
+  - includes/cloud-init.yaml
+  - includes/application.yaml
+  - includes/kube-config.yaml
+
+inputs:
+
+  aws_access_key_id:
+    description: YOUR AWS ACCESS KEY ID
+    default: { get_secret: aws_access_key_id }
+
+  aws_secret_access_key:
+    description: YOUR AWS SECRET ACCESS KEY
+    default: { get_secret: aws_secret_access_key }
+
+  region_name:
+    type: string
+
+  availability_zone:
+    type: string
+
+  ec2_region_endpoint:
+    default: { concat: [ 'ec2.', { get_input: region_name}, '.amazonaws.com' ] }
+
+  vpc_cidr:
+    default: 10.10.0.0/16
+
+  public_subnet_cidr:
+    default: 10.10.0.0/24
+
+  private_subnet_cidr:
+    default: 10.10.1.0/24
+
+  ebs_volume_attachment_device:
+    default: /dev/sdh
+
+  image_id:
+    type: string
+    description: The AWS AMI.
+
+  instance_type:
+    type: string
+    description: The AWS instance type.
+
+  agent_user:
+    type: string
+    description: The name of the linux user.
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_input: aws_access_key_id }
+    aws_secret_access_key: { get_input: aws_secret_access_key }
+    region_name: { get_input: region_name }
+
+node_types:
+
+  k8s-cluster: &k8s-cluster
+    derived_from: cloudify.nodes.aws.ec2.Instances
+    properties:
+      client_config:
+        default: *client_config
+      agent_config:
+        default:
+          install_method: none
+          key: { get_secret: agent_key_private }
+          user: { get_input: agent_user }
+      use_public_ip:
+        default: true
+
+  kube-master: *k8s-cluster
+
+  kube-node: *k8s-cluster
+
+node_templates:
+
+  vpc:
+    type: cloudify.nodes.aws.ec2.Vpc
+    properties:
+      resource_config:
+        CidrBlock: { get_input: vpc_cidr }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes
+
+  internet_gateway:
+    type: cloudify.nodes.aws.ec2.InternetGateway
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: vpc
+
+  public_subnet:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: { get_input: public_subnet_cidr }
+        AvailabilityZone: { get_input: availability_zone }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes-Public
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  private_subnet:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: { get_input: private_subnet_cidr }
+        AvailabilityZone: { get_input: availability_zone }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes-Private
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  public_subnet_routetable:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes-Public
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: public_subnet
+
+  private_subnet_routetable:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes-Private
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: private_subnet
+
+  route_public_subnet_internet_gateway:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_subnet_routetable
+      - type: cloudify.relationships.connected_to
+        target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  nat_gateway_ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  nat_gateway:
+    type: cloudify.nodes.aws.ec2.NATGateway
+    properties:
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.depends_on
+        target: nat_gateway_ip
+
+  route_private_subnet_nat_gateway:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_subnet_routetable
+      - type: cloudify.relationships.connected_to
+        target: nat_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  security_group:
+    type: cloudify.nodes.aws.ec2.SecurityGroup
+    properties:
+      resource_config:
+        GroupName: AWSSDKExample
+        Description: Created by aws-instances-example blueprint.yaml.
+        VpcId: { get_attribute: [ vpc, aws_resource_id] }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes-Public
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+
+  security_group_rules:
+    type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
+    properties:
+     client_config: *client_config
+     resource_config:
+      IpPermissions:
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        IpRanges:
+        - CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 0
+        ToPort: 65535
+        IpRanges:
+        - CidrIp: 0.0.0.0/0
+      - IpProtocol: udp
+        FromPort: 0
+        ToPort: 65535
+        IpRanges:
+        - CidrIp: 0.0.0.0/0
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: security_group
+
+  kube-master-nic:
+    type: cloudify.nodes.aws.ec2.Interface
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Description: Cloudify Kubernetes.
+          SubnetId: { get_attribute: [ public_subnet, aws_resource_id] }
+          Groups:
+            - { get_attribute: [ security_group, aws_resource_id ] }
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.depends_on
+        target: security_group
+
+  kube-master-ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-master-nic
+
+  kube-master-volume:
+    type: cloudify.nodes.aws.ec2.EBSVolume
+    properties:
+      resource_config:
+        AvailabilityZone: { get_input: availability_zone }
+        Size: 20
+      client_config: *client_config
+
+  kube-master-volume-attachment:
+    type: cloudify.nodes.aws.ec2.EBSAttachment
+    properties:
+      resource_config:
+        kwargs:
+          Device: { get_input: ebs_volume_attachment_device }
+          InstanceId: { get_attribute: [ kube-master, aws_resource_id ] }
+          VolumeId: { get_attribute: [ kube-master-volume, aws_resource_id ] }
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-master-volume
+      - type: cloudify.relationships.depends_on
+        target: kube-master
+
+  kube-master:
+    type: kube-master
+    properties:
+      resource_config:
+        ImageId: { get_input: image_id }
+        InstanceType: { get_input: instance_type}
+        kwargs:
+          UserData: { get_attribute: [ cloudify-host-cloud-config, cloud_config ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-master-nic
+      - type: cloudify.relationships.depends_on
+        target: kube-master-ip
+      - type: cloudify.relationships.depends_on
+        target: cloudify-host-cloud-config
+
+  kube-node-nic:
+    type: cloudify.nodes.aws.ec2.Interface
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Description: Cloudify Kubernetes.
+          SubnetId: { get_attribute: [ public_subnet, aws_resource_id] }
+          Groups:
+            - { get_attribute: [ security_group, aws_resource_id ] }
+      Tags:
+        - Key: Name
+          Value: Cloudify-Kubernetes
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.depends_on
+        target: security_group
+
+  kube-node-ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-node-nic
+
+  kube-node-volume:
+    type: cloudify.nodes.aws.ec2.EBSVolume
+    properties:
+      resource_config:
+        AvailabilityZone: { get_input: availability_zone }
+        Size: 20
+      client_config: *client_config
+
+  kube-node-volume-attachment:
+    type: cloudify.nodes.aws.ec2.EBSAttachment
+    properties:
+      resource_config:
+        kwargs:
+          Device: { get_input: ebs_volume_attachment_device }
+          InstanceId: { get_attribute: [ kube-node, aws_resource_id ] }
+          VolumeId: { get_attribute: [ kube-node-volume, aws_resource_id ] }
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-node-volume
+      - type: cloudify.relationships.depends_on
+        target: kube-node
+
+  kube-node:
+    type: kube-node
+    properties:
+      resource_config:
+        ImageId: { get_input: image_id }
+        InstanceType: { get_input: instance_type}
+        kwargs:
+          UserData: { get_attribute: [ cloudify-host-cloud-config, cloud_config ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-node-nic
+      - type: cloudify.relationships.depends_on
+        target: kube-node-ip
+      - type: cloudify.relationships.depends_on
+        target: cloudify-host-cloud-config
+
+groups:
+
+  kube-master-group:
+    members:
+    - kube-config
+    - kube-master
+    - kube-master-nic
+    - kube-master-ip
+    - kube-master-volume
+    - kube-master-volume-attachment
+
+  kube-node-group:
+    members:
+    - kube-node
+    - kube-node-nic
+    - kube-node-ip
+    - kube-node-volume
+    - kube-node-volume-attachment
+
+policies:
+
+  kube-master-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-master-group]
+
+  kube-node-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-node-group]

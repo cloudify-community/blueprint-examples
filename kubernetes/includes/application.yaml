@@ -1,0 +1,37 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - plugin:cloudify-ansible-plugin
+
+inputs:
+
+  kubespray_ansible_playbook_path:
+    type: string
+    default: kubespray/cluster.yml
+
+node_templates:
+
+  kubespray:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+    relationships:
+      - type: cloudify.ansible.relationships.connected_to_host
+        target: kube-master
+      - type: cloudify.ansible.relationships.connected_to_host
+        target: kube-node
+
+groups:
+
+  k8s-cluster:
+    members:
+    - kube-master
+    - kube-node
+
+  etcd:
+    members:
+    - kube-master
