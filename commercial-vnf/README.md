@@ -36,6 +36,9 @@ The infrastructures used in this example are Microsoft Azure or OpenStack, and t
     * *keystone_tenant_name* - Name of the tenant in OpenStack. You can set this up via the CLI: ``cfy secrets create keystone_tenant_name -s <keystone_tenant_name>``
     * *keystone_url* - URL used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create keystone_url -s <keystone_url>``
     * *keystone_region* - Name of the region in OpenStack. You can set this up via the CLI: ``cfy secrets create keystone_region -s <keystone_region>``
+  * **FOR BOTH:**:
+    * *resource_prefix* - Prefix of every resource created at this deployment. You can set this up via the CLI: ``cfy secrets create resource_prefix -s <resource_prefix>``
+    * *resource_suffix* - Suffix of every resource created at this deployment. You can set this up via the CLI: ``cfy secrets create resource_suffix -s <resource_suffix>``
 
 
 ## Installation

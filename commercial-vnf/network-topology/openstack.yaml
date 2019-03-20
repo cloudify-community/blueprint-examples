@@ -14,14 +14,12 @@ inputs:
     default: GATEWAY_NET
 
   resource_prefix:
-    description: >
-      Prefix of every resource created at this deployment on OpenStack.
-    default: cfy
+    description: Prefix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_prefix }
 
   resource_suffix:
-    description: >
-      Suffix of every resource created at this deployment on OpenStack.
-    default: 0
+    description: Suffix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_suffix }
 
   nameservers:
     default: [8.8.4.4, 8.8.8.8]

@@ -8,11 +8,11 @@ imports:
 inputs:
   resource_prefix:
     description: Prefix of every resource created at this deployment on Openstack.
-    default: cfy
+    default: { get_secret: resource_prefix }
 
   resource_suffix:
     description: Suffix of every resource created at this deployment on Openstack.
-    default: 0
+    default: { get_secret: resource_suffix }
 
   openstack_network_deployment_name:
     type: string
