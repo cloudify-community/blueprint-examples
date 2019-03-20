@@ -41,6 +41,8 @@ Create the below secrets in the secret store management:
     * *keystone_url* - Keystone URL
     * *keystone_region* - Keystone region
 * **Common secrets:**
+    * *resource_prefix* - Prefix of every resource created at this deployment. You can set this up via the CLI: `cfy secrets create resource_prefix -s [secret_value]`
+    * *resource_suffix* - Suffix of every resource created at this deployment. You can set this up via the CLI: `cfy secrets create resource_suffix -s [secret_value]`
     * *bigip_username* - Username for BIG IP VE. Relevant only for Azure - Openstack uses default credentials (uname: root, pwd: default). It is set during provisioning and used during configuration, "admin" is not allowed. You can set this up via the CLI: `cfy secrets create bigip_username -s [secret value]`.
     * *bigip_password* - Password for BIG IP VE. Relevant only for Azure - Openstack uses default credentials (uname: root, pwd: default). It is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed. . You can set this up via the CLI: `cfy secrets create bigip_password -s [secret value]`.
     * *bigip_license* - License key for BIG IP VE, it is being applied during configuration

@@ -13,12 +13,11 @@ inputs:
 
   resource_prefix:
     description: Prefix of every resource created at this deployment on Azure.
-    # default: cfy
-    default: jaroslaw
+    default: { get_secret: resource_prefix }
 
   resource_suffix:
     description: Suffix of every resource created at this deployment on Azure.
-    default: 0
+    default: { get_secret: resource_suffix }
 
   azure_network_deployment_name:
     type: string
