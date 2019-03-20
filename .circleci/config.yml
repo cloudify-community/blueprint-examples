@@ -51,6 +51,9 @@ jobs:
           name: install plugins bundle
           command: cfy plugins bundle-upload
       - run:
+          name: install plugins bundle
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.0.0/cloudify_openstack_plugin-3.0.0-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.0.0/plugin.yaml
+      - run:
           name: execute test
           command: pytest -s .cicd/test_examples.py
 
@@ -59,6 +62,11 @@ jobs:
       - image: circleci/python:2.7.15-stretch
     steps:
       - checkout
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
       - run:
           name: Download pip
           command: curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
