@@ -4,7 +4,7 @@ description: A simple GCP example network.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=2.14.7
+  - plugin:cloudify-openstack-plugin?version=3.0.0
 
 inputs:
 
