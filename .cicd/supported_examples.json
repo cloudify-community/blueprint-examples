@@ -20,18 +20,34 @@
   "open-source-vnf/haproxy": ["openstack.yaml"],
   "open-source-vnf/pfsense": ["openstack.yaml"],
   "open-source-vnf/service": ["openstack.yaml"],
-  "commercial-vnf/network-topology": ["infrastructure.yaml"],
   "commercial-vnf/bigip": [
-    "infrastructure.yaml",
-    "application.yaml"
+    "azure.yaml",
+    "azure_application.yaml",
+    "openstack.yaml",
+    "openstack_application.yaml"
+  ],
+  "commercial-vnf/e2e": [
+    "azure_e2e.yaml",
+    "openstack_e2e.yaml"
   ],
   "commercial-vnf/fortigate": [
-    "infrastructure.yaml",
-    "application.yaml"
+    "azure.yaml",
+    "azure_application.yaml",
+    "openstack.yaml",
+    "openstack_application.yaml"
   ],
   "commercial-vnf/httpd": [
-    "infrastructure.yaml",
-    "application.yaml"
+    "azure.yaml",
+    "azure_application.yaml",
+    "openstack.yaml",
+    "openstack_application.yaml"
   ],
-  "commercial-vnf/service": ["service.yaml"]
+  "commercial-vnf/network-topology": [
+    "azure.yaml",
+    "openstack.yaml"
+  ],
+  "commercial-vnf/service": [
+    "azure.yaml",
+    "openstack.yaml"
+  ]
 }
