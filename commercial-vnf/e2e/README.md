@@ -89,10 +89,10 @@ You can create those with the following cfy commands:\
 To apply the service configuration execute:
 
 AZURE:
-``cfy install azure_e2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy install azuree2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
 
 OPENSTACK:
-``cfy install openstack_e2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy install openstacke2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
 
 ### Service validation
 

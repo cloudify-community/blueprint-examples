@@ -25,12 +25,12 @@ imports:
 # deployments which this blueprint will leverage.
 inputs:
   network_prov_name:
-    description: Name of common resources provisioning blueprint/deployment
-    default: VNFM-Networking-Prov-Openstack-networks
+    description: Name of network resources provisioning blueprint/deployment
+    default: VNFM-Networking-Prov-Azure-networks
 
   f5_prov_name:
     description: Name of BIG IP Provisioning blueprint/deployment
-    default: VNFM-F5-Prov-Openstack-vm
+    default: VNFM-F5-Prov-Azure-vm
 
   f5_conf_name:
     description: Name of BIG IP Configuration blueprint/deployment
@@ -38,7 +38,7 @@ inputs:
 
   fg_prov_name:
     description: Name of Fortigate Provisioning blueprint/deployment
-    default: VNFM-Fortigate-Prov-Openstack-vm
+    default: VNFM-Fortigate-Prov-Azure-vm
 
   fg_conf_name:
     description: Name of Fortigate Configuration blueprint/deployment
@@ -46,7 +46,7 @@ inputs:
 
   httpd_prov_name:
     description: Name of HTTPD Provisioning blueprint/deployment
-    default: VNFM-HTTPD-Prov-Openstack-vm
+    default: VNFM-HTTPD-Prov-Azure-vm
 
   httpd_conf_name:
     description: Name of HTTPD Configuration blueprint/deployment
@@ -63,7 +63,7 @@ node_templates:
 
   # Network-topology:
   #   This blueprint is responsible for creating all of the common resources,
-  #   which are later used in other blueprints. Especially: router,
+  #   which are later used in other blueprints. Especially: resource_group,
   #   networks, subnets and security groups.
   #   DeploymentProxy is being used for the blueprint uploading and the
   #   deployment creation.
@@ -76,7 +76,7 @@ node_templates:
         blueprint:
           id: { get_input: network_prov_name }
           blueprint_archive: Resources/network-topology.zip
-          main_file_name: openstack.yaml
+          main_file_name: azure.yaml
         deployment:
           id: { get_input: network_prov_name }
 
@@ -84,8 +84,9 @@ node_templates:
   ### PROVISIONING ###
 
   # F5 Provisioning:
-  #   This blueprint is responsible for provisioning the F5 BIG-IP VM in OpenStack
-  #   infrastructure, including the necessary network interfaces.
+  #   This blueprint is responsible for provisioning the F5 BIG-IP VM in Azure
+  #   infrastructure, including the necessary storage account and network
+  #   interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
@@ -99,7 +100,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_prov_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: openstack.yaml
+          main_file_name: azure.yaml
         deployment:
           id: { get_input: f5_prov_name }
     relationships:
@@ -107,8 +108,9 @@ node_templates:
         target: network_prov
 
   # FortiGate Provisioning:
-  #   This blueprint is responsible for provisioning the FortiGate VM in OpenStack
-  #   infrastructure, including the necessary network interfaces.
+  #   This blueprint is responsible for provisioning the FortiGate VM in Azure
+  #   infrastructure, including the necessary storage account and network
+  #   interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
@@ -122,7 +124,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_prov_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: openstack.yaml
+          main_file_name: azure.yaml
         deployment:
           id: { get_input: fg_prov_name }
     relationships:
@@ -130,8 +132,9 @@ node_templates:
         target: network_prov
 
   # HTTPD Provisioning:
-  #   This blueprint is responsible for provisioning the HTTPD VM in OpenStack
-  #   infrastructure, including the necessary network interfaces.
+  #   This blueprint is responsible for provisioning the HTTPD VM in Azure
+  #   infrastructure, including the necessary storage account and network
+  #   interfaces.
   #   DeploymentProxy is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
@@ -145,7 +148,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_prov_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: openstack.yaml
+          main_file_name: azure.yaml
         deployment:
           id: { get_input: httpd_prov_name }
     relationships:
@@ -171,7 +174,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_conf_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: openstack_application.yaml
+          main_file_name: azureapp
         deployment:
           id: { get_input: f5_conf_name }
     relationships:
@@ -195,7 +198,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_conf_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: openstack_application.yaml
+          main_file_name: azureapp
         deployment:
           id: { get_input: fg_conf_name }
     relationships:
@@ -219,7 +222,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_conf_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: openstack_application.yaml
+          main_file_name: azureapp
         deployment:
           id: { get_input: httpd_conf_name }
     relationships:
@@ -245,7 +248,7 @@ node_templates:
         blueprint:
           id: { get_input: service_prov_name }
           blueprint_archive: Resources/service.zip
-          main_file_name: openstack_service.yaml
+          main_file_name: azure_service.yaml
         deployment: {}
         # deployment:
         #   id: { get_input: service_prov_name }

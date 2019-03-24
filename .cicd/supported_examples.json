@@ -22,25 +22,25 @@
   "open-source-vnf/service": ["openstack.yaml"],
   "commercial-vnf/bigip": [
     "azure.yaml",
-    "azure_application.yaml",
+    "azureapp.yaml",
     "openstack.yaml",
-    "openstack_application.yaml"
+    "openstackapp"
   ],
   "commercial-vnf/e2e": [
-    "azure_e2e.yaml",
-    "openstack_e2e.yaml"
+    "azuree2e.yaml",
+    "openstacke2e.yaml"
   ],
   "commercial-vnf/fortigate": [
     "azure.yaml",
-    "azure_application.yaml",
+    "azureapp.yaml",
     "openstack.yaml",
-    "openstack_application.yaml"
+    "openstackapp"
   ],
   "commercial-vnf/httpd": [
     "azure.yaml",
-    "azure_application.yaml",
+    "azureapp.yaml",
     "openstack.yaml",
-    "openstack_application.yaml"
+    "openstackapp"
   ],
   "commercial-vnf/network-topology": [
     "azure.yaml",

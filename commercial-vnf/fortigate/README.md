@@ -80,10 +80,10 @@ The configuration requires the IP addresses of the VM created during provisionin
 ### Install
 
 AZURE:
-`cfy install azure_application.yaml -b VNFM-Fortigate-Conf`
+`cfy install azureapp -b VNFM-Fortigate-Conf`
 
 OPENSTACK:
-`cfy install openstack_application.yaml -b VNFM-Fortigate-Conf`
+`cfy install openstackapp -b VNFM-Fortigate-Conf`
 
 ### Uninstall
 

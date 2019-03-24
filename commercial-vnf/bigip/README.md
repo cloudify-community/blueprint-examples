@@ -83,10 +83,10 @@ The configuration requires the IP addresses of the VM created during provisionin
 ### Install
 
 AZURE:
-`cfy install azure_application.yaml -b VNFM-F5-Conf`
+`cfy install azureapp -b VNFM-F5-Conf`
 
 OPENSTACK:
-`cfy install openstack_application.yaml -b VNFM-F5-Conf`
+`cfy install openstackapp -b VNFM-F5-Conf`
 
 ### Uninstall
 
