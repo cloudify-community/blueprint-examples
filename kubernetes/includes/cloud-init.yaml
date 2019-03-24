@@ -19,3 +19,5 @@ node_templates:
             sudo: ['ALL=(ALL) NOPASSWD:ALL']
             ssh-authorized-keys:
               - { get_secret: agent_key_public }
+        runcmd:
+        - "yum install python-netaddr"
