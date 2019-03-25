@@ -18,7 +18,7 @@ description: >
 # to allow using the Deployment Proxy mechanism.
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-utilities-plugin
 
 # The inputs section includes the names of the particular blueprints and
@@ -171,7 +171,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_conf_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: openstackapp
+          main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: f5_conf_name }
     relationships:
@@ -195,7 +195,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_conf_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: openstackapp
+          main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: fg_conf_name }
     relationships:
@@ -219,7 +219,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_conf_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: openstackapp
+          main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: httpd_conf_name }
     relationships:

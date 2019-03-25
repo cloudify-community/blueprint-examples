@@ -86,7 +86,7 @@ AZURE:
 `cfy install azureapp -b VNFM-F5-Conf`
 
 OPENSTACK:
-`cfy install openstackapp -b VNFM-F5-Conf`
+`cfy install openstackapp.yaml -b VNFM-F5-Conf`
 
 ### Uninstall
 

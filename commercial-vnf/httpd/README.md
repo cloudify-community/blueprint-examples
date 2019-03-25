@@ -71,7 +71,7 @@ AZURE:
 `cfy install azureapp -b VNFM-HTTPD-Conf`
 
 OPENSTACK:
-`cfy install openstackapp -b VNFM-HTTPD-Conf`
+`cfy install openstackapp.yaml -b VNFM-HTTPD-Conf`
 
 ### Uninstall
 

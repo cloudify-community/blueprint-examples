@@ -83,7 +83,7 @@ AZURE:
 `cfy install azureapp -b VNFM-Fortigate-Conf`
 
 OPENSTACK:
-`cfy install openstackapp -b VNFM-Fortigate-Conf`
+`cfy install openstackapp.yaml -b VNFM-Fortigate-Conf`
 
 ### Uninstall
 
