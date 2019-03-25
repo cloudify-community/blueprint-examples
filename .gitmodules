@@ -1,0 +1,4 @@
+[submodule "kubernetes/kubespray"]
+    branch = cloudify-blueprint-examples
+    path = kubernetes/kubespray
+    url = https://github.com/EarthmanT/kubespray.git
