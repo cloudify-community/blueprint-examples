@@ -156,7 +156,7 @@ node_templates:
       cloudify.interfaces.lifecycle:
         stop: {}
 
-outputs:
+capabilities:
 
   vpc_id:
     value: { get_attribute: [ vpc, aws_resource_id ] }

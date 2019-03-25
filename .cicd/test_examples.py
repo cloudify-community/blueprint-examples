@@ -23,9 +23,18 @@ UPLOAD_BLUEPRINT = 'cfy blueprints upload {0} -b {1}'
 
 @pytest.fixture(scope='function', params=blueprint_list)
 def validate_blueprint(request):
-    blueprint_id = '{0}-{1}'.format(
-        path.dirname(request.param).split('/')[-1:][0],
-        path.basename(request.param).split('.yaml')[0])
+    # For the db-lb-app, we need a blueprint named 'infrastructure'.
+    # So this makes sure that the first one that gets uploaded (aws)
+    # will be the reference.
+    # TODO: Add to supported examples.json desired blueprint name.
+    dirname_param = path.dirname(request.param).split('/')[-1:][0]
+    infra_name = path.basename(request.param).split('.yaml')[0]
+    if dirname_param == 'infrastructure' and infra_name == 'aws':
+        blueprint_id = '{0}'.format(dirname_param)
+    else:
+        blueprint_id = '{0}-{1}'.format(
+            dirname_param,
+            infra_name)
     return system(UPLOAD_BLUEPRINT.format(request.param, blueprint_id))
 
 

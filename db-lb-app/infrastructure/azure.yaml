@@ -1,0 +1,271 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-azure-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  resource_prefix:
+    default: infra_
+
+  resource_suffix:
+    default: '0'
+
+  agent_user:
+    description: The user name of the agent on the instance created from the image.
+    default: centos
+
+  public_subnet_cidr:
+    type: string
+    default: 10.10.0.0/24
+
+  size:
+    default: Standard_A3
+
+dsl_definitions:
+
+  azure_config: &client_config
+    subscription_id: { get_secret: azure_subscription_id }
+    tenant_id: { get_secret: azure_tenant_id }
+    client_id: { get_secret: azure_client_id }
+    client_secret: { get_secret: azure_client_secret }
+    endpoints_active_directory: https://login.microsoftonline.com
+    endpoints_resource_manager: https://management.azure.com
+    endpoint_resource: https://management.core.windows.net/
+    endpoint_verify: true
+    scale_name_separator: "_"
+    scale_name_suffix_chars: "1234567890"
+    certificate: ""
+    thumbprint: ""
+
+node_templates:
+
+  host:
+    type: cloudify.azure.nodes.compute.VirtualMachine
+    properties:
+      azure_config: *client_config
+      agent_config:
+        install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      use_public_ip: true
+      os_family: linux
+      retry_after: 60
+      location: { get_capability: [ azure, location ] }
+      storage_endpoint: core.windows.net
+      resource_config:
+        hardwareProfile:
+          vmSize: { get_input: size }
+        storageProfile:
+          imageReference:
+            publisher: OpenLogic
+            offer: CentOS
+            sku: '7-CI'
+            version: latest
+        osProfile:
+          customData:  { get_attribute: [ cloud_init, cloud_config ] }
+          adminUsername: { get_input: agent_user }
+          adminPassword: ''
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+              - keydata: { get_secret: agent_key_public }
+                path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
+            disablePasswordAuthentication: true
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.connected_to_storage_account
+        target: storage_account
+      - type: cloudify.azure.relationships.connected_to_availability_set
+        target: availability_set
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: nic
+
+  nic:
+    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.nic_connected_to_network_security_group
+        target: security_group
+      - type: cloudify.azure.relationships.nic_connected_to_ip_configuration
+        target: ip_config
+
+  ip_config:
+    type: cloudify.azure.nodes.network.IPConfiguration
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+      resource_config:
+        privateIPAllocationMethod: Dynamic
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_subnet
+        target: subnet
+      - type: cloudify.azure.relationships.ip_configuration_connected_to_public_ip
+        target: ip
+
+  ip:
+    type: cloudify.azure.nodes.network.PublicIPAddress
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+      resource_config:
+        publicIPAllocationMethod: Static
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  security_group:
+    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+      resource_config:
+        securityRules:
+          - name: shell_access
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 22
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 100
+              access: Allow
+              direction: Inbound
+          - name: mysql_access
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 3306
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 101
+              access: Allow
+              direction: Inbound
+          - name: mysql_access2
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 4444
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 102
+              access: Allow
+              direction: Inbound
+          - name: mysql_access3
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 4567-4568
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 103
+              access: Allow
+              direction: Inbound
+          - name: http_access
+            properties:
+              description: TCP access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 80
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 104
+              access: Allow
+              direction: Inbound
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  subnet:
+    type: cloudify.azure.nodes.network.Subnet
+    properties:
+      azure_config: *client_config
+      use_external_resource: true
+      name: { get_capability: [ azure, public_subnet ] }
+      location: { get_capability: [ azure, location ] }
+      resource_config:
+        addressPrefix: { get_input: public_subnet_cidr }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_virtual_network
+        target: network
+
+  network:
+    type: cloudify.azure.nodes.network.VirtualNetwork
+    properties:
+      azure_config: *client_config
+      use_external_resource: true
+      name: { get_capability: [ azure, virtual_network ] }
+      location: { get_capability: [ azure, location ] }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  availability_set:
+    type: cloudify.azure.nodes.compute.AvailabilitySet
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  storage_account:
+    type: cloudify.azure.nodes.storage.StorageAccount
+    properties:
+      azure_config: *client_config
+      location: { get_capability: [ azure, location ] }
+      resource_config:
+        accountType: Standard_LRS
+    relationships:
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+
+  resource_group:
+    type: cloudify.azure.nodes.ResourceGroup
+    properties:
+      azure_config: *client_config
+      use_external_resource: true
+      name: { get_capability: [ azure, resource_group ] }
+      location: { get_capability: [ azure, location ] }
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          primary-group: wheel
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_secret: agent_key_public }
+
+groups:
+
+  scalable_compute:
+    members:
+      - host
+      - nic
+      - ip_config
+      - ip
+
+capabilities:
+
+  ip:
+    description: Host IP
+    value: { get_attribute: [ host, ip ] }

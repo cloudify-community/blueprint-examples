@@ -1,0 +1,10 @@
+- hosts: balancer
+  roles:
+    - haproxy
+  vars:
+    haproxy_frontend_name: 'mysql_frontends'
+    haproxy_frontend_port: 3306
+    haproxy_frontend_mode: 'tcp'
+    haproxy_backend_name: 'mysql_backends'
+    haproxy_backend_mode: 'tcp'
+    haproxy_backend_servers: "{{ server_list }}"

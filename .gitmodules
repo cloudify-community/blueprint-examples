@@ -2,3 +2,15 @@
     branch = cloudify-blueprint-examples
     path = kubernetes/kubespray
     url = https://github.com/EarthmanT/kubespray.git
+[submodule "db-lb-app/db/mariadb"]
+	path = db-lb-app/db/mariadb
+	url = https://github.com/EarthmanT/mariadb-ansible-galera-cluster.git
+[submodule "db-lb-app/lb/haproxy/roles"]
+	path = db-lb-app/lb/haproxy/haproxy
+	url = https://github.com/EarthmanT/ansible-role-haproxy.git
+[submodule "db-lb-app/app/drupal/droop"]
+	path = db-lb-app/app/drupal/droop
+	url = https://github.com/earthmant/ansible-role-drupal-1.git
+[submodule "db-lb-app/app/drupal/apache"]
+	path = db-lb-app/app/drupal/apache
+	url = https://github.com/earthmant/ansible-role-httpd.git

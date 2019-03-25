@@ -9,6 +9,20 @@
     "gcp.yaml",
     "openstack.yaml"
   ],
+  "db-lb-app/infrastructure": [
+    "aws.yaml",
+    "azure.yaml",
+    "openstack.yaml"
+  ],
+  "db-lb-app/db": [
+    "application.yaml"
+  ],
+  "db-lb-app/lb": [
+    "application.yaml"
+  ],
+  "db-lb-app/app": [
+    "application.yaml"
+  ],
   "kubernetes": [
     "aws.yaml",
     "azure.yaml",
