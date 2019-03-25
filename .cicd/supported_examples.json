@@ -24,7 +24,7 @@
     "azure.yaml",
     "azureapp.yaml",
     "openstack.yaml",
-    "openstackapp"
+    "openstackapp.yaml"
   ],
   "commercial-vnf/e2e": [
     "azuree2e.yaml",
@@ -34,20 +34,20 @@
     "azure.yaml",
     "azureapp.yaml",
     "openstack.yaml",
-    "openstackapp"
+    "openstackapp.yaml"
   ],
   "commercial-vnf/httpd": [
     "azure.yaml",
     "azureapp.yaml",
     "openstack.yaml",
-    "openstackapp"
+    "openstackapp.yaml"
   ],
   "commercial-vnf/network-topology": [
     "azure.yaml",
     "openstack.yaml"
   ],
   "commercial-vnf/service": [
-    "azure.yaml",
-    "openstack.yaml"
+    "azure_service.yaml",
+    "openstack_service.yaml"
   ]
 }
