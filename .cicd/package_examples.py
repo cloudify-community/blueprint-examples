@@ -56,7 +56,8 @@ class NewRelease(object):
         if create_new_release:
             return True
         for commit_file in self.commit.files:
-            if commit_file in blueprint_list:
+            if commit_file.filename in \
+                    [path.relpath(f) for f in blueprint_list]:
                 return True
         logging.info(
             'No changes to blueprint files, not creating new release.')
