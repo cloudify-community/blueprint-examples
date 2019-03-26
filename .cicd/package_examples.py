@@ -22,7 +22,10 @@ import zipfile
 
 from github import Github
 
-from __init__ import CWD, SUPPORTED_EXAMPLES, blueprint_list, get_cloudify_version
+from __init__ import (CWD,
+                      SUPPORTED_EXAMPLES,
+                      blueprint_list,
+                      get_cloudify_version)
 
 ASSET_TYPE = 'zip'
 RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
@@ -94,6 +97,7 @@ class NewRelease(object):
         return RELEASE_MESSAGE.format(gen, iteration)
 
     def _create(self):
+        logging.info('Attempting to create new release.')
         return self.repo.create_git_release(
             tag=self.version,
             name=self.name,
@@ -119,15 +123,22 @@ class BlueprintArchive(object):
     """Handles creating zip archives of blueprints."""
 
     def __init__(self, name, source_directory):
+        if '/' in name:
+            name = name.replace('/', '-')
+            name = name.strip('-')
         self.name = name
         self.source = source_directory
         self._dest = NamedTemporaryFile(delete=False)
         self.destination = path.join(
             path.dirname(self._dest.name), '{0}.zip'.format(self.name))
         self._create_archive()
+        logging.info('Moving {0} to {1}.'.format(
+            self._dest.name, self.destination))
         shutil.move(self._dest.name, self.destination)
 
     def _create_archive(self):
+        logging.info('Archive source: {0}.'.format(self.source))
+        logging.info('Archive destination: {0}.'.format(self._dest.name))
         zip_file = zipfile.ZipFile(self._dest.name, 'w')
         for root, _, files in walk(self.source):
             for filename in files:
@@ -136,6 +147,7 @@ class BlueprintArchive(object):
                 zip_file.write(
                     file_path, path.relpath(file_path, source_dir))
         zip_file.close()
+        logging.info('Finished writing archive {0}'.format(self.name))
 
 
 if __name__ == "__main__":
@@ -143,19 +155,17 @@ if __name__ == "__main__":
     upload zip archives of all the blueprints.
     """
 
-    logging.info('Attempting to create new release.')
-    new_release = NewRelease()
+    # new_release = NewRelease()
 
-    if not new_release.release:
-        logging.info('No new release to upload new archives to.')
-        sys.exit()
+    # if not new_release.release:
+    #     logging.info('No new release to upload new archives to.')
+    #     sys.exit()
 
-    for blueprint_id, blueprint_data in SUPPORTED_EXAMPLES.items():
-        logging.info('Attempting to create new archive {0}:{1}.'.format(
-            blueprint_id, blueprint_data))
+    for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
+        logging.info('Attempting to create new zip {0}.'.format(blueprint_id))
         new_archive = BlueprintArchive(
             blueprint_id,
             path.join(CWD, blueprint_id)
         )
-        new_release.upload(new_archive.destination, new_archive.name)
-        remove(new_archive.destination)
+        # new_release.upload(new_archive.destination, new_archive.name)
+        # remove(new_archive.destination)
