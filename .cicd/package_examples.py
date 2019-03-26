@@ -155,11 +155,11 @@ if __name__ == "__main__":
     upload zip archives of all the blueprints.
     """
 
-    # new_release = NewRelease()
+    new_release = NewRelease()
 
-    # if not new_release.release:
-    #     logging.info('No new release to upload new archives to.')
-    #     sys.exit()
+    if not new_release.release:
+        logging.info('No new release to upload new archives to.')
+        sys.exit()
 
     for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
         logging.info('Attempting to create new zip {0}.'.format(blueprint_id))
@@ -167,5 +167,5 @@ if __name__ == "__main__":
             blueprint_id,
             path.join(CWD, blueprint_id)
         )
-        # new_release.upload(new_archive.destination, new_archive.name)
-        # remove(new_archive.destination)
+        new_release.upload(new_archive.destination, new_archive.name)
+        remove(new_archive.destination)
