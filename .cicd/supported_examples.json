@@ -9,12 +9,18 @@
     "gcp.yaml",
     "openstack.yaml"
   ],
+  "kubernetes": [
+    "aws.yaml",
+    "azure.yaml",
+    "openstack.yaml"
+  ],
   "open-source-vnf/connected-host": ["openstack.yaml"],
   "open-source-vnf/network-topology": ["openstack.yaml"],
   "open-source-vnf/httpd": ["openstack.yaml"],
   "open-source-vnf/haproxy": ["openstack.yaml"],
   "open-source-vnf/pfsense": ["openstack.yaml"],
   "open-source-vnf/service": ["openstack.yaml"],
+<<<<<<< HEAD
   "commercial-vnf/network-topology": ["infrastructure.yaml"],
   "commercial-vnf/bigip": [
     "infrastructure.yaml",
@@ -29,4 +35,36 @@
     "application.yaml"
   ],
   "commercial-vnf/service": ["service.yaml"]
+=======
+  "commercial-vnf/bigip": [
+    "azure.yaml",
+    "azureapp.yaml",
+    "openstack.yaml",
+    "openstackapp.yaml"
+  ],
+  "commercial-vnf/e2e": [
+    "azuree2e.yaml",
+    "openstacke2e.yaml"
+  ],
+  "commercial-vnf/fortigate": [
+    "azure.yaml",
+    "azureapp.yaml",
+    "openstack.yaml",
+    "openstackapp.yaml"
+  ],
+  "commercial-vnf/httpd": [
+    "azure.yaml",
+    "azureapp.yaml",
+    "openstack.yaml",
+    "openstackapp.yaml"
+  ],
+  "commercial-vnf/network-topology": [
+    "azure.yaml",
+    "openstack.yaml"
+  ],
+  "commercial-vnf/service": [
+    "azure_service.yaml",
+    "openstack_service.yaml"
+  ]
+>>>>>>> upstream/add-azure-stuff
 }

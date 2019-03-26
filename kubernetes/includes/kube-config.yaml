@@ -1,0 +1,115 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - plugin:cloudify-fabric-plugin
+
+node_templates:
+
+  kube-config:
+    type: cloudify.nodes.Root
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubespray
+      - type: cloudify.relationships.contained_in
+        target: kube-master
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            preconfigure:
+              implementation: fabric.fabric_plugin.tasks.run_task
+              inputs:
+                tasks_file: scripts/tasks.py
+                task_name: setup_kubectl
+                task_properties:
+                  username: { get_property: [ TARGET, agent_config, user ] }
+                fabric_env: &fabric_env
+                  host_string: { get_attribute: [ TARGET, ip ] }
+                  user: { get_property: [ TARGET, agent_config, user ] }
+                  key: { get_property: [ TARGET, agent_config, key ] }
+            postconfigure:
+              implementation: fabric.fabric_plugin.tasks.run_task
+              inputs:
+                tasks_file: scripts/tasks.py
+                task_name: setup_secrets
+                fabric_env: *fabric_env
+            establish:
+              implementation: fabric.fabric_plugin.tasks.run_task
+              inputs:
+                tasks_file: scripts/tasks.py
+                task_name: kubectl_apply
+                task_properties:
+                  username: { get_property: [ kube-master, agent_config, user ] }
+                  resource: service-accounts.yaml
+                fabric_env: *fabric_env
+
+  dashboard-token-and-port:
+    type: cloudify.nodes.ApplicationServer
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: fabric.fabric_plugin.tasks.run_task
+          inputs:
+            tasks_file: scripts/generate_port_token.py
+            task_name: setup_dashboard_access
+            fabric_env: &fabric_env_ni
+              host_string: { get_attribute: [ kube-master, ip ] }
+              user: { get_property: [ kube-master, agent_config, user ] }
+              key: { get_property: [ kube-master, agent_config, key ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-config
+
+  kube-monitoring:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: fabric.fabric_plugin.tasks.run_task
+          inputs:
+            tasks_file: scripts/tasks.py
+            task_name: kubectl_apply
+            task_properties:
+              username: { get_property: [ kube-master, agent_config, user ] }
+              resource: monitoring.yaml
+            fabric_env: *fabric_env_ni
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: dashboard-token-and-port
+
+
+outputs:
+
+  kubernetes-cluster-name:
+    description: The name of the Kubernetes Cluster
+    value: { get_attribute: [ kube-master, kubernetes-cluster-name] }
+
+  kubernetes-username:
+    description: Kubernetes Cluster Username
+    value: { get_attribute: [ kube-master, kubernetes-username] }
+
+  kubernetes-server:
+    description: Kubernetes Cluster Endpoint
+    value: { get_attribute: [ kube-master, kubernetes-server ] }
+
+  client-certificate-data:
+    description: Client Certificate Data
+    value: { get_attribute: [ kube-master, kubernetes-admin-client-certificate-data ] }
+
+  client-key-data:
+    description: Client Key
+    value: { get_attribute: [ kube-master, kubernetes-admin-client-key-data ] }
+
+  certificate-authority-data:
+    description: Client Certificate Authority
+    value: { get_attribute: [ kube-master, cluster.local-certificate-authority-data ] }
+
+  kube_config:
+    description: String for KUBE_CONFIG content.
+    value: { get_attribute: [ kube-master, configuration_file_content ] }
+
+  bearer_token:
+    description: Kubernetes Token
+    value: { get_attribute: [dashboard-token-and-port, bearer_token] }
+
+  dashboard_url:
+    description: Kubernetes Access Url
+    value: { concat: [ "https://", { get_attribute: [ kube-master, ip ] }, ":", { get_attribute: [ dashboard-token-and-port, dashboard_port ] } ] }
