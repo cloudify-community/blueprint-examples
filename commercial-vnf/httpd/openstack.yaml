@@ -33,87 +33,104 @@ inputs:
 dsl_definitions:
 
   client_config: &client_config
-    username: { get_secret: keystone_username }
-    password: { get_secret: keystone_password }
-    tenant_name: { get_secret: keystone_tenant_name }
-    auth_url: { get_secret: keystone_url }
-    region: { get_secret: keystone_region }
+    password: { get_secret: openstack_password }
+    username: { get_secret: openstack_username }
+    project_name: { get_secret: openstack_tenant_name }
+    region_name: { get_secret: openstack_region }
+    auth_url: { get_secret: openstack_auth_url }
 
 node_templates:
 
-  mgmt_network:
-    type: cloudify.openstack.nodes.Network
+  external_network:
+    type: cloudify.nodes.openstack.Network
     properties:
-      openstack_config: *client_config
+      client_config: *client_config
       use_external_resource: true
-      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+        kwargs:
+          routing:
+            external: true
+
+  mgmt_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
 
   lan_network:
-    type: cloudify.openstack.nodes.Network
+    type: cloudify.nodes.openstack.Network
     properties:
-      openstack_config: *client_config
+      client_config: *client_config
       use_external_resource: true
-      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, lan_network] }
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, lan_network] }
 
   network_security_group:
-    type: cloudify.openstack.nodes.SecurityGroup
+    type: cloudify.nodes.openstack.SecurityGroup
     properties:
-      openstack_config: *client_config
+      client_config: *client_config
       use_external_resource: true
-      resource_id:  { get_capability: [{ get_input: openstack_network_deployment_name }, network_security_group] }
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, network_security_group] }
 
   mgmt_floating_ip_address:
-    type: cloudify.openstack.nodes.FloatingIP
+    type: cloudify.nodes.openstack.FloatingIP
     properties:
-      openstack_config: *client_config
-      use_external_resource: false
-      floatingip:
-        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+      client_config: *client_config
+      # resource_config:
+      #   floating_network_id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
+      - type: cloudify.relationships.connected_to
+        target: mgmt_port
 
   mgmt_port:
-    type: cloudify.openstack.nodes.Port
+    type: cloudify.nodes.openstack.Port
     properties:
-      openstack_config: *client_config
-      port:
+      client_config: *client_config
+      resource_config:
         name:
           concat:
             - { get_input: resource_prefix }
             - "_httpd_mgmt_port"
             - { get_input: resource_suffix }
+        # network_id: { get_attribute: [ mgmt_network, id ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: mgmt_network
-    - type: cloudify.openstack.port_connected_to_security_group
+    - type: cloudify.relationships.connected_to
       target: network_security_group
-    - type: cloudify.openstack.port_connected_to_floating_ip
-      target: mgmt_floating_ip_address
 
   lan_port:
-    type: cloudify.openstack.nodes.Port
+    type: cloudify.nodes.openstack.Port
     properties:
-      openstack_config: *client_config
-      port:
+      client_config: *client_config
+      resource_config:
         name:
           concat:
             - { get_input: resource_prefix }
             - "_httpd_lan_port"
             - { get_input: resource_suffix }
+        # network_id: { get_attribute: [ lan_network, id ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: lan_network
-    - type: cloudify.openstack.port_connected_to_security_group
+    - type: cloudify.relationships.connected_to
       target: network_security_group
 
   image:
-    type: cloudify.openstack.nodes.Image
+    type: cloudify.nodes.openstack.Image
     properties:
-      image:
+      resource_config:
+        id: { get_input: image_id }
         container_format: "bare"
         disk_format: "qcow2"
-      openstack_config: *client_config
+      client_config: *client_config
       use_external_resource: True
-      create_if_missing: False
-      resource_id: { get_input: image_id }
 
   keypair:
     type: cloudify.keys.nodes.RSAKey
@@ -171,30 +188,25 @@ node_templates:
         target: keypair
 
   vm:
-    type: cloudify.openstack.nodes.Server
+    type: cloudify.nodes.openstack.Server
     properties:
-      openstack_config: *client_config
+      client_config: *client_config
       agent_config:
         install_method: none
-      management_network_name: { get_attribute: [ mgmt_network, external_name ] }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          inputs:
-            args:
-              name:
-                concat:
-                  - { get_input: resource_prefix }
-                  - "_httpd_vm"
-                  - { get_input: resource_suffix }
-              image: { get_input: image_id }
-              flavor: { get_input: flavor_id }
-              key_name: ''
-              userdata: { get_attribute: [ cloud_config, cloud_config ] }
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_httpd_vm"
+            - { get_input: resource_suffix }
+        image_id: { get_attribute: [ image, id ] }
+        flavor_id: { get_input: flavor_id }
+        # key_name: ''
+        user_data: { get_attribute: [ cloud_config, cloud_config ] }
     relationships:
-    - type: cloudify.openstack.server_connected_to_port
+    - type: cloudify.relationships.openstack.server_connected_to_port
       target: mgmt_port
-    - type: cloudify.openstack.server_connected_to_port
+    - type: cloudify.relationships.openstack.server_connected_to_port
       target: lan_port
     - type: cloudify.relationships.depends_on
       target: image
@@ -206,6 +218,6 @@ capabilities:
   vm_public_ip:
     value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address] }
   lan_ip:
-    value: { get_attribute: [lan_port, fixed_ip_address] }
+    value: { get_attribute: [lan_port, fixed_ips, 0, ip_address] }
   private_key_content:
     value: { get_attribute: [keypair, private_key_export] }

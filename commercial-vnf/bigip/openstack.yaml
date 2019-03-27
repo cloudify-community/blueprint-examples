@@ -41,10 +41,21 @@ dsl_definitions:
     password: { get_secret: openstack_password }
     username: { get_secret: openstack_username }
     project_name: { get_secret: openstack_tenant_name }
-    region_name: { get_input: region }
+    region_name: { get_secret: openstack_region }
     auth_url: { get_secret: openstack_auth_url }
 
 node_templates:
+
+  external_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+        kwargs:
+          routing:
+            external: true
 
   mgmt_network:
     type: cloudify.nodes.openstack.Network
@@ -83,9 +94,11 @@ node_templates:
     type: cloudify.nodes.openstack.FloatingIP
     properties:
       client_config: *client_config
-      resource_config:
-        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+      # resource_config:
+      #   floating_network_id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
     relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
       - type: cloudify.relationships.connected_to
         target: mgmt_port
 
@@ -93,9 +106,11 @@ node_templates:
     type: cloudify.nodes.openstack.FloatingIP
     properties:
       client_config: *client_config
-      resource_config:
-        floating_network_name: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+      # resource_config:
+      #   floating_network_id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
     relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
       - type: cloudify.relationships.connected_to
         target: public_port
 
@@ -109,7 +124,7 @@ node_templates:
             - { get_input: resource_prefix }
             - "_bigip_mgmt_port"
             - { get_input: resource_suffix }
-        network_id: { get_attribute: [ mgmt_network, id ] }
+        # network_id: { get_attribute: [ mgmt_network, id ] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: network_security_group
@@ -126,7 +141,7 @@ node_templates:
             - { get_input: resource_prefix }
             - "_bigip_public_port"
             - { get_input: resource_suffix }
-        network_id: { get_attribute: [ public_network, id ] }
+        # network_id: { get_attribute: [ public_network, id ] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: network_security_group
@@ -143,7 +158,7 @@ node_templates:
             - { get_input: resource_prefix }
             - "_bigip_wan_port"
             - { get_input: resource_suffix }
-        network_id: { get_attribute: [ wan_network, id ] }
+        # network_id: { get_attribute: [ wan_network, id ] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: network_security_group
@@ -156,6 +171,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
+        id: { get_input: image_id }
         container_format: "bare"
         disk_format: "qcow2"
 
@@ -184,7 +200,7 @@ node_templates:
               done
 
   vm:
-    type: cloudify.openstack.nodes.Server
+    type: cloudify.nodes.openstack.Server
     properties:
       client_config: *client_config
       agent_config:
@@ -216,13 +232,13 @@ node_templates:
 capabilities:
 
   mgmt_public_ip:
-    value: { get_attribute: [mgmt_floating_ip_address, id ] }
+    value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address ] }
 
   public_public_ip:
-    value: { get_attribute: [public_floating_ip_address, id ] }
+    value: { get_attribute: [public_floating_ip_address, floating_ip_address ] }
 
   wan_ip:
-    value: { get_attribute: [wan_port, fixed_ip_address ] }
+    value: { get_attribute: [wan_port, fixed_ips, 0, ip_address ] }
 
   public_ip:
-    value: { get_attribute: [public_port, fixed_ip_address ] }
+    value: { get_attribute: [public_port, fixed_ips, 0, ip_address ] }

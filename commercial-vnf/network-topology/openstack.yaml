@@ -55,16 +55,13 @@ inputs:
     - start: 10.10.4.2
       end: 10.10.4.254
 
-  region:
-    default: ''
-
 dsl_definitions:
 
   client_config: &client_config
     password: { get_secret: openstack_password }
     username: { get_secret: openstack_username }
     project_name: { get_secret: openstack_tenant_name }
-    region_name: { get_input: region }
+    region_name: { get_secret: openstack_region }
     auth_url: { get_secret: openstack_auth_url }
 
 node_templates:
@@ -153,7 +150,7 @@ node_templates:
         dns_nameservers: { get_input: nameservers }
         cidr: { get_input: mgmt_subnet_cidr }
         allocation_pools: { get_input: mgmt_subnet_allocation_pools }
-        gateway_ip: null
+        # gateway_ip: null
     relationships:
       - type: cloudify.relationships.contained_in
         target: mgmt_network
@@ -174,7 +171,7 @@ node_templates:
         dns_nameservers: { get_input: nameservers }
         cidr: { get_input: public_subnet_cidr }
         allocation_pools: { get_input: public_subnet_allocation_pools }
-        gateway_ip: null
+        # gateway_ip: null
     relationships:
       - type: cloudify.relationships.contained_in
         target: public_network
@@ -248,7 +245,7 @@ node_templates:
 capabilities:
 
   external_network:
-    value: { get_attribute: [ external_network, name ] }
+    value: { get_attribute: [ external_network, id ] }
 
   router:
     value: { get_attribute: [ router, id ] }

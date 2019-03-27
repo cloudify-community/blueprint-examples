@@ -71,7 +71,7 @@ cfy uninstall VNFM-Fortigate-Prov-Openstack-vm
 
 The configuration requires the IP addresses of the VM created during provisioning, therefore the provisioning deployment name is required as an input. Exposed IP addresses are fetched using `get_capability` function: `{ get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }`.
 
-* Blueprint: The `<infrastructure>_application.yaml` blueprint is responsible for applying base configuration for the newly created FortiGate VM. It configures all of the interfaces. It consists of one node:
+* Blueprint: The `<infrastructure>app.yaml` blueprint is responsible for applying base configuration for the newly created FortiGate VM. It configures all of the interfaces. It consists of one node:
   * `fortigate_vnf_config`: Applies base configuration for Fortigate (VNF name change and basic configuration to interfaces) using [fortigate-baseline.txt](Resources/templates/fortigate-baseline.txt) file.
 
 * Inputs:
@@ -80,7 +80,7 @@ The configuration requires the IP addresses of the VM created during provisionin
 ### Install
 
 AZURE:
-`cfy install azureapp -b VNFM-Fortigate-Conf`
+`cfy install azureapp.yaml -b VNFM-Fortigate-Conf`
 
 OPENSTACK:
 `cfy install openstackapp.yaml -b VNFM-Fortigate-Conf`

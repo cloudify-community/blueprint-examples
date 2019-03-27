@@ -12,7 +12,7 @@ Prior to installation please upload the below plugins and create the mentioned s
 
 Upload:
 * **cloudify-azure-plugin** - Tested for version 2.1.1
-* **cloudify-openstack-plugin** - Tested for version 2.14.7
+* **cloudify-openstack-plugin** - Tested for version 3.0.0
 * **cloudify-utilities-plugin** - Tested for version 1.12.5
 
 This can be applied through the Cloudify manager user interface or using the CLI.
@@ -21,7 +21,7 @@ This can be applied through the Cloudify manager user interface or using the CLI
 * To upload plugins using the CLI, run the following commands:
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/cloudify_utilities_plugin-1.12.5-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases/download/1.12.5/plugin.yaml``
 
-``cfy plugins upload https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/2.14.7/cloudify_openstack_plugin-2.14.7-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/2.14.7/plugin.yaml``
+``cfy plugins upload https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/3.0.0/cloudify_openstack_plugin-3.0.0-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases/download/3.0.0/plugin.yaml``
 
 ``cfy plugins upload https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/cloudify_azure_plugin-2.1.1-py27-none-linux_x86_64-centos-Core.wgn -y https://github.com/cloudify-incubator/cloudify-azure-plugin/releases/download/2.1.1/plugin.yaml``
 
@@ -35,11 +35,11 @@ Create the below secrets in the secret store management:
     * *azure_tenant_id* - Service Principal tenant
     * *azure_location* - Specifies the supported Azure location for the resource
 * **Openstack secrets:**
-    * *keystone_username* - Keystone username
-    * *keystone_password* - Keystone password
-    * *keystone_tenant_name* - Keystone tenant name
-    * *keystone_url* - Keystone URL
-    * *keystone_region* - Keystone region
+    * *openstack_username* - Keystone username
+    * *openstack_password* - Keystone password
+    * *openstack_tenant_name* - Keystone tenant name
+    * *openstack_auth_url* - Keystone URL
+    * *openstack_region* - Keystone region
 * **Common secrets:**
     * *resource_prefix* - Prefix of every resource created at this deployment. You can set this up via the CLI: `cfy secrets create resource_prefix -s [secret_value]`
     * *resource_suffix* - Suffix of every resource created at this deployment. You can set this up via the CLI: `cfy secrets create resource_suffix -s [secret_value]`
@@ -58,11 +58,11 @@ You can create those with the following cfy commands:\
 ``cfy secrets create azure_subscription_id -s <azure_subscription_id>``\
 ``cfy secrets create azure_tenant_id -s <azure_tenant_id>``\
 ``cfy secrets create azure_location -s <azure_location>``\
-``cfy secrets create keystone_username -s <keystone_username>``\
-``cfy secrets create keystone_password -s <keystone_password>``\
-``cfy secrets create keystone_tenant_name -s <keystone_tenant_name>``\
-``cfy secrets create keystone_url -s <keystone_url>``\
-``cfy secrets create keystone_region -s <keystone_region>``\
+``cfy secrets create _username -s <openstack_username>``\
+``cfy secrets create openstack_password -s <openstack_password>``\
+``cfy secrets create openstack_tenant_name -s <openstack_tenant_name>``\
+``cfy secrets create openstack_auth_url -s <openstack_auth_url>``\
+``cfy secrets create openstack_region -s <openstack_region>``\
 ``cfy secrets create bigip_username -s <bigip_username>``\
 ``cfy secrets create bigip_password -s <bigip_password>``\
 ``cfy secrets create bigip_license -s <bigip_license>``\
@@ -74,6 +74,7 @@ You can create those with the following cfy commands:\
 
 ### Inputs
 
+* *external_network_id* - (ONLY OPENSTACK) The ID of the existing external network
 * *network_prov_name* - The name of the common network resources provisioning deployment - default: VNFM-Networking-Prov-Azure-networks
 * *f5_prov_name* - The name of the BIG IP Provisioning deployment - default: VNFM-F5-Prov-Azure-vm
 * *f5_conf_name* - The name of the BIG IP Configuration deployment - default: VNFM-F5-Conf

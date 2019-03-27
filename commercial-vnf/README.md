@@ -18,7 +18,7 @@ The infrastructures used in this example are Microsoft Azure or OpenStack, and t
 
 * These plugins should exist on your manager. (E.g. You can just run `cfy plugins bundle-upload`, which will satisfy all plugin requirements.):
   * [cloudify-azure-plugin](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases), version 2.1.1 or higher.
-  * [cloudify-openstack-plugin](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases), version 2.14.7 or higher.
+  * [cloudify-openstack-plugin](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases), version 3.0.0 or higher.
   * [cloudify-utilities-plugin](https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases), version 1.12.5 or higher.
 
 * These secrets should exist on your manager:
@@ -31,11 +31,11 @@ The infrastructures used in this example are Microsoft Azure or OpenStack, and t
     * `agent_key_private`: The content of an RSA private key. (E.g. You can upload this key from a file: `cfy secrets create agent_key_private -f ~/.ssh/id_rsa`).
     * `agent_key_public`: The content of an RSA public key. (E.g. You can upload this key from a file: `cfy secrets create agent_key_private -f ~/.ssh/id_rsa.pub`).
   * **FOR OPENSTACK:**:
-    * *keystone_username* - Username used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create keystone_username -s <keystone_username>``
-    * *keystone_password* - Password used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create keystone_password -s <keystone_password>``
-    * *keystone_tenant_name* - Name of the tenant in OpenStack. You can set this up via the CLI: ``cfy secrets create keystone_tenant_name -s <keystone_tenant_name>``
-    * *keystone_url* - URL used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create keystone_url -s <keystone_url>``
-    * *keystone_region* - Name of the region in OpenStack. You can set this up via the CLI: ``cfy secrets create keystone_region -s <keystone_region>``
+    * *openstack_username* - Username used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create openstack_username -s <openstack_username>``
+    * *openstack_password* - Password used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create openstack_password -s <openstack_password>``
+    * *openstack_tenant_name* - Name of the tenant in OpenStack. You can set this up via the CLI: ``cfy secrets create openstack_tenant_name -s <openstack_tenant_name>``
+    * *openstack_auth_url* - URL used for authentication in Keystone service. You can set this up via the CLI: ``cfy secrets create openstack_auth_url -s <openstack_auth_url>``
+    * *openstack_region* - Name of the region in OpenStack. You can set this up via the CLI: ``cfy secrets create openstack_region -s <openstack_region>``
   * **FOR BOTH:**:
     * *resource_prefix* - Prefix of every resource created at this deployment. You can set this up via the CLI: ``cfy secrets create resource_prefix -s <resource_prefix>``
     * *resource_suffix* - Suffix of every resource created at this deployment. You can set this up via the CLI: ``cfy secrets create resource_suffix -s <resource_suffix>``

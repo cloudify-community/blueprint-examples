@@ -70,7 +70,7 @@ cfy uninstall VNFM-F5-Prov-Openstack-vm
 The configuration requires the IP addresses of the VM created during provisioning, therefore the provisioning deployment name is required as an input. Exposed IP addresses are fetched using `get_capability` function: `{ get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }`.
 
 * Blueprint: The `<infrastructure>_application.yaml` blueprint is responsible for licensing BIG IP with the provided registration key and applying VLAN configuration necessary for further LTM configuration. It consists of two nodes (+ one extra node in OpenStack deployment):
-  * `check_mcpd_status`: (Only in OpenStack) Checks if the MCPD services is already started, because it's necessary for applying the license succesfully.
+  * `check_mcpd_status`: (ONLY OPENSTACK) Checks if the MCPD services is already started, because it's necessary for applying the license succesfully.
     Uses [check_mcpd_status.txt](Resources/templates/openstack/check_mcpd_status.txt) file.
   * `license`: Applies license using [install_license.txt](Resources/templates/azure/install_license.txt) file for Azure and [install_license.txt](Resources/templates/openstack/install_license.txt) file for Openstack and revokes it using [revoke_license.txt](Resources/templates/azure/revoke_license.txt) for Azure and [revoke_license.txt](Resources/templates/openstack/revoke_license.txt) for Openstack.
   * `vlan_configuration`: Creates VLAN configuration on WAN and Public interfaces - using [vlan_config.txt](Resources/templates/azure/vlan_config.txt) for Azure and [vlan_config.txt](Resources/templates/openstack/vlan_config.txt) for Openstack, to apply it during install and [vlan_config_delete.txt](Resources/templates/azure/vlan_config_delete.txt) for Azure and [vlan_config_delete.txt](Resources/templates/openstack/vlan_config_delete.txt) for Openstack to tear it down during uninstall.
@@ -83,7 +83,7 @@ The configuration requires the IP addresses of the VM created during provisionin
 ### Install
 
 AZURE:
-`cfy install azureapp -b VNFM-F5-Conf`
+`cfy install azureapp.yaml -b VNFM-F5-Conf`
 
 OPENSTACK:
 `cfy install openstackapp.yaml -b VNFM-F5-Conf`

@@ -24,6 +24,9 @@ imports:
 # The inputs section includes the names of the particular blueprints and
 # deployments which this blueprint will leverage.
 inputs:
+  external_network_id:
+    description: ID of the external network in OpenStack
+
   network_prov_name:
     description: Name of common resources provisioning blueprint/deployment
     default: VNFM-Networking-Prov-Openstack-networks
@@ -79,6 +82,8 @@ node_templates:
           main_file_name: openstack.yaml
         deployment:
           id: { get_input: network_prov_name }
+          inputs:
+            external_network_id: { get_input: external_network_id }
 
 
   ### PROVISIONING ###

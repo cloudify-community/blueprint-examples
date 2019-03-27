@@ -60,7 +60,7 @@ cfy uninstall VNFM-HTTPD-Prov-Openstack-vm
 
 ## Configuration
 
-* Blueprint: The `<infrastructure>_application.yaml` blueprint is responsible for starting HTTPD process on the target VM, `web_server` node is responsible for creating such server using the following command: `screen -dmS -X python3 -m http.server 8080`. The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm/VNFM-HTTPD-Prov-Openstack-vm deployment using capabilities.
+* Blueprint: The `<infrastructure>app.yaml` blueprint is responsible for starting HTTPD process on the target VM, `web_server` node is responsible for creating such server using the following command: `screen -dmS -X python3 -m http.server 8080`. The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm/VNFM-HTTPD-Prov-Openstack-vm deployment using capabilities.
 
 * Inputs:
   * `httpd_vm_deployment_name`: Name of HTTPD Provisioning deployment. Default: `VNFM-HTTPD-Prov-Azure-vm` or `VNFM-HTTPD-Prov-Openstack-vm`.
@@ -68,7 +68,7 @@ cfy uninstall VNFM-HTTPD-Prov-Openstack-vm
 ### Install
 
 AZURE:
-`cfy install azureapp -b VNFM-HTTPD-Conf`
+`cfy install azureapp.yaml -b VNFM-HTTPD-Conf`
 
 OPENSTACK:
 `cfy install openstackapp.yaml -b VNFM-HTTPD-Conf`

@@ -26,13 +26,13 @@ Upload the blueprint, create the deployment and execute install workflow in one 
 
 AZURE:
 ```bash
-cfy install  infrastructure.yaml -b  \
+cfy install  azure.yaml -b  \
     VNFM-Networking-Prov-Azure-networks
 ```
 
 OPENSTACK:
 ```bash
-cfy install  infrastructure.yaml -b  \
+cfy install  openstack.yaml -b  \
     VNFM-Networking-Prov-Openstack-networks
 ```
 

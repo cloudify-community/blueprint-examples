@@ -1,2 +1,0 @@
-revoke /sys license
-quit

@@ -174,7 +174,7 @@ node_templates:
         blueprint:
           id: { get_input: f5_conf_name }
           blueprint_archive: Resources/bigip.zip
-          main_file_name: azureapp
+          main_file_name: azureapp.yaml
         deployment:
           id: { get_input: f5_conf_name }
     relationships:
@@ -198,7 +198,7 @@ node_templates:
         blueprint:
           id: { get_input: fg_conf_name }
           blueprint_archive: Resources/fortigate.zip
-          main_file_name: azureapp
+          main_file_name: azureapp.yaml
         deployment:
           id: { get_input: fg_conf_name }
     relationships:
@@ -222,7 +222,7 @@ node_templates:
         blueprint:
           id: { get_input: httpd_conf_name }
           blueprint_archive: Resources/httpd.zip
-          main_file_name: azureapp
+          main_file_name: azureapp.yaml
         deployment:
           id: { get_input: httpd_conf_name }
     relationships:
