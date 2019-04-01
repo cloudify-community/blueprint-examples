@@ -87,7 +87,7 @@ If you are an Openstack user:
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.0-2/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--resource_name_prefix='db'`
 
   **Openstack**
-  `cfy install ~/dev/repos/blueprint-examples/db-lb-app/db/application.yaml -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.0-2/db-lb-app-db.zip -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
 
 ### Install the load balancer
 

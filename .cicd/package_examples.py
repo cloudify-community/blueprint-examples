@@ -71,6 +71,9 @@ class NewRelease(object):
         if not self._version:
             blueprints_version = get_cloudify_version()
             version = self._get_last_version()
+            logging.info(
+                'Old version: {0}. New version: {1}'.format(
+                    blueprints_version, version))
             if blueprints_version > version:
                 version = blueprints_version
             try:
