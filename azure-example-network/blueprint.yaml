@@ -113,7 +113,7 @@ node_templates:
     - type: cloudify.azure.relationships.contained_in_virtual_network
       target: network
 
-outputs:
+capabilities:
 
   resource_group:
     value: { get_attribute: [ resource_group, name ] }
