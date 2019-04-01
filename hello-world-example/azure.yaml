@@ -3,7 +3,9 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-azure-plugin
-  - install-script.yaml
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - ansible.yaml
 
 inputs:
 
@@ -50,9 +52,6 @@ inputs:
     description: The user name of the agent on the instance created from the image.
     default: ubuntu
 
-  agent_password:
-    type: string
-
 dsl_definitions:
 
   azure_config: &azure_config
@@ -76,11 +75,19 @@ node_templates:
         storageProfile:
           imageReference: { get_input: image }
         osProfile:
-          customData:  { get_input: install_script }
           adminUsername: { get_input: agent_user }
-          adminPassword: { get_input: agent_password }
+          adminPassword: ''
+          linuxConfiguration:
+            ssh:
+              publicKeys:
+              - keydata: { get_secret: agent_key_public }
+                path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
+            disablePasswordAuthentication: true
       agent_config:
         install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      use_public_ip: true
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
