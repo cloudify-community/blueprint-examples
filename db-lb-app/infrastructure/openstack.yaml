@@ -30,11 +30,11 @@ inputs:
 dsl_definitions:
 
   client_config: &client_config
-    auth_url: { get_secret: auth_url }
-    username: { get_secret: username }
-    password: { get_secret: password }
-    project_name: { get_secret: project_name }
-    region_name: { get_secret: region_name }
+    auth_url: { get_secret: openstack_auth_url }
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    project_name: { get_secret: openstack_project_name }
+    region_name: { get_input: region_name }
 
 node_templates:
 
