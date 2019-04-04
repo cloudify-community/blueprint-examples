@@ -1,0 +1,129 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+  - infoblox.yaml
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+
+  rest_username:
+    description: >
+      REST API user name
+
+  rest_userpass:
+    description: >
+      REST API user password
+
+  record_network_addrs:
+    description: >
+      Preexisted network record
+    default:
+        10.0.0.0/24
+
+  record_host_name:
+    description: >
+      New record host
+
+node_templates:
+
+  network_record:
+    type: infoblox.record_network
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      network:
+        addr: { get_input: record_network_addrs }
+
+  network_ids_record:
+    type: infoblox.request_free_ips
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      network:
+        addr: { get_input: record_network_addrs }
+        amount: 10
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_record
+
+  a_record:
+    type: infoblox.record_a
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      record:
+         ipv4addr: 10.10.1.1
+         name: { get_input: record_host_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_ids_record
+
+  ptr_record:
+    type: infoblox.record_ptr
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      record:
+        ipv4addr: 10.10.1.1
+        name: { get_input: record_host_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: a_record
+
+  host_record:
+    type: infoblox.record_host
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      record:
+         ipv4addr:
+            concat:
+              - "func:nextavailableip:"
+              - { get_input: record_network_addrs }
+         name: { get_input: record_host_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: ptr_record
+
+  update_host:
+    type: infoblox.update_host
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      record:
+         ipv4addr: 10.10.1.2
+         name: { get_input: record_host_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: host_record
+
+  update_a:
+    type: infoblox.update_record_a
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+      record:
+         ipv4addr: 10.10.1.2
+         name: { get_input: record_host_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: update_host

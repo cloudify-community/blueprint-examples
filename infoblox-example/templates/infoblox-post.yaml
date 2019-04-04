@@ -1,0 +1,15 @@
+rest_calls:
+
+  - path: /wapi/v2.7/{{type}}{{function}}
+    method: POST
+    headers:
+      Content-type: application/json
+    auth:
+      user: {{username|tojson}}
+      password: {{userpass|tojson }}
+    payload: {{ payload|tojson }}
+    response_format: auto
+    translation_format: v3
+    response_translation:
+      id: []
+

@@ -1,0 +1,9 @@
+rest_calls:
+
+{% for obj in raw %}
+  - path: /wapi/v2.7/{{obj['_ref']}}
+    method: DELETE
+    auth:
+      user: {{username|tojson}}
+      password: {{userpass|tojson }}
+{% endfor %}
