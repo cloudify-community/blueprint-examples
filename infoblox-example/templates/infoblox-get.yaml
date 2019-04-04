@@ -1,0 +1,13 @@
+rest_calls:
+
+  - path: /wapi/v2.7/{{type}}?{{field}}~={{value}}
+    method: GET
+    auth:
+      user: {{username|tojson}}
+      password: {{userpass|tojson }}
+    response_format: json
+    translation_format: v3
+    response_translation:
+      raw: []
+      id: [0, '_ref']
+

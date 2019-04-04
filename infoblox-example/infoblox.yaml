@@ -1,0 +1,347 @@
+node_types:
+
+  infoblox.record_a:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # create a record
+                - template_file: templates/infoblox-post.yaml
+                  save_to: post_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    type: "record:a"
+                    payload:
+                      ipv4addr: { get_property: [ SELF, record, ipv4addr ] }
+                      name:  { get_property: [ SELF, record, name ] }
+                      view: default
+        delete:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # search a record
+                - template_file: templates/infoblox-get.yaml
+                  save_to: reget_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: name
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:a"
+                # remove found a record
+                - template_file: templates/infoblox-delete.yaml
+                  save_to: delete_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                  params_attributes:
+                    # used full list of records with same name
+                    raw: [ reget_record_a, result_properties, raw]
+
+  infoblox.get_record_a:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # get preexisted a record
+                - template_file: templates/infoblox-get.yaml
+                  save_to: get_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: name
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:a"
+
+  infoblox.update_record_a:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # get preexisted a record
+                - template_file: templates/infoblox-get.yaml
+                  save_to: get_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: name
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:a"
+                # update a record
+                - template_file: templates/infoblox-put.yaml
+                  save_to: put_record_a
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    payload:
+                      ipv4addr: { get_property: [ SELF, record, ipv4addr ] }
+                  params_attributes:
+                    id: [ get_record_a, result_properties, id]
+
+  infoblox.record_ptr:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # create ptr record
+                - template_file: templates/infoblox-post.yaml
+                  save_to: post_record_ptr
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    type: "record:ptr"
+                    payload:
+                      ipv4addr: { get_property: [ SELF, record, ipv4addr ] }
+                      ptrdname: { get_property: [ SELF, record, name ] }
+                      view: default
+        delete:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # search prt record
+                - template_file: templates/infoblox-get.yaml
+                  save_to: reget_record_ptr
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: ptrdname
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:ptr"
+                # remove found prt record
+                - template_file: templates/infoblox-delete.yaml
+                  save_to: delete_record_ptr
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                  params_attributes:
+                    # used full list of records with same name
+                    raw: [ reget_record_ptr, result_properties, raw]
+
+  infoblox.record_host:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # create host
+                - template_file: templates/infoblox-post.yaml
+                  save_to: post_record_host
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    type: "record:host"
+                    payload:
+                      ipv4addrs:
+                        - configure_for_dhcp: false
+                          ipv4addr: { get_property: [ SELF, record, ipv4addr ] }
+                      name: { get_property: [ SELF, record, name ] }
+                      view: default
+        delete:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # search host by name
+                - template_file: templates/infoblox-get.yaml
+                  save_to: reget_record_host
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: name
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:host"
+                # remove found a record host
+                - template_file: templates/infoblox-delete.yaml
+                  save_to: delete_record_host
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                  params_attributes:
+                    raw: [ reget_record_host, result_properties, raw]
+
+  infoblox.update_host:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      record:
+        description: record properties
+        default:
+          ipv4addr: false
+          name: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # get host records
+                - template_file: templates/infoblox-get.yaml
+                  save_to: get_record_host
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: name
+                    value: { get_property: [ SELF, record, name ] }
+                    type: "record:host"
+                # update host record
+                - template_file: templates/infoblox-put.yaml
+                  save_to: put_record_host
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    payload:
+                      ipv4addrs:
+                      - ipv4addr: { get_property: [ SELF, record, ipv4addr ] }
+                  params_attributes:
+                    id: [ get_record_host, result_properties, id]
+
+  infoblox.record_network:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      network:
+        default:
+          addr: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # create network
+                - template_file: templates/infoblox-post.yaml
+                  save_to: post_record_network
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    type: "network"
+                    payload:
+                      network: { get_property: [ SELF, network, addr ] }
+        delete:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # search all networks with some ip/mask
+                - template_file: templates/infoblox-get.yaml
+                  save_to: reget_record_network
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: network
+                    value: { get_property: [ SELF, network, addr ] }
+                    type: "network"
+                # remove selected masks
+                - template_file: templates/infoblox-delete.yaml
+                  save_to: delete_record_network
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                  params_attributes:
+                    raw: [ reget_record_network, result_properties, raw]
+
+  infoblox.request_free_ips:
+    derived_from: cloudify.rest.BunchRequests
+    properties:
+      network:
+        default:
+          addr: false
+          amount: 1
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: rest.cloudify_rest.tasks.bunch_execute
+          inputs:
+            templates:
+              default:
+                # get network information
+                - template_file: templates/infoblox-get.yaml
+                  save_to: get_record_network
+                  prerender: true
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    field: network
+                    value: { get_property: [ SELF, network, addr ] }
+                    type: "network"
+                # get free ip's
+                - template_file: templates/infoblox-post.yaml
+                  save_to: get_record_ips
+                  prerender: true
+                  params_attributes:
+                    type: [ get_record_network, result_properties, id]
+                  params:
+                    username: { get_input: rest_username }
+                    userpass: { get_input: rest_userpass }
+                    function: "?_function=next_available_ip"
+                    payload:
+                      num: { get_property: [ SELF, network, amount ] }
