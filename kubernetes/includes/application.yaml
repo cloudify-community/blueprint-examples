@@ -11,21 +11,214 @@ inputs:
     type: string
     default: kubespray/cluster.yml
 
+  kubespray_ansible_playbook_path_removal:
+    type: string
+    default: kubespray/remove-node.yml
+
+  kubespray_dns_mode:
+    type: string
+    default: kubedns
+
+  kubespray_kube_network_plugin:
+    type: string
+    default: flannel
+
+dsl_definitions:
+
+  - &cluster_vars
+    dns_mode: { get_input: kubespray_dns_mode}
+    kube_network_plugin: { get_input: kubespray_kube_network_plugin }
+    kube_api_anonymous_auth: true
+
+  - &step1_configure
+    tags:
+      - always
+      - bootstrap-os
+    skip_tags:
+      - localhost
+      - check
+      - bastion
+      - preinstall
+      - container-engine
+      - download
+      - kubelet
+      - etcd
+      - node
+      - master
+      - win_nodes
+      - cluster-roles
+      - kubeadm
+      - network
+      - rotate_tokens
+      - dnsmasq
+      - policy-controller
+      - ingress-controller
+      - external-provisioner
+      - resolvconf
+      - apps
+      - k8s-secrets
+
+  - &step1_start
+    tags:
+      - always
+      - preinstall
+    skip_tags:
+      - bootstrap-os
+      - localhost
+      - check
+      - bastion
+      - etcd
+      - container-engine
+      - download
+      - kubelet
+      - node
+      - master
+      - win_nodes
+      - cluster-roles
+      - kubeadm
+      - network
+      - rotate_tokens
+      - dnsmasq
+      - policy-controller
+      - ingress-controller
+      - external-provisioner
+      - resolvconf
+      - apps
+      - k8s-secrets
+
+  - &step2_create
+    tags:
+      - always
+      - container-engine
+    skip_tags:
+      - preinstall
+      - bootstrap-os
+      - localhost
+      - check
+      - bastion
+      - download
+      - etcd
+      - kubelet
+      - node
+      - master
+      - win_nodes
+      - cluster-roles
+      - kubeadm
+      - network
+      - rotate_tokens
+      - dnsmasq
+      - policy-controller
+      - ingress-controller
+      - external-provisioner
+      - resolvconf
+      - apps
+      - k8s-secrets
+
+  - &step2_configure
+    tags:
+      - always
+      - download
+    skip_tags:
+      - container-engine
+      - preinstall
+      - bootstrap-os
+      - localhost
+      - check
+      - bastion
+      - download
+      - kubelet
+      - etcd
+      - node
+      - master
+      - win_nodes
+      - cluster-roles
+      - kubeadm
+      - network
+      - rotate_tokens
+      - dnsmasq
+      - policy-controller
+      - ingress-controller
+      - external-provisioner
+      - resolvconf
+      - apps
+      - k8s-secrets
+
+  - &step2_start
+    skip_tags:
+      - download
+      - container-engine
+      - preinstall
+      - bootstrap-os
+      - localhost
+      - check
+      - bastion
+
 node_templates:
 
-  kubespray:
+  kube-base-config-step1:
     type: cloudify.nodes.Root
     interfaces:
       cloudify.interfaces.lifecycle:
+        configure:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+            run_data:
+              <<: *cluster_vars
+            options_config:
+              <<: *step1_configure
+              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
         start:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
             site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+            run_data:
+              <<: *cluster_vars
+            options_config:
+              <<: *step1_start
+              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
     relationships:
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-master
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-node
+
+  kube-base-config-step2:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+            sources: { get_attribute: [ kube-base-config-step1, sources ] }
+            run_data:
+              <<: *cluster_vars
+            options_config:
+              <<: *step2_create
+              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
+        configure:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+            sources: { get_attribute: [ kube-base-config-step1, sources ] }
+            run_data:
+              <<: *cluster_vars
+            options_config:
+              <<: *step2_configure
+              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
+        start:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: { get_input: kubespray_ansible_playbook_path }
+            sources: { get_attribute: [ kube-base-config-step1, sources ] }
+            run_data:
+              <<: *cluster_vars
+            options_config:
+              <<: *step2_start
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-base-config-step1
 
 groups:
 

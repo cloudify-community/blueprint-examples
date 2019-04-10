@@ -9,7 +9,7 @@ node_templates:
     type: cloudify.nodes.Root
     relationships:
       - type: cloudify.relationships.depends_on
-        target: kubespray
+        target: kube-base-config-step2
       - type: cloudify.relationships.contained_in
         target: kube-master
         source_interfaces:

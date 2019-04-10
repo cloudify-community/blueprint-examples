@@ -29,8 +29,12 @@ def validate_blueprint(request):
     # TODO: Add to supported examples.json desired blueprint name.
     dirname_param = path.dirname(request.param).split('/')[-1:][0]
     infra_name = path.basename(request.param).split('.yaml')[0]
-    if dirname_param == 'infrastructure' and infra_name == 'aws':
+    if dirname_param == 'infrastructure' and infra_name == 'azure':
         blueprint_id = '{0}'.format(dirname_param)
+    elif dirname_param == 'infrastructure' and infra_name == 'aws':
+        blueprint_id = 'public-cloud'
+    elif dirname_param == 'infrastructure' and infra_name == 'openstack':
+        blueprint_id = 'private-cloud'
     else:
         blueprint_id = '{0}-{1}'.format(
             dirname_param,

@@ -14,3 +14,6 @@
 [submodule "db-lb-app/app/drupal/apache"]
 	path = db-lb-app/app/drupal/apache
 	url = https://github.com/earthmant/ansible-role-httpd.git
+[submodule "kubernetes/kubeadm-ansible"]
+	path = kubernetes/kubeadm-ansible
+	url = https://github.com/kairen/kubeadm-ansible.git

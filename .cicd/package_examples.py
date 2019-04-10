@@ -91,8 +91,8 @@ class NewRelease(object):
     @property
     def name(self):
         gen, iteration = self.version.split('-')
-        return 'Cloudify v{0} Blueprint Examples ' \
-               'Bundle no. {1}'.format(gen, iteration)
+        return 'Cloudify {0} Blueprint Examples ' \
+               'Bundle v{1}'.format(gen, iteration)
 
     @property
     def message(self):
