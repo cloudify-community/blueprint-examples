@@ -4,7 +4,7 @@ description: Install Drupal7 on infrastructure.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - infrastructure--blueprint:cloud-a
+  - infrastructure--blueprint:public-cloud
   - plugin:cloudify-ansible-plugin
 
 inputs:
