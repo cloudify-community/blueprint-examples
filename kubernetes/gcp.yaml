@@ -127,7 +127,6 @@ node_templates:
           - 0 - 65535
         udp:
           - 0 - 65535
-        ipip: []
       sources:
         - 0.0.0.0/0
     relationships:
