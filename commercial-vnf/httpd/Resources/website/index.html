@@ -1,0 +1,52 @@
+<html>
+    <header>
+        <title>Cloudify Hello World</title>
+    </header>
+<style>
+html {
+	background: url(https://blastmkt.com/wp-content/uploads/2018/08/seo-2-slide-1-background-4.jpg) center top;
+    background-size: auto contain;
+    -webkit-animation: velocity 0.5s linear 0s infinite normal forwards; /* Safari 4.0 - 8.0 */
+    animation: velocity 0.5s linear 0s infinite normal forwards;
+    height: 100%;
+}
+body {
+	background: url(https://blastmkt.com/wp-content/uploads/2018/08/home-2-slide-rocket-shape-4.png) no-repeat center bottom;
+    -webkit-animation: flying 1s ease-in-out 0s infinite normal; /* Safari 4.0 - 8.0 */
+    animation: flying 1s ease-in-out 0s infinite normal;
+    height: 100%;
+    margin: 0;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes flying {
+    0%   {background-position: center 200%}
+    50%   {background-position: center 150%}
+    100%   {background-position: center 200%}
+}
+
+/* Standard syntax */
+@keyframes flying {
+    0%   {background-position: center 200%}
+    50%   {background-position: center 150%}
+    100%   {background-position: center 200%}
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes velocity {
+    0%   {background-position: center bottom}
+    50%   {background-position: center center}
+    100%   {background-position: center top}
+}
+
+@keyframes velocity {
+    0%   {background-position: center bottom}
+    50%   {background-position: center center}
+    100%   {background-position: center top}
+}
+</style>
+<body>
+    <div style="text-align: center; color: white;"><h1>Hello World!</h1><br>You deployed your first Cloudify blueprint. Well done!
+    <br><br><img src="https://raw.githubusercontent.com/cloudify-examples/local-simple-python-webserver-blueprint/master/Cloudify-Logo-White.png" width="300px"></div>
+</body>
+</html>

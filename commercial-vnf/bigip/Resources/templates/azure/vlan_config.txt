@@ -1,0 +1,6 @@
+create net vlan inside interfaces add { 1.1 { untagged } }
+create net vlan outside interfaces add { 1.2 { untagged } }
+create net self {{IP_INSIDE}} address {{IP_INSIDE}}/24 vlan inside allow-service default
+create net self {{IP_OUTSIDE}} address {{IP_OUTSIDE}}/24 vlan outside allow-service default
+save sys config
+quit

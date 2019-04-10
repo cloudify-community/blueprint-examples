@@ -1,0 +1,5 @@
+delete net self {{IP_OUTSIDE}}
+delete net self {{IP_INSIDE}}
+delete net vlan outside
+delete net vlan outside
+quit

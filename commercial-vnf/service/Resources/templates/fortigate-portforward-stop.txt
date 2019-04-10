@@ -1,0 +1,6 @@
+config firewall policy
+    delete 1
+end
+config firewall vip
+    delete "sg-port-forward-vip"
+end
