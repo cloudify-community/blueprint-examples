@@ -84,7 +84,7 @@ node_templates:
     - type: cloudify.gcp.relationships.contained_in_network
       target: network
 
-outputs:
+capabilities:
 
   network:
     value: { get_property: [ network, name ] }

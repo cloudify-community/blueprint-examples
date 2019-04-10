@@ -1,12 +1,15 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
-description: A simple GCP example network.
+description: A simple Openstack example network.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-openstack-plugin?version=3.0.0
 
 inputs:
+
+  external_network_id:
+    description: Openstack tenant external network name.
 
   username:
     description: OS_USERNAME as specified in Openstack RC file.
@@ -27,9 +30,6 @@ inputs:
   region:
     description: OS_REGION_NAME as specified in Openstack RC file.
     default: { get_secret: openstack_region }
-
-  external_network_id:
-    description: Openstack tenant external network name.
 
   nameservers:
     default: [8.8.4.4, 8.8.8.8]
@@ -126,7 +126,7 @@ node_templates:
       - type: cloudify.relationships.openstack.subnet_connected_to_router
         target: public-network-router
 
-outputs:
+capabilities:
 
   external_network:
     value: { get_attribute: [ external-network, id ] }

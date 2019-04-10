@@ -1,0 +1,195 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates a MariaDB Cluster.
+  Update Centos AMI Product Code: https://wiki.centos.org/Cloud/AWS#head-cc841c2a7d874025ae24d427776e05c7447024b2.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-aws-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  instance_type:
+    description: >
+      The AWS instance_type. Tested with m3.medium, although that is unnecessarily large.
+    default: 't2.micro'
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'ec2-user'
+
+  resource_name_prefix:
+    type: string
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_secret: aws_access_key_id }
+    aws_secret_access_key: { get_secret: aws_secret_access_key }
+    region_name: { get_capability: [ aws, region_name ] }
+
+node_templates:
+
+  host:
+    type: cloudify.nodes.aws.ec2.Instances
+    properties:
+      client_config: *client_config
+      agent_config:
+        install_method: none
+        user: { get_input: agent_user }
+        key: { get_secret: agent_key_private }
+      resource_config:
+        MaxCount: 1
+        MinCount: 1
+        ImageId: { get_attribute: [ centos_core_ami, aws_resource_id ] }
+        InstanceType: { get_input: instance_type }
+        kwargs:
+          BlockDeviceMappings:
+          - DeviceName: '/dev/sda1'
+            Ebs:
+              DeleteOnTermination: True
+          Placement:
+            AvailabilityZone: { get_capability: [ aws, availability_zone ] }
+          UserData: { get_attribute: [ cloud_init, cloud_config ] }
+      use_public_ip: true
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: nic
+      - type: cloudify.relationships.depends_on
+        target: ip
+      - type: cloudify.relationships.depends_on
+        target: centos_core_ami
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+
+  ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: nic
+
+  nic:
+    type: cloudify.nodes.aws.ec2.Interface
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Description: db-lb-app db-nic.
+          SubnetId: { get_attribute: [ subnet, aws_resource_id] }
+          Groups:
+            - { get_attribute: [ security_group, aws_resource_id ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: subnet
+      - type: cloudify.relationships.depends_on
+        target: security_group
+      - type: cloudify.relationships.depends_on
+        target: security_group_rules
+
+  security_group_rules:
+    type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
+    properties:
+      client_config: *client_config
+      resource_config:
+        IpPermissions:
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 3306
+            ToPort: 3306
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 4444
+            ToPort: 4444
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 4567
+            ToPort: 4568
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: security_group
+
+  security_group:
+    type: cloudify.nodes.aws.ec2.SecurityGroup
+    properties:
+      client_config: *client_config
+      resource_config:
+        GroupName: { concat: [ { get_input: resource_name_prefix }, '-infra-group' ] }
+        Description: db lb app infra group
+        VpcId: { get_capability: [ aws, vpc_id ] }
+
+  subnet:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_id: { get_capability: [ aws, public_subnet_id ] }
+      resource_config:
+        CidrBlock: 'N/A'
+        AvailabilityZone: 'N/A'
+
+  vpc:
+    type: cloudify.nodes.aws.ec2.Vpc
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_id: { get_capability: [ aws, vpc_id ] }
+      resource_config:
+        CidrBlock: 'N/A'
+
+  centos_core_ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: owner-id
+            Values:
+            - "057448758665"
+          - Name: name
+            Values:
+            - "CentOS 7.6.1810 x86_64 with cloud-init (HVM)"
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          primary-group: wheel
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_secret: agent_key_public }
+
+groups:
+
+  scalable_compute:
+    members:
+      - host
+      - nic
+      - ip
+
+capabilities:
+
+  ip:
+    description: Host IP
+    value: { get_attribute: [ host, ip ] }

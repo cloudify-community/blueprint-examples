@@ -3,7 +3,9 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-gcp-plugin
-  - install-script.yaml
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - ansible.yaml
 
 inputs:
 
@@ -31,6 +33,11 @@ inputs:
     description: A small GCP machine type.
     default: n1-standard-1
 
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'ubuntu'
+
 dsl_definitions:
 
   client_config: &gcp_config
@@ -50,22 +57,31 @@ dsl_definitions:
 
 node_templates:
 
-  host:
+  vm:
     type: cloudify.gcp.nodes.Instance
     properties:
       gcp_config: *gcp_config
       agent_config:
         install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      use_public_ip: true
       image_id: { get_input: image }
       instance_type: { get_input: instance_type }
       zone: { get_secret: gcp_zone }
       external_ip: true
-      startup_script:
-        type: string
-        script: { get_input: install_script }
     relationships:
     - type: cloudify.relationships.depends_on
       target: subnet
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/gcp/key.py
+          executor: central_deployment_agent
+          inputs:
+            user: { get_input: agent_user }
+            ssh_keys:
+            - { get_secret: agent_key_public }
 
   firewall:
     type: cloudify.gcp.nodes.FirewallRule
@@ -73,6 +89,7 @@ node_templates:
       gcp_config: *gcp_config
       allowed:
         tcp:
+          - 22
           - 80
       sources:
         - 0.0.0.0/0
@@ -101,4 +118,4 @@ outputs:
 
   application_endpoint:
     description: The external endpoint of the application.
-    value: { concat: [ 'http://', { get_attribute: [ host, networkInterfaces, 0, accessConfigs, 0, natIP ] }, ':80' ] }
+    value: { concat: [ 'http://', { get_attribute: [ vm, ip ] }, ':80' ] }

@@ -6,7 +6,9 @@ description: >
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-aws-plugin
-  - install-script.yaml
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - ansible.yaml
 
 inputs:
 
@@ -29,6 +31,11 @@ inputs:
     description: The name of the AWS AMI in the AWS region.
     default: 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727'
 
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'ubuntu'
+
 dsl_definitions:
 
   client_config: &client_config
@@ -44,16 +51,21 @@ node_templates:
       client_config: *client_config
       agent_config:
         install_method: none
+        user: { get_input: agent_user }
+        key: { get_secret: agent_key_private }
       resource_config:
         ImageId: { get_attribute: [ ami, aws_resource_id ] }
         InstanceType: t2.micro
         kwargs:
-          UserData: { get_input: install_script }
+          UserData: { get_attribute: [ cloud_init, cloud_config ] }
+      use_public_ip: true
     relationships:
     - type: cloudify.relationships.depends_on
       target: ami
     - type: cloudify.relationships.depends_on
       target: nic
+    - type: cloudify.relationships.depends_on
+      target: cloud_init
 
   ami:
     type: cloudify.nodes.aws.ec2.Image
@@ -99,6 +111,11 @@ node_templates:
       client_config: *client_config
       resource_config:
         IpPermissions:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          IpRanges:
+          - CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
@@ -171,6 +188,17 @@ node_templates:
       client_config: *client_config
       resource_config:
         CidrBlock: 10.10.0.0/16
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_secret: agent_key_public }
 
 outputs:
 

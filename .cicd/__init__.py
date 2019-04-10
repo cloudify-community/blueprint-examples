@@ -67,6 +67,11 @@ def get_cloudify_version():
                 # It's not a cloudify.co import.
                 continue
             next_version = import_url.path.split('/')[-2:-1]
+            if isinstance(next_version, list):
+                next_version = next_version.pop()
+            if not isinstance(next_version, basestring):
+                raise VersionsException(
+                    'Cloudify version problem: {0}'.format(cloudify_version))
             if cloudify_version and next_version != cloudify_version:
                 raise VersionsException(
                     'Cloudify version mismatch: {0}/{1} from {2}'.format(
