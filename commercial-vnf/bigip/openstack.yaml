@@ -1,0 +1,237 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Create an instance of BIG-IP on OpenStack.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  resource_prefix:
+    description: Prefix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_prefix }
+
+  resource_suffix:
+    description: Suffix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_suffix }
+
+  openstack_network_deployment_name:
+    type: string
+    default: VNFM-Networking-Prov-Openstack-networks
+
+  flavor_id:
+    type: string
+    default: 8f68d4e5-4281-48c0-ad43-a8ac58d635f0
+
+  image_id:
+    type: string
+    default: 7f5477bd-c2a8-4608-82ae-0ca2a9bf5254
+
+  vnf_vm_name:
+    type: string
+    default: bigip
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    password: { get_secret: openstack_password }
+    username: { get_secret: openstack_username }
+    project_name: { get_secret: openstack_tenant_name }
+    region_name: { get_secret: openstack_region }
+    auth_url: { get_secret: openstack_auth_url }
+
+node_templates:
+
+  external_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
+        kwargs:
+          routing:
+            external: true
+
+  mgmt_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
+
+  public_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, public_network] }
+
+  wan_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, wan_network] }
+
+  network_security_group:
+    type: cloudify.nodes.openstack.SecurityGroup
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_capability: [{ get_input: openstack_network_deployment_name }, network_security_group] }
+
+
+  mgmt_floating_ip_address:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
+      - type: cloudify.relationships.connected_to
+        target: mgmt_port
+
+  public_floating_ip_address:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
+      - type: cloudify.relationships.connected_to
+        target: public_port
+
+  mgmt_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_mgmt_port"
+            - { get_input: resource_suffix }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: network_security_group
+      - type: cloudify.relationships.contained_in
+        target: mgmt_network
+
+  public_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_public_port"
+            - { get_input: resource_suffix }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: network_security_group
+      - type: cloudify.relationships.contained_in
+        target: public_network
+
+  wan_port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_wan_port"
+            - { get_input: resource_suffix }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: network_security_group
+      - type: cloudify.relationships.contained_in
+        target: wan_network
+
+  image:
+    type: cloudify.nodes.openstack.Image
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_input: image_id }
+        container_format: "bare"
+        disk_format: "qcow2"
+
+  cloud_config:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        write_files:
+          - path: /config/check_mcpd_status.sh
+            permissions: 0755
+            owner: root:root
+            content: |
+              #!/bin/sh
+              echo preOnboard: Starting MCP status check
+              checks=0
+              while [ $checks -lt 120 ]; do
+                  echo preOnboard: checking mcpd
+                  if tmsh -a show sys mcp-state field-fmt | grep -q running; then
+                      echo preOnboard: mcpd ready
+                      sleep 10
+                      break
+                  fi
+                  echo preOnboard: mcpd not ready yet
+                  let checks=checks+1
+                  sleep 10
+              done
+
+  vm:
+    type: cloudify.nodes.openstack.Server
+    properties:
+      client_config: *client_config
+      agent_config:
+        install_method: none
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - "_bigip_vm"
+            - { get_input: resource_suffix }
+        image_id: { get_attribute: [ image, id ] }
+        flavor_id: { get_input: flavor_id }
+        user_data: { get_attribute: [ cloud_config, cloud_config ] }
+        kwargs:
+          config_drive: true
+    relationships:
+    - type: cloudify.relationships.openstack.server_connected_to_port
+      target: mgmt_port
+    - type: cloudify.relationships.openstack.server_connected_to_port
+      target: wan_port
+    - type: cloudify.relationships.openstack.server_connected_to_port
+      target: public_port
+    - type: cloudify.relationships.depends_on
+      target: image
+    - type: cloudify.relationships.depends_on
+      target: cloud_config
+
+
+capabilities:
+
+  mgmt_public_ip:
+    value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address ] }
+
+  public_public_ip:
+    value: { get_attribute: [public_floating_ip_address, floating_ip_address ] }
+
+  wan_ip:
+    value: { get_attribute: [wan_port, fixed_ips, 0, ip_address ] }
+
+  public_ip:
+    value: { get_attribute: [public_port, fixed_ips, 0, ip_address ] }

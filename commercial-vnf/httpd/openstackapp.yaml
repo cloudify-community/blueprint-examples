@@ -1,0 +1,28 @@
+tosca_definitions_version: cloudify_dsl_1_3
+description: >
+    Starts HTTPD process on VM.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+  httpd_vm_deployment_name:
+    description: Name of HTTPD Provisioning deployment
+    default: VNFM-HTTPD-Prov-Openstack-vm
+
+node_templates:
+
+  web_server:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth:
+              user: { get_secret: httpd_username }
+              ip: { get_capability: [{ get_input: httpd_vm_deployment_name }, vm_public_ip] }
+              key_content: { get_capability: [{ get_input: httpd_vm_deployment_name }, private_key_content] }
+              errors: []
+            calls:
+              - action: 'screen -dmS -X python3 -m http.server 8080'

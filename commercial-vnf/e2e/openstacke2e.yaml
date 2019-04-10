@@ -1,0 +1,281 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This is the master blueprint for the Cloudify VNF example. It provisions all the atomic components,
+  configures, and then chains them together. In partilucar:
+    * prepares the environment, including networks, subnets, security groups etc.
+    * provisions F5 BIG-IP VM
+    * provisions Fortigate VM
+    * provisions HTTPD VM
+    * configures F5 BIG-IP
+    * configures Fortigate
+    * configures HTTPD
+    * creates a service chain to allow traffic forwarding
+
+# In this section, we import the basic node types, which will be later used in the
+# node_templates section to define particular elements of the chain and the
+# relationships between them. This section also imports the cloudify-utilities-plugin
+# to allow using the Deployment Proxy mechanism.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+# The inputs section includes the names of the particular blueprints and
+# deployments which this blueprint will leverage.
+inputs:
+  external_network_id:
+    description: ID of the external network in OpenStack
+
+  network_prov_name:
+    description: Name of common resources provisioning blueprint/deployment
+    default: VNFM-Networking-Prov-Openstack-networks
+
+  f5_prov_name:
+    description: Name of BIG IP Provisioning blueprint/deployment
+    default: VNFM-F5-Prov-Openstack-vm
+
+  f5_conf_name:
+    description: Name of BIG IP Configuration blueprint/deployment
+    default: VNFM-F5-Conf
+
+  fg_prov_name:
+    description: Name of Fortigate Provisioning blueprint/deployment
+    default: VNFM-Fortigate-Prov-Openstack-vm
+
+  fg_conf_name:
+    description: Name of Fortigate Configuration blueprint/deployment
+    default: VNFM-Fortigate-Conf
+
+  httpd_prov_name:
+    description: Name of HTTPD Provisioning blueprint/deployment
+    default: VNFM-HTTPD-Prov-Openstack-vm
+
+  httpd_conf_name:
+    description: Name of HTTPD Configuration blueprint/deployment
+    default: VNFM-HTTPD-Conf
+
+  service_prov_name:
+    description: Name of service chain Provisioning blueprint/deployment
+    default: NS-LB-Firewall-F5-Fortigate-HTTPD
+
+# In the node_templates section, we define the nodes that will be instanciated.
+# We use DeploymentProxy nodes to deploy other blueprints representing the example
+# building blocks.
+node_templates:
+
+  # Network-topology:
+  #   This blueprint is responsible for creating all of the common resources,
+  #   which are later used in other blueprints. Especially: router,
+  #   networks, subnets and security groups.
+  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   deployment creation.
+  #   There's no relationships defined under this node, which means that during
+  #   install it will be instantiated at first.
+  network_prov:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: network_prov_name }
+          blueprint_archive: Resources/network-topology.zip
+          main_file_name: openstack.yaml
+        deployment:
+          id: { get_input: network_prov_name }
+          inputs:
+            external_network_id: { get_input: external_network_id }
+
+
+  ### PROVISIONING ###
+
+  # F5 Provisioning:
+  #   This blueprint is responsible for provisioning the F5 BIG-IP VM in OpenStack
+  #   infrastructure, including the necessary network interfaces.
+  #   DeploymentProxy is used for the blueprint uploading and the
+  #   deployment creation.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
+  #   It means, that during the install workflow, "f5_prov" node will be instantiated
+  #   after "network_prov" node will. That will alllow the "f5_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
+  f5_prov:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: f5_prov_name }
+          blueprint_archive: Resources/bigip.zip
+          main_file_name: openstack.yaml
+        deployment:
+          id: { get_input: f5_prov_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_prov
+
+  # FortiGate Provisioning:
+  #   This blueprint is responsible for provisioning the FortiGate VM in OpenStack
+  #   infrastructure, including the necessary network interfaces.
+  #   DeploymentProxy is used for the blueprint uploading and the
+  #   deployment creation.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
+  #   It means, that during the install workflow, "fg_prov" node will be instantiated
+  #   after "network_prov" node will. That will alllow the "fg_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
+  fg_prov:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: fg_prov_name }
+          blueprint_archive: Resources/fortigate.zip
+          main_file_name: openstack.yaml
+        deployment:
+          id: { get_input: fg_prov_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_prov
+
+  # HTTPD Provisioning:
+  #   This blueprint is responsible for provisioning the HTTPD VM in OpenStack
+  #   infrastructure, including the necessary network interfaces.
+  #   DeploymentProxy is used for the blueprint uploading and the
+  #   deployment creation.
+  #   A "depends_on" relationship which targets the "network_prov" node is defined.
+  #   It means, that during the install workflow, "httpd_prov" node will be instantiated
+  #   after "network_prov" node will. That will alllow the "httpd_prov" node to create network
+  #   interfaces in the networks created by "network_prov" blueprint.
+  httpd_prov:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: httpd_prov_name }
+          blueprint_archive: Resources/httpd.zip
+          main_file_name: openstack.yaml
+        deployment:
+          id: { get_input: httpd_prov_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_prov
+
+  ### CONFIGURATION ###
+
+  # F5 Configuration:
+  #   This blueprint is responsible for configuration of the F5 BIG-IP VM
+  #   created by the "f5_prov" node.
+  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   deployment creation.
+  #   In relationships section, there's a "depends_on" relationship defined,
+  #   which targets the "f5_prov" node. It means, that during install
+  #   workflow, "f5_conf" node will be instantiated after "f5_prov".
+  #   It prevents the situation, when Cloudify Manager starts to configure
+  #   F5 BIG-IP VM before it gets instantiated by "f5_prov" node.
+  f5_conf:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: f5_conf_name }
+          blueprint_archive: Resources/bigip.zip
+          main_file_name: openstackapp.yaml
+        deployment:
+          id: { get_input: f5_conf_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: f5_prov
+
+  # FortiGate Configuration:
+  #   This blueprint is responsible for configuration of the FortiGate VM
+  #   created by the "fg_prov" node.
+  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   deployment creation.
+  #   In relationships section, there's a "depends_on" relationship defined,
+  #   which targets the "fg_prov" node. It means, that during install
+  #   workflow, "fg_conf" node will be instantiated after "fg_prov".
+  #   It prevents the situation, when Cloudify Manager starts to configure
+  #   FortiGate VM before it gets instantiated by "fg_prov" node.
+  fg_conf:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: fg_conf_name }
+          blueprint_archive: Resources/fortigate.zip
+          main_file_name: openstackapp.yaml
+        deployment:
+          id: { get_input: fg_conf_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: fg_prov
+
+  # HTTPD Configuration:
+  #   This blueprint is responsible for configuration of the HTTPD VM
+  #   created by the "httpd_prov" node.
+  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   deployment creation.
+  #   In relationships section, there's a "depends_on" relationship defined,
+  #   which targets the "httpd_prov" node. It means, that during install
+  #   workflow, "httpd_conf" node will be instantiated after "httpd_prov".
+  #   It prevents the situation, when Cloudify Manager starts to configure
+  #   HTTPD VM before it gets instantiated by "httpd_prov" node.
+  httpd_conf:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: httpd_conf_name }
+          blueprint_archive: Resources/httpd.zip
+          main_file_name: openstackapp.yaml
+        deployment:
+          id: { get_input: httpd_conf_name }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: httpd_prov
+
+  # Service Chain:
+  #   This blueprint is responsible for creating a service chain between the
+  #   nodes created in previous steps. It applies the load balancing rules to
+  #   the F5 BIG-IP VM and sets a port-forwarding policy on FortiGate VM to
+  #   expose a website served by HTTPD VM on the public interface of the F5
+  #   BIG-IP VM.
+  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   deployment creation.
+  #   In the relationships section, there are several "depends_on"
+  #   relationships defined. As a result, Cloudify Manager will be waiting
+  #   with the service chain creation until all of the particular VNFs, which are
+  #   going to be a part of this chain, are properly provisioned & configured
+  service_prov:
+    type: cloudify.nodes.DeploymentProxy
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: service_prov_name }
+          blueprint_archive: Resources/service.zip
+          main_file_name: openstack_service.yaml
+        deployment: {}
+        # deployment:
+        #   id: { get_input: service_prov_name }
+        #   outputs:
+        #     web_server: web_server_value
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure: {}
+        start: {}
+        stop: {}
+        delete: {}
+    # relationships:
+    #   - type: cloudify.relationships.depends_on
+    #     target: f5_conf
+    #   - type: cloudify.relationships.depends_on
+    #     target: fg_conf
+    #   - type: cloudify.relationships.depends_on
+    #     target: httpd_conf
+
+# In the outputs section we can expose values, which will appear in GUI after
+# the successful deployment installation. Here, a webserver endpoint is being
+# printed. "get_attribute" function gets this value from the "service_prov"
+# deployment outputs. Once the "install" workflow is finished, user can use this
+# endpoint to check if the service is working fine.
+# outputs:
+#   web_server:
+#     description: Web server endpoint exposed on BIG IP Public interface
+#     value: { get_attribute: [service_prov, deployment, outputs, web_server_value] }

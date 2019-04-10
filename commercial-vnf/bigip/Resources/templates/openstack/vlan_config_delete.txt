@@ -1,0 +1,5 @@
+tmsh delete net self {{IP_OUTSIDE}}
+tmsh delete net self {{IP_INSIDE}}
+tmsh delete net vlan outside
+tmsh delete net vlan outside
+tmsh quit
