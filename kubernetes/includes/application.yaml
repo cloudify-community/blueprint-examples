@@ -216,6 +216,7 @@ node_templates:
               <<: *cluster_vars
             options_config:
               <<: *step2_start
+              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
     relationships:
       - type: cloudify.relationships.depends_on
         target: kube-base-config-step1
