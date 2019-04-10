@@ -142,6 +142,14 @@ node_templates:
           protocol: icmp
           port_range_min: null
           port_range_max: null
+        - direction: ingress
+          protocol: ipip
+          port_range_min: null
+          port_range_max: null
+        - direction: egress
+          protocol: ipip
+          port_range_min: null
+          port_range_max: null
 
   kube-node-port:
     type: cloudify.nodes.openstack.Port

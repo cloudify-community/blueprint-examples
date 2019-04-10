@@ -1,21 +1,33 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
-description: Install HAProxy on infrastructure.
+description: Install Drupal7 on infrastructure.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - infrastructure--blueprint:infrastructure
+  - infrastructure--blueprint:cloud-a
   - plugin:cloudify-ansible-plugin
 
 inputs:
 
-  database_deployment:
+  database_name:
     type: string
-    default: db
+    default: drupal
+
+  database_user:
+    type: string
+    default: drupal
+
+  database_password:
+    type: string
+    default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
+
+  load_balancer_deployment:
+    type: string
+    default: public-cloud-db
 
 node_templates:
 
-  haproxy:
+  drupal:
     type: cloudify.nodes.Root
     relationships:
       - type: cloudify.relationships.depends_on
@@ -25,7 +37,7 @@ node_templates:
             preconfigure:
               implementation: ansible.cloudify_ansible.tasks.ansible_requires_host
               inputs:
-                group_name: balancer
+                group_name: server
                 host_config:
                   ansible_host: { get_attribute: [ infrastructure--host, ip ] }
                   ansible_user: { get_property: [ infrastructure--host, agent_config, user ] }
@@ -37,12 +49,15 @@ node_templates:
         configure:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
-            run_data:
-              server_list: { get_capability: [ { get_input: database_deployment }, endpoints ] }
-            site_yaml_path: haproxy/playbook.yaml
+            site_yaml_path: drupal/playbook.yaml
             sources: { get_attribute: [ SELF, sources ] }
+            run_data:
+              drupal_database: { get_input: database_name }
+              drupal_username:  { get_input: database_user }
+              drupal_password:  { get_input: database_password }
+              drupal_database_host: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
 
-capabilities:
+outputs:
 
-  endpoint:
-    value: { get_attribute: [ infrastructure--host, ip ] }
+  url:
+    value: { concat: [ "http://", { get_attribute: [ infrastructure--host, ip ] }, "/drupal7/install.php" ]}

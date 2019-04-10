@@ -271,6 +271,8 @@ node_templates:
         target: public_subnet
       - type: cloudify.relationships.depends_on
         target: security_group
+      - type: cloudify.relationships.depends_on
+        target: route_private_subnet_nat_gateway
 
   kube-master-ip:
     type: cloudify.nodes.aws.ec2.ElasticIP
@@ -337,6 +339,8 @@ node_templates:
         target: public_subnet
       - type: cloudify.relationships.depends_on
         target: security_group
+      - type: cloudify.relationships.depends_on
+        target: route_private_subnet_nat_gateway
 
   kube-node-ip:
     type: cloudify.nodes.aws.ec2.ElasticIP
@@ -366,7 +370,7 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: kube-node-volume
-      - type: cloudify.relationships.depends_on
+      - type: cloudify.relationships.contained_in
         target: kube-node
 
   kube-node:
