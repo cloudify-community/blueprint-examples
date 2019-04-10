@@ -69,7 +69,6 @@ dsl_definitions:
       - check
       - bastion
       - etcd
-      - container-engine
       - download
       - kubelet
       - node
