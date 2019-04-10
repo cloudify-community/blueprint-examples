@@ -1,0 +1,98 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Install MariaDB on infrastructure.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - infrastructure--blueprint:public-cloud
+  - plugin:cloudify-ansible-plugin
+
+inputs:
+
+  database_name:
+    type: string
+    default: drupal
+
+  database_user:
+    type: string
+    default: drupal
+
+  database_password:
+    type: string
+    default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
+
+node_templates:
+
+
+  cluster_member_aggregator:
+    type: cloudify.nodes.Root
+
+  mariadb:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: mariadb/galera.yml
+            sources: { get_attribute: [ SELF, sources ] }
+            options_config:
+              tags: setup
+        start:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: mariadb/galera.yml
+            sources: { get_attribute: [ SELF, sources ] }
+            options_config:
+              skip_tags: setup
+            run_data:
+              new_database_name: { get_input: database_name }
+              new_database_user: { get_input: database_user }
+              new_database_password: { get_input: database_password }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: infrastructure--host
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            preconfigure:
+              implementation: ansible.cloudify_ansible.tasks.ansible_requires_host
+              inputs:
+                group_name: galera_cluster
+                host_config:
+                  ansible_host: { get_attribute: [ infrastructure--host, ip ] }
+                  ansible_user: { get_property: [ infrastructure--host, agent_config, user ] }
+                  ansible_ssh_private_key_file: { get_property: [ infrastructure--host, agent_config, key ] }
+                  ansible_become: true
+                  ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+      - type: cloudify.relationships.depends_on
+        target: cluster_member_aggregator
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            establish:
+              implementation: scripts/establish.py
+              executor: central_deployment_agent
+
+  galera_cluter_configuration:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: mariadb/galera_bootstrap.yml
+            sources: { get_attribute: [ mariadb, sources ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: mariadb
+
+groups:
+
+  scalable_cluster:
+    members:
+      - infrastructure--scalable_compute
+      - mariadb
+
+capabilities:
+
+  endpoints:
+    value: { get_attribute: [ cluster_member_aggregator, cluster_members ] }

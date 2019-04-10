@@ -124,8 +124,9 @@ node_templates:
       gcp_config: *gcp_config
       allowed:
         tcp:
-          - 22
-          - 80
+          - 0 - 65535
+        udp:
+          - 0 - 65535
       sources:
         - 0.0.0.0/0
     relationships:

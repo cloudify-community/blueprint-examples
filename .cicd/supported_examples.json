@@ -15,13 +15,19 @@
     "openstack.yaml"
   ],
   "db-lb-app/db": [
-    "application.yaml"
+    "application.yaml",
+    "private-cloud-application.yaml",
+    "public-cloud-application.yaml"
   ],
   "db-lb-app/lb": [
-    "application.yaml"
+    "application.yaml",
+    "private-cloud-application.yaml",
+    "public-cloud-application.yaml"
   ],
   "db-lb-app/app": [
-    "application.yaml"
+    "application.yaml",
+    "private-cloud-application.yaml",
+    "public-cloud-application.yaml"
   ],
   "kubernetes": [
     "aws.yaml",
@@ -34,5 +40,26 @@
   "open-source-vnf/httpd": ["openstack.yaml"],
   "open-source-vnf/haproxy": ["openstack.yaml"],
   "open-source-vnf/pfsense": ["openstack.yaml"],
-  "open-source-vnf/service": ["openstack.yaml"]
+  "open-source-vnf/service": ["openstack.yaml"],
+  "commercial-vnf/bigip": [
+    "azure.yaml",
+    "azureapp.yaml"
+  ],
+  "commercial-vnf/e2e": [
+    "azuree2e.yaml"
+  ],
+  "commercial-vnf/fortigate": [
+    "azure.yaml",
+    "azureapp.yaml"
+  ],
+  "commercial-vnf/httpd": [
+    "azure.yaml",
+    "azureapp.yaml"
+  ],
+  "commercial-vnf/network-topology": [
+    "azure.yaml"
+  ],
+  "commercial-vnf/service": [
+    "azure_service.yaml"
+  ]
 }

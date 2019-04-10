@@ -21,6 +21,10 @@ inputs:
     type: string
     default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
 
+  load_balancer_deployment:
+    type: string
+    default: lb
+
 node_templates:
 
   drupal:
@@ -51,7 +55,7 @@ node_templates:
               drupal_database: { get_input: database_name }
               drupal_username:  { get_input: database_user }
               drupal_password:  { get_input: database_password }
-              drupal_database_host: { get_capability: [ lb, endpoint] }
+              drupal_database_host: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
 
 outputs:
 
