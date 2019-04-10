@@ -34,11 +34,11 @@ dsl_definitions:
     tags:
       - always
       - bootstrap-os
+      - preinstall
     skip_tags:
       - localhost
       - check
       - bastion
-      - preinstall
       - container-engine
       - download
       - kubelet
@@ -61,8 +61,9 @@ dsl_definitions:
   - &step1_start
     tags:
       - always
-      - preinstall
+      - container-engine
     skip_tags:
+      - preinstall
       - bootstrap-os
       - localhost
       - check
@@ -89,14 +90,14 @@ dsl_definitions:
   - &step2_create
     tags:
       - always
-      - container-engine
+      - download
     skip_tags:
+      - container-engine
       - preinstall
       - bootstrap-os
       - localhost
       - check
       - bastion
-      - download
       - etcd
       - kubelet
       - node
@@ -116,9 +117,11 @@ dsl_definitions:
 
   - &step2_configure
     tags:
+      - kubelet
+      - etcd
       - always
-      - download
     skip_tags:
+      - download
       - container-engine
       - preinstall
       - bootstrap-os
@@ -126,8 +129,6 @@ dsl_definitions:
       - check
       - bastion
       - download
-      - kubelet
-      - etcd
       - node
       - master
       - win_nodes
@@ -145,6 +146,8 @@ dsl_definitions:
 
   - &step2_start
     skip_tags:
+      - kubelet
+      - etcd
       - download
       - container-engine
       - preinstall

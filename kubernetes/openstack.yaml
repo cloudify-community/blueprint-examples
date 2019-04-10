@@ -234,7 +234,6 @@ groups:
 
   kube-node-group:
     members:
-    - kubespray
     - kube-node
     - kube-node-port
     - kube-node-ip-address
