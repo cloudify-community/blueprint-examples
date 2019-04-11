@@ -9,7 +9,7 @@ node_templates:
     type: cloudify.nodes.Root
     relationships:
       - type: cloudify.relationships.depends_on
-        target: kube-base-config-step2
+        target: kube-base-config
       - type: cloudify.relationships.contained_in
         target: kube-master
         source_interfaces:
@@ -113,3 +113,11 @@ outputs:
   dashboard_url:
     description: Kubernetes Access Url
     value: { concat: [ "https://", { get_attribute: [ kube-master, ip ] }, ":", { get_attribute: [ dashboard-token-and-port, dashboard_port ] } ] }
+
+capabilities:
+
+  endpoint:
+    value: { get_attribute: [ kube-master, ip ] }
+
+  token:
+    value: { get_attribute: [dashboard-token-and-port, bearer_token] }
