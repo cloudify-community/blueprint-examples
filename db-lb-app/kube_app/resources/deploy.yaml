@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        tier: frontend
+    spec:
+      containers:
+      - image: wordpress:4.8.0-apache
+        name: wordpress
+        env:
+          - name: WORDPRESS_DB_HOST
+            value: {{ WORDPRESS_DB_HOST }}
+          - name: WORDPRESS_DB_USER
+            value: {{ WORDPRESS_DB_USER }}
+          - name: WORDPRESS_DB_PASSWORD
+            value: {{ WORDPRESS_DB_PASSWORD }}
+          - name: WORDPRESS_DB_NAME
+            value: {{ WORDPRESS_DB_NAME }}
+          - name: WORDPRESS_TABLE_PREFIX
+            value: cfy
+        ports:
+          - containerPort: 80
+            name: wordpress
+        volumeMounts:
+          - name: wordpress-persistent-storage
+            mountPath: /var/www/html
+      volumes:
+        - name: wordpress-persistent-storage
+          persistentVolumeClaim:
+            claimName: wp-pv-claim

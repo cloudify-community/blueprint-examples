@@ -29,6 +29,9 @@
     "private-cloud-application.yaml",
     "public-cloud-application.yaml"
   ],
+  "db-lb-app/kube_app": [
+    "application.yaml"
+  ],
   "kubernetes": [
     "aws.yaml",
     "azure.yaml",
