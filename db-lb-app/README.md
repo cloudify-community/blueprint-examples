@@ -94,7 +94,7 @@ If you are an Openstack user:
 
 ### Install the database
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--resource_name_prefix='db'`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-db.zip -n application.yaml -b db`
 
   **Openstack**\
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
@@ -102,7 +102,7 @@ If you are an Openstack user:
   Where `infrastructure--image_id` is ID of centos-7-with-docker image.
 ### Install the load balancer
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--resource_name_prefix='lb'`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-lb.zip -n application.yaml -b lb`
 
   **Openstack**\
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--resource_name_prefix='lb' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
@@ -110,7 +110,7 @@ If you are an Openstack user:
 
 ### Install the application (Drupal)
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--resource_name_prefix='app'`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-app.zip -n application.yaml -b app`
 
   **Openstack**\
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--resource_name_prefix='app' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
