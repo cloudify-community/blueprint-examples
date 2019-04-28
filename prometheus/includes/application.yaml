@@ -1,0 +1,33 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Install Kubernetes on kube-master and kube-node.
+
+imports:
+  - plugin:cloudify-ansible-plugin
+
+node_templates:
+
+  prometheus:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path: includes/prometheus/site.yaml
+            run_data:
+              prometheus_scrape_configs: { get_input: prometheus_scrape_jobs }
+    relationships:
+      - type: cloudify.ansible.relationships.connected_to_host
+        target: prometheus-host
+
+outputs:
+
+  ui:
+    description: The Prometheus UI.
+    value: { concat: [ 'http://', { get_attribute: [ prometheus-host, ip ] }, ':9090/graph' ] }
+
+capabilities:
+
+  endpoint:
+    value: { get_attribute: [ prometheus-host, ip ] }
