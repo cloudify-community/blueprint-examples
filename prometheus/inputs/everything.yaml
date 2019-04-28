@@ -1,0 +1,73 @@
+prometheus_scrape_jobs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+
+  - job_name: 'aws'
+    ec2_sd_configs:
+      - access_key: { get_secret: aws_access_key_id }
+        secret_key: { get_secret: aws_secret_access_key }
+        region: { get_secret: aws_region_name }
+        port: 9100
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_azure_machine_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__
+
+  - job_name: 'azure'
+    azure_sd_configs:
+      - subscription_id: { get_secret: azure_subscription_id }
+        tenant_id: { get_secret: azure_tenant_id }
+        client_id: { get_secret: azure_client_id }
+        client_secret: { get_secret: azure_client_secret }
+        port: 9100
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_ec2_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__
+
+  - job_name: 'gcp'
+    gce_sd_configs:
+      - project: { get_secret: gcp_project_id }
+        zone: { get_secret: gcp_zone }
+        port: 9100
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_gce_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__
+
+  - job_name: 'openstack'
+    openstack_sd_configs:
+      - role: instance
+        identity_endpoint: { get_secret: openstack_auth_url }
+        region: { get_secret: openstack_region }
+        project_name: { get_secret: openstack_project_name }
+        username: { get_secret: openstack_username }
+        password: { get_secret: openstack_password }
+        port: 9100
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_openstack_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__

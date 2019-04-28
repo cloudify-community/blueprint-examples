@@ -1,0 +1,24 @@
+prometheus_scrape_jobs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+  - job_name: 'openstack'
+    openstack_sd_configs:
+      - role: instance
+        identity_endpoint: { get_input: auth_url }
+        region: { get_input: region_name }
+        project_name: { get_input: project_name }
+        username: { get_input: username }
+        password: { get_input: password }
+        port: 9100
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_openstack_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__

@@ -1,0 +1,168 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Install Kubernetes using Kubespray on Openstack.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  # - plugin:cloudify-openstack-plugin?version=3.0.0
+  - plugin:cloudify-openstack-plugin
+  - plugin:cloudify-ansible-plugin
+  - includes/cloud-init.yaml
+  - includes/application.yaml
+
+inputs:
+
+  auth_url:
+    type: string
+    default: { get_secret: openstack_auth_url }
+
+  username:
+    type: string
+    default: { get_secret: openstack_username }
+
+  password:
+    type: string
+    default: { get_secret: openstack_password }
+
+  project_name:
+    type: string
+    default: { get_secret: openstack_project_name }
+
+  region_name:
+    type: string
+
+  external_network_id:
+    type: string
+
+  public_subnet_cidr:
+    type: string
+    default: 10.10.1.0/24
+
+  image_id:
+    type: string
+
+  flavor_id:
+    type: string
+
+  agent_user:
+    type: string
+    default: centos
+
+  prometheus_scrape_jobs:
+    description: a list of jobs.
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    auth_url: { get_input: auth_url }
+    username: { get_input: username }
+    password: { get_input: password }
+    project_name: { get_input: project_name }
+    region_name: { get_input: region_name }
+
+node_templates:
+
+  external-network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_input: external_network_id }
+        kwargs:
+          routing:
+            external: true
+
+  router:
+    type: cloudify.nodes.openstack.Router
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external-network
+
+  network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      resource_config:
+        name: network
+
+  public-subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        cidr: { get_input: public_subnet_cidr }
+        enable_dhcp: true
+        ip_version: 4
+        dns_nameservers: [8.8.4.4, 8.8.8.8]
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: network
+      - type: cloudify.relationships.openstack.subnet_connected_to_router
+        target: router
+
+  security-group:
+    type: cloudify.nodes.openstack.SecurityGroup
+    properties:
+      client_config: *client_config
+      resource_config:
+        name: kubernetes-security-group
+        description: 'Kubernetes Openstack Group'
+      security_group_rules:
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 0
+          port_range_max: 65535
+        - direction: ingress
+          protocol: udp
+          port_range_min: 0
+          port_range_max: 65535
+        - direction: ingress
+          protocol: icmp
+          port_range_min: null
+          port_range_max: null
+
+  prometheus-host-port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *client_config
+      resource_config:
+        network_id: { get_attribute: [ network, id ] }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: public-subnet
+      - type: cloudify.relationships.connected_to
+        target: security-group
+
+  prometheus-host-ip-address:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external-network
+      - type: cloudify.relationships.connected_to
+        target: prometheus-host-port
+
+  prometheus-host:
+    type: cloudify.nodes.openstack.Server
+    properties:
+      client_config: *client_config
+      agent_config:
+        install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      use_public_ip: true
+      resource_config:
+        name: prometheus-host
+        image_id: { get_input: image_id }
+        flavor_id: { get_input: flavor_id }
+        user_data: { get_attribute: [ cloud_init, cloud_config ] }
+    relationships:
+      - type: cloudify.relationships.openstack.server_connected_to_port
+        target: prometheus-host-port
+      - type: cloudify.relationships.depends_on
+        target: cloud_init

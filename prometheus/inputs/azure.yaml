@@ -1,0 +1,13 @@
+prometheus_scrape_jobs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+  - job_name: 'azure'
+    azure_sd_configs:
+      - subscription_id: { get_input: subscription_id }
+        tenant_id: { get_input: tenant_id }
+        client_id: { get_input: client_id }
+        client_secret: { get_input: client_secret }
+

@@ -1,0 +1,19 @@
+prometheus_scrape_jobs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - "{{ ansible_fqdn | default(ansible_host) | default('localhost') }}:9090"
+  - job_name: 'gcp'
+    gce_sd_configs:
+      - project: { get_secret: gcp_project_id }
+        zone: { get_secret: gcp_zone }
+    relabel_configs:
+      - regex: ([^:]+)(?::\d+)?
+        replacement: $1:9100
+        source_labels:
+        - __meta_gce_public_ip
+        target_label: instance
+      - source_labels:
+        - instance
+        target_label: __address__
