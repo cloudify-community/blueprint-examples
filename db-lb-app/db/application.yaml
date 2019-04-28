@@ -23,7 +23,6 @@ inputs:
 
 node_templates:
 
-
   cluster_member_aggregator:
     type: cloudify.nodes.Root
 

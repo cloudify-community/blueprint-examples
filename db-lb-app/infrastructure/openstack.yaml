@@ -2,8 +2,9 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.0.0
+  - plugin:cloudify-openstack-plugin
   - plugin:cloudify-utilities-plugin
+  - includes/cloud-init.yaml
 
 inputs:
 
@@ -110,6 +111,10 @@ node_templates:
           protocol: tcp
           port_range_min: 4567
           port_range_max: 4568
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 9100
+          port_range_max: 9100
 
   subnet:
     type: cloudify.nodes.openstack.Subnet
@@ -153,18 +158,6 @@ node_templates:
         kwargs:
           routing:
             external: true
-
-  cloud_init:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        users:
-        - name: { get_input: agent_user }
-          primary-group: wheel
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_secret: agent_key_public }
 
 groups:
 

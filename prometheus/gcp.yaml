@@ -4,9 +4,7 @@ imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-gcp-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
   - includes/application.yaml
-  - includes/kube-config.yaml
 
 inputs:
 
@@ -17,12 +15,12 @@ inputs:
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellovnet
+    default: pnet
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellosubnet
+    default: psubnet
 
   image:
     type: string
@@ -38,6 +36,9 @@ inputs:
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
+
+  prometheus_scrape_jobs:
+    description: a list of jobs.
 
 dsl_definitions:
 
@@ -55,49 +56,6 @@ dsl_definitions:
       private_key: { get_secret: gcp_private_key }
     project: { get_secret: gcp_project_id }
     zone: { get_secret: gcp_zone }
-
-node_types:
-
-  k8s-cluster: &k8s-cluster
-    derived_from: cloudify.gcp.nodes.Instance
-    properties:
-      gcp_config:
-        default: *gcp_config
-      agent_config:
-        default:
-          install_method: none
-          key: { get_secret: agent_key_private }
-          user: { get_input: agent_user }
-      use_public_ip:
-        default: true
-      image_id:
-        default: { get_input: image }
-      instance_type:
-        default: { get_input: instance_type }
-      zone:
-        default: { get_secret: gcp_zone }
-      external_ip:
-        default: true
-      startup_script:
-        default:
-          type: string
-          script: |
-            yum install python-netaddr
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: scripts/gcp/key.py
-          executor: central_deployment_agent
-          inputs:
-            user:
-              default: { get_input: agent_user }
-            ssh_keys:
-              default:
-                - { get_secret: agent_key_public }
-
-  kube-master: *k8s-cluster
-
-  kube-node: *k8s-cluster
 
 node_templates:
 
@@ -133,39 +91,28 @@ node_templates:
       - type: cloudify.relationships.connected_to
         target: network
 
-  kube-master:
-    type: kube-master
+  prometheus-host:
+    type: cloudify.gcp.nodes.Instance
+    properties:
+      gcp_config: *gcp_config
+      agent_config:
+        install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      use_public_ip: true
+      image_id: { get_input: image }
+      instance_type: { get_input: instance_type }
+      zone: { get_secret: gcp_zone }
+      external_ip: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/gcp/key.py
+          executor: central_deployment_agent
+          inputs:
+            user: { get_input: agent_user }
+            ssh_keys:
+              - { get_secret: agent_key_public }
     relationships:
       - type: cloudify.relationships.depends_on
         target: subnet
-
-  kube-node:
-    type: kube-node
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: subnet
-
-groups:
-
-  kube-master-group:
-    members:
-    - kube-config
-    - kube-master
-
-  kube-node-group:
-    members:
-    - kube-node
-
-policies:
-
-  kube-master-policy:
-    type: cloudify.policies.scaling
-    properties:
-      default_instances: 1
-    targets: [kube-master-group]
-
-  kube-node-policy:
-    type: cloudify.policies.scaling
-    properties:
-      default_instances: 1
-    targets: [kube-node-group]
