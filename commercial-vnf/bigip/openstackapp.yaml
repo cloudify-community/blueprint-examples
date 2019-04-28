@@ -1,0 +1,96 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Licensing BIG IP with provided registration key and applying VLAN configuration.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  prov_deployment_name:
+    description: Name of BIG IP Provisioning deployment
+    default: VNFM-F5-Prov-Openstack-vm
+
+dsl_definitions:
+
+  terminal_auth: &terminal_auth
+    user: root
+    password: default
+    ip: { get_capability: [ {get_input: prov_deployment_name}, mgmt_public_ip ] }
+    promt_check:
+      - '#'
+      - '$'
+    errors:
+      - "Command fail."
+
+node_templates:
+
+  check_mcpd_status:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/check_mcpd_status.txt
+
+  license:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/install_license.txt
+                params:
+                  REG_KEY: { get_secret: bigip_license }
+        delete:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/revoke_license.txt
+                responses:
+                  - question: 'Revoking the license will return this BIG-IP to an unlicensed state.  It will stop processing traffic. Are you sure? Y/N:'
+                    answer: 'Y'
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: check_mcpd_status
+
+  vlan_configuration:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/vlan_config.txt
+                params:
+                  IP_INSIDE: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }
+                  IP_OUTSIDE: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
+        delete:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/openstack/vlan_config_delete.txt
+                params:
+                  IP_INSIDE: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }
+                  IP_OUTSIDE: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: license
+
+capabilities:
+  bigip_ip:
+    description: Public IP of management interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, mgmt_public_ip ] }
+  public_ip:
+    description: Private IP of WAN interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, public_ip ] }
+  wan_ip:
+    description: Private IP of Public interface
+    value: { get_capability: [ {get_input: prov_deployment_name}, wan_ip ] }

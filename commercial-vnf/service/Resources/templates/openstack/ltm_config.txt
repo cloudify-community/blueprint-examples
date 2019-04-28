@@ -1,0 +1,6 @@
+tmsh create ltm node app-node-1 address {{APP_NODE_1_IP}}
+tmsh create ltm pool sg-pool
+tmsh modify ltm pool sg-pool members add { app-node-1:{{APP_NODE_1_PORT}} }
+tmsh modify ltm pool sg-pool monitor http
+tmsh create ltm virtual sg-virtual pool sg-pool destination {{DESTINATION_IP}}:{{DESTINATION_PORT}} mask 255.255.255.255 source-address-translation { type automap }
+tmsh quit

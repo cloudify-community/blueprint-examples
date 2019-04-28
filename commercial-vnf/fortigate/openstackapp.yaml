@@ -1,0 +1,47 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+   Applies base configuration for newly created FortiGate VM.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  fortigate_vm_deployment_name:
+    description: Name of Fortigate Provisioning deployment
+    type: string
+    default: VNFM-Fortigate-Prov-Openstack-vm
+
+node_templates:
+
+  fortigate_vnf_config:
+    type: cloudify.terminal.raw
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth: &terminal_auth
+              user: admin
+              password: ''
+              ip: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
+              promt_check:
+                - '#'
+                - '$'
+              errors:
+                - "Command fail."
+            calls:
+              - action: exit
+        configure:
+          inputs:
+            terminal_auth: *terminal_auth
+            calls:
+              - template: Resources/templates/fortigate-baseline.txt
+
+
+capabilities:
+  mgmt_public_ip:
+    value: { get_capability: [ { get_input: fortigate_vm_deployment_name }, vm_public_ip_address] }
+  wan_ip:
+    value: { get_capability: [ { get_input: fortigate_vm_deployment_name }, wan_ip] }
