@@ -8,6 +8,7 @@ imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-utilities-plugin
+  - includes/cloud-init.yaml
 
 inputs:
 
@@ -122,6 +123,11 @@ node_templates:
             ToPort: 4568
             IpRanges:
               - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 9100
+            ToPort: 9100
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
     relationships:
       - type: cloudify.relationships.contained_in
         target: security_group
@@ -167,18 +173,6 @@ node_templates:
           - Name: name
             Values:
             - "CentOS 7.6.1810 x86_64 with cloud-init (HVM)"
-
-  cloud_init:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        users:
-        - name: { get_input: agent_user }
-          primary-group: wheel
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_secret: agent_key_public }
 
 groups:
 

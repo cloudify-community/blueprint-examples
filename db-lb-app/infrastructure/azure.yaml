@@ -4,6 +4,7 @@ imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
   - plugin:cloudify-azure-plugin
   - plugin:cloudify-utilities-plugin
+  - includes/cloud-init.yaml
 
 inputs:
 
@@ -187,6 +188,17 @@ node_templates:
               priority: 104
               access: Allow
               direction: Inbound
+          - name: prometheus_access
+            properties:
+              description: Prometheus access
+              protocol: Tcp
+              sourcePortRange: '*'
+              destinationPortRange: 9100
+              sourceAddressPrefix: '*'
+              destinationAddressPrefix: '*'
+              priority: 105
+              access: Allow
+              direction: Inbound
     relationships:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
@@ -242,18 +254,6 @@ node_templates:
       use_external_resource: true
       name: { get_capability: [ azure, resource_group ] }
       location: { get_capability: [ azure, location ] }
-
-  cloud_init:
-    type: cloudify.nodes.CloudInit.CloudConfig
-    properties:
-      resource_config:
-        users:
-        - name: { get_input: agent_user }
-          primary-group: wheel
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_secret: agent_key_public }
 
 groups:
 

@@ -42,7 +42,7 @@ node_templates:
                 - localhost
                 - check
                 - bastion
-              ssh_common_args: "-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null"
+              ssh_common_args: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null'
     relationships:
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-master
