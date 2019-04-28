@@ -1,0 +1,276 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Create an Example Openstack Network.
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+
+inputs:
+
+  external_network_id:
+    description: Openstack tenant external network name.
+
+  resource_prefix:
+    description: Prefix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_prefix }
+
+  resource_suffix:
+    description: Suffix of every resource created at this deployment on Openstack.
+    default: { get_secret: resource_suffix }
+
+  nameservers:
+    default: [8.8.4.4, 8.8.8.8]
+
+  mgmt_subnet_cidr:
+    default: 10.10.1.0/24
+
+  mgmt_subnet_allocation_pools:
+    default:
+    - start: 10.10.1.2
+      end: 10.10.1.254
+
+  public_subnet_cidr:
+    default: 10.10.2.0/24
+
+  public_subnet_allocation_pools:
+    default:
+    - start: 10.10.2.2
+      end: 10.10.2.254
+
+  wan_subnet_cidr:
+    default: 10.10.3.0/24
+
+  wan_subnet_allocation_pools:
+    default:
+    - start: 10.10.3.2
+      end: 10.10.3.254
+
+  lan_subnet_cidr:
+    default: 10.10.4.0/24
+
+  lan_subnet_allocation_pools:
+    default:
+    - start: 10.10.4.2
+      end: 10.10.4.254
+
+dsl_definitions:
+
+  client_config: &client_config
+    password: { get_secret: openstack_password }
+    username: { get_secret: openstack_username }
+    project_name: { get_secret: openstack_tenant_name }
+    region_name: { get_secret: openstack_region }
+    auth_url: { get_secret: openstack_auth_url }
+
+node_templates:
+
+  external_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_config:
+        id: { get_input: external_network_id }
+        kwargs:
+          routing:
+            external: true
+
+  router:
+    type: cloudify.nodes.openstack.Router
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_router'
+            - { get_input: resource_suffix }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external_network
+
+  mgmt_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_mgmt_net'
+            - { get_input: resource_suffix }
+
+
+  public_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_public_net'
+            - { get_input: resource_suffix }
+
+  wan_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_wan_net'
+            - { get_input: resource_suffix }
+
+  lan_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_lan_net'
+            - { get_input: resource_suffix }
+
+  mgmt_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_mgmt_subnet'
+            - { get_input: resource_suffix }
+        ip_version: 4
+        dns_nameservers: { get_input: nameservers }
+        cidr: { get_input: mgmt_subnet_cidr }
+        allocation_pools: { get_input: mgmt_subnet_allocation_pools }
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: mgmt_network
+      - type: cloudify.relationships.openstack.subnet_connected_to_router
+        target: router
+
+  public_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_public_subnet'
+            - { get_input: resource_suffix }
+        ip_version: 4
+        dns_nameservers: { get_input: nameservers }
+        cidr: { get_input: public_subnet_cidr }
+        allocation_pools: { get_input: public_subnet_allocation_pools }
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_network
+      - type: cloudify.relationships.openstack.subnet_connected_to_router
+        target: router
+
+  wan_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_wan_net'
+            - { get_input: resource_suffix }
+        ip_version: 4
+        dns_nameservers: { get_input: nameservers }
+        cidr: { get_input: wan_subnet_cidr }
+        allocation_pools: { get_input: wan_subnet_allocation_pools }
+        gateway_ip: null
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: wan_network
+
+  lan_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        name:
+          concat:
+            - { get_input: resource_prefix }
+            - '_lan_net'
+            - { get_input: resource_suffix }
+        ip_version: 4
+        dns_nameservers: { get_input: nameservers }
+        cidr: { get_input: lan_subnet_cidr }
+        allocation_pools: { get_input: lan_subnet_allocation_pools }
+        gateway_ip: null
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: lan_network
+
+  network_security_group:
+    type: cloudify.nodes.openstack.SecurityGroup
+    properties:
+      client_config: *client_config
+      resource_config:
+        name: &nsgname
+          concat:
+            - { get_input: resource_prefix }
+            - '_security_group'
+            - { get_input: resource_suffix }
+        description: *nsgname
+      security_group_rules:
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 1
+          port_range_max: 65535
+        - direction: ingress
+          protocol: udp
+          port_range_min: 1
+          port_range_max: 65535
+        - direction: ingress
+          protocol: icmp
+          port_range_min: null
+          port_range_max: null
+
+
+capabilities:
+
+  external_network:
+    value: { get_attribute: [ external_network, id ] }
+
+  router:
+    value: { get_attribute: [ router, id ] }
+
+  mgmt_network:
+    value: { get_attribute: [ mgmt_network, id ] }
+
+  public_network:
+    value: { get_attribute: [ public_network, id ] }
+
+  wan_network:
+    value: { get_attribute: [ wan_network, id ] }
+
+  lan_network:
+    value: { get_attribute: [ lan_network, id ] }
+
+  mgmt_subnet:
+    value: { get_attribute: [ mgmt_subnet, id ] }
+
+  public_subnet:
+    value: { get_attribute: [ public_subnet, id ] }
+
+  wan_subnet:
+    value: { get_attribute: [ wan_subnet, id ] }
+
+  lan_subnet:
+    value: { get_attribute: [ lan_subnet, id ] }
+
+  network_security_group:
+    value: { get_attribute: [ network_security_group, id ] }

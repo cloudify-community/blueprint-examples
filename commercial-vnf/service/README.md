@@ -16,7 +16,7 @@ IP addresses are fetched using `get_capability` function.
 
 * Blueprint: The `service.yaml` blueprint is responsible for orchestrating the service chaining. It consists of two nodes:
   * `fg_port_forwarding`: Prepares NAT rules and policies, which are required to perform the service chain. [fortigate-portforward-start.txt](Resources/templates/fortigate-portforward-start.txt) file is used to apply configuration during installation and [fortigate-portforward-stop.txt](Resources/templates/fortigate-portforward-stop.txt) to delete it during uninstall.
-  * `ltm_config`: Creates load balancing rule responsible for passing traffic from app (exposed on WAN fortigate interface) to BIG-IP Public interface using [ltm_config.txt](Resources/templates/azure/ltm_config.txt) file to apply configuration and [ltm_config_stop.txt](Resources/templates/azure/ltm_config_stop.txt) file to delete it during uninstall.
+  * `ltm_config`: Creates load balancing rule responsible for passing traffic from app (exposed on WAN fortigate interface) to BIG-IP Public interface using [ltm_config.txt](Resources/templates/azure/ltm_config.txt) file on Azure and [ltm_config.txt](Resources/templates/openstack/ltm_config.txt) file on Openstack to apply configuration and [ltm_config_stop.txt](Resources/templates/azure/ltm_config_stop.txt) file on Azure and [ltm_config_stop.txt](Resources/templates/openstack/ltm_config_stop.txt) file on Openstack to delete it during uninstall.
 
 * Inputs:
   * `f5_prov_deployment_name`: The name of the BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE. Default: `VNFM-F5-Prov-Azure-vm`.
@@ -25,17 +25,21 @@ IP addresses are fetched using `get_capability` function.
   * `lb_public_port`: Load balancer public network port on which the service is exposed. Default: `8080`.
   * `wan_port`: Fortigate WAN port on which the service is going to be exposed. Default: `8080'`.
 
-### Installation
+### Install
 
 To apply service configuration execute:
 
+AZURE:
 ``cfy install azure_service.yaml -b NS-LB-Firewall-F5-Fortigate-HTTPD``
+
+OPENSTACK:
+``cfy install openstack_service.yaml -b NS-LB-Firewall-F5-Fortigate-HTTPD``
 
 ### Service validation
 
 After service creation You should be able to display web server exposed on Public interface of BIG-IP. The URL is available on *web_server* deployment output.
 
-### Uninstalling
+### Uninstall
 
 To tear down service configuration execute:
 
