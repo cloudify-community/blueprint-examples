@@ -4,7 +4,7 @@ description: Install Kubernetes using Kubespray on Openstack.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.0.0
+  - plugin:cloudify-openstack-plugin?version=3.1.0
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
