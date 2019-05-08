@@ -22,8 +22,13 @@ inputs:
     default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
 
   load_balancer_deployment:
+    description: >
+      The deployment ID of an existing deployment.
+      For example, db or public-cloud-lb.
+      The following capabilities should be exposed:
+      - endpoint
     type: string
-    default: public-cloud-db
+    default: public-cloud-lb
 
 node_templates:
 

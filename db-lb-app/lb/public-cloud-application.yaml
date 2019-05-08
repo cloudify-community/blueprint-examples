@@ -10,7 +10,11 @@ imports:
 inputs:
 
   database_deployment:
-    description: "name of DV deployment"
+    description: >
+      The deployment ID of an existing deployment.
+      For example, db or public-cloud-db.
+      The following capabilities should be exposed:
+      - endpoints
     type: string
     default: public-cloud-db
 

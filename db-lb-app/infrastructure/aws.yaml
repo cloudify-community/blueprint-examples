@@ -14,7 +14,7 @@ inputs:
 
   instance_type:
     description: >
-      The AWS instance_type. Tested with m3.medium, although that is unnecessarily large.
+      The AWS instance_type.
     default: 't2.micro'
 
   agent_user:
@@ -23,8 +23,7 @@ inputs:
     default: 'ec2-user'
 
   resource_name_prefix:
-    description: >
-      prefix string to differentiate VMs. eg db, lb
+    description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
 dsl_definitions:

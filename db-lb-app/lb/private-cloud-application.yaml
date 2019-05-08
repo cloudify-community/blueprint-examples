@@ -10,7 +10,11 @@ imports:
 inputs:
 
   database_deployment:
-    description: "name of DB deployment"
+    description: >
+      The deployment ID of an existing deployment.
+      For example, db or private-cloud-db.
+      The following capabilities should be exposed:
+      - endpoints
     type: string
     default: private-cloud-db
 
