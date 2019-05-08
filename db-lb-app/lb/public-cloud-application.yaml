@@ -10,6 +10,7 @@ imports:
 inputs:
 
   database_deployment:
+    description: "name of DV deployment"
     type: string
     default: public-cloud-db
 

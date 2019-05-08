@@ -9,32 +9,32 @@ imports:
 inputs:
 
   openstack_region:
-    description: ""
-    type:
+    description: "region- mostly RegionOne"
+    type: string
     default: { get_secret: openstack_region }
 
   public_subnet_cidr:
-    description: ""
+    description: "set the public subnet you want to allocate"
     type: string
     default: 10.10.1.0/24
 
   agent_user:
-    description: ""
+    description: "user to feed and use on VM login"
     type: string
     default: centos
 
   image_id:
-    description: ""
-    type:
+    description: "Id on openstack. need to be loaded to glance"
+    type: string
     default: { get_secret: base_image_id }
 
   flavor_id:
-    description: ""
-    type:
+    description: "flavor ID on openstack"
+    type: string
     default: { get_secret: base_flavor_id }
 
   resource_name_prefix:
-    description: "prefix to use for this elemts (VM) e.g db,lb"
+    description: "prefix to use for this elemets (VM) differentiation. e.g db, lb"
     type: string
 
 dsl_definitions:

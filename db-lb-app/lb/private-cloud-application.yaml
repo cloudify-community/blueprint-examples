@@ -10,6 +10,7 @@ imports:
 inputs:
 
   database_deployment:
+    description: "name of DB deployment"
     type: string
     default: private-cloud-db
 

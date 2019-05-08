@@ -23,6 +23,8 @@ inputs:
     default: 'ec2-user'
 
   resource_name_prefix:
+    description: >
+      prefix string to differentiate VMs. eg db, lb
     type: string
 
 dsl_definitions:
