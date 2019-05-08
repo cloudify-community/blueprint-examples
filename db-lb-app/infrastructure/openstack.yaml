@@ -149,7 +149,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id:  { get_capapability: [ { get_input: network_deployment_name }, public_network ] }
+        id:  { get_capability: [ { get_input: network_deployment_name }, public_network ] }
 
 
   router:
