@@ -8,6 +8,11 @@ imports:
 
 inputs:
 
+  network_deployment_name:
+    description: "existing Openstack network deploymemt name for connected_to"
+    type: string
+    default: "openstack-exmple-network"
+
   openstack_region:
     description: "region- mostly RegionOne"
     type: string
@@ -144,7 +149,8 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack-network, public_network ] }
+        id:  { get_capapability: [ { get_input: network_deployment_name }, public_network ] }
+
 
   router:
     type: cloudify.nodes.openstack.Router
