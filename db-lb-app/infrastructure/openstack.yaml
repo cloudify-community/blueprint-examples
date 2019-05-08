@@ -8,24 +8,33 @@ imports:
 
 inputs:
 
-  region_name:
-    type: string
+  openstack_region:
+    description: ""
+    type:
+    default: { get_secret: openstack_region }
 
   public_subnet_cidr:
+    description: ""
     type: string
     default: 10.10.1.0/24
 
   agent_user:
+    description: ""
     type: string
     default: centos
 
   image_id:
-    type: string
+    description: ""
+    type:
+    default: { get_secret: base_image_id }
 
   flavor_id:
-    type: string
+    description: ""
+    type:
+    default: { get_secret: base_flavor_id }
 
   resource_name_prefix:
+    description: "prefix to use for this elemts (VM) e.g db,lb"
     type: string
 
 dsl_definitions:
@@ -35,7 +44,7 @@ dsl_definitions:
     username: { get_secret: openstack_username }
     password: { get_secret: openstack_password }
     project_name: { get_secret: openstack_project_name }
-    region_name: { get_input: region_name }
+    region_name: { get_input: openstack_region }
 
 node_templates:
 
@@ -122,7 +131,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack, public_subnet ] }
+        id: { get_capability: [ openstack-network, public_subnet ] }
     relationships:
       - type: cloudify.relationships.contained_in
         target: network
@@ -135,7 +144,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack, public_network ] }
+        id: { get_capability: [ openstack-network, public_network ] }
 
   router:
     type: cloudify.nodes.openstack.Router
@@ -143,7 +152,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack, public_network_router ] }
+        id: { get_capability: [ openstack-network, public_network_router ] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external_network
@@ -154,7 +163,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack, external_network ] }
+        id: { get_capability: [ openstack-network, external_network ] }
         kwargs:
           routing:
             external: true
