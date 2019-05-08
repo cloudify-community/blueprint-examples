@@ -12,6 +12,22 @@ imports:
 
 inputs:
 
+  resource_name_prefix:
+    description: A prefix for resource names for resources that will be created, for example, db or lb.
+    type: string
+
+  network_deployment_name:
+    description: >
+      The deployment ID of an existing deployment.
+      For example, aws-example-network.
+      The following capabilities should be exposed:
+      - external_network
+      - public_network_router
+      - public_network
+      - public_subnet
+    type: string
+    default: aws
+
   instance_type:
     description: >
       The AWS instance_type.
@@ -22,16 +38,12 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'ec2-user'
 
-  resource_name_prefix:
-    description: A prefix for resource names for resources that will be created, for example, db or lb.
-    type: string
-
 dsl_definitions:
 
   client_config: &client_config
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
-    region_name: { get_capability: [ aws, region_name ] }
+    region_name: { get_capability: [ { get_input: network_deployment_name }, region_name ] }
 
 node_templates:
 
@@ -54,7 +66,7 @@ node_templates:
             Ebs:
               DeleteOnTermination: True
           Placement:
-            AvailabilityZone: { get_capability: [ aws, availability_zone ] }
+            AvailabilityZone: { get_capability: [ { get_input: network_deployment_name }, availability_zone ] }
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
       use_public_ip: true
     relationships:
@@ -140,14 +152,14 @@ node_templates:
       resource_config:
         GroupName: { concat: [ { get_input: resource_name_prefix }, '-infra-group' ] }
         Description: db lb app infra group
-        VpcId: { get_capability: [ aws, vpc_id ] }
+        VpcId: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
 
   subnet:
     type: cloudify.nodes.aws.ec2.Subnet
     properties:
       client_config: *client_config
       use_external_resource: true
-      resource_id: { get_capability: [ aws, public_subnet_id ] }
+      resource_id: { get_capability: [ { get_input: network_deployment_name }, public_subnet_id ] }
       resource_config:
         CidrBlock: 'N/A'
         AvailabilityZone: 'N/A'
@@ -157,7 +169,7 @@ node_templates:
     properties:
       client_config: *client_config
       use_external_resource: true
-      resource_id: { get_capability: [ aws, vpc_id ] }
+      resource_id: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
       resource_config:
         CidrBlock: 'N/A'
 

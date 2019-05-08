@@ -8,6 +8,10 @@ imports:
 
 inputs:
 
+  resource_name_prefix:
+    description: A prefix for resource names for resources that will be created, for example, db or lb.
+    type: string
+
   network_deployment_name:
     description: >
       The deployment ID of an existing deployment.
@@ -45,10 +49,6 @@ inputs:
     description: The ID of an appropriate flavor that is available in your account, for example 3.
     type: string
     default: { get_secret: base_flavor_id }
-
-  resource_name_prefix:
-    description: A prefix for resource names for resources that will be created, for example, db or lb.
-    type: string
 
 dsl_definitions:
 
