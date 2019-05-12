@@ -32,9 +32,9 @@ def validate_blueprint(request):
     if dirname_param == 'infrastructure' and infra_name == 'azure':
         blueprint_id = '{0}'.format(dirname_param)
     elif dirname_param == 'infrastructure' and infra_name == 'aws':
-        blueprint_id = 'public-cloud'
+        blueprint_id = 'public-cloud-vm'
     elif dirname_param == 'infrastructure' and infra_name == 'openstack':
-        blueprint_id = 'private-cloud'
+        blueprint_id = 'private-cloud-vm'
     else:
         blueprint_id = '{0}-{1}'.format(
             dirname_param,
