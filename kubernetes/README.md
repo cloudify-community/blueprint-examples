@@ -26,7 +26,7 @@ For **AWS**
 cfy secrets create aws_access_key_id --secret-string <value>
 cfy secrets create aws_secret_access_key --secret-string <value>
 ```
- 
+
 For **Azure**
 ```shell
 cfy secrets create azure_subscription_id --secret-string <value>
@@ -53,8 +53,12 @@ cfy secrets create openstack_username --secret-string <value>
 cfy secrets create openstack_password --secret-string <value>
 cfy secrets create openstack_tenant_name --secret-string <value>
 cfy secrets create openstack_auth_url --secret-string <value>
+cfy secrets create openstack_region_name --secret-string <value>
+cfy secrets create base_image_id --secret-string <value>
+cfy secrets create base_flavor_id --secret-string <value>
+
 ```
-      
+
 For **Key pair**
 ```shell
 ssh-keygen -t rsa -C "your_email@example.com"
@@ -62,7 +66,7 @@ ssh-keygen -t rsa -C "your_email@example.com"
 cfy secrets create agent_key_private -f ~/.ssh/id_rsa -u
 cfy secrets create agent_key_public -f ~/.ssh/id_rsa.pub -u
 ```
-         
+
 ### Running the example
 
 
