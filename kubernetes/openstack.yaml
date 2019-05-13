@@ -33,6 +33,7 @@ inputs:
 
   region_name:
     type: string
+    default: { get_secret: openstack_region_name }
 
   external_network_id:
     type: string
@@ -43,9 +44,11 @@ inputs:
 
   image_id:
     type: string
+    default: { get_secret: base_image_id }
 
   flavor_id:
     type: string
+    default: { get_secret: base_flavor_id }
 
   agent_user:
     type: string
