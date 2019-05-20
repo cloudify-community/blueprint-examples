@@ -17,12 +17,12 @@ inputs:
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellovnet
+    default: kubevnet
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellosubnet
+    default: kubevsubnet
 
   image:
     type: string
@@ -106,6 +106,7 @@ node_templates:
     properties:
       name: { get_input: network_name }
       gcp_config: *gcp_config
+      auto_subnets: false
 
   subnet:
     type: cloudify.gcp.nodes.SubNetwork
