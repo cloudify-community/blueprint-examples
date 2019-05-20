@@ -113,6 +113,7 @@ node_templates:
     properties:
       name: { get_input: network_name }
       gcp_config: *gcp_config
+      auto_subnets: false
 
 outputs:
 
