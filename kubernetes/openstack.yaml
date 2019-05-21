@@ -226,7 +226,6 @@ groups:
 
   kube-master-group:
     members:
-    - kube-config
     - kube-master
     - kube-master-port
     - kube-master-ip-address
