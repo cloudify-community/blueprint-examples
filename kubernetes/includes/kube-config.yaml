@@ -10,7 +10,7 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: kube-base-config
-      - type: cloudify.relationships.contained_in
+      - type: cloudify.relationships.depends_on
         target: kube-master
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:

@@ -325,7 +325,6 @@ groups:
 
   kube-master-group:
     members:
-    - kube-config
     - kube-master
     - kube-master-nic
     - kube-master-ip

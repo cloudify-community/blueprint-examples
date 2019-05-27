@@ -11,6 +11,10 @@ inputs:
     type: string
     default: kubespray/cluster.yml
 
+  kubespray_ansible_playbook_path_scale:
+    type: string
+    default: kubespray/scale.yml
+
   kubespray_ansible_playbook_path_removal:
     type: string
     default: kubespray/remove-node.yml
@@ -22,6 +26,10 @@ inputs:
   kubespray_kube_network_plugin:
     type: string
     default: flannel
+
+  kubespray_ansible_ssh_common_args:
+    type: string
+    default: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null'
 
 node_templates:
 
@@ -42,12 +50,29 @@ node_templates:
                 - localhost
                 - check
                 - bastion
-              ssh_common_args: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null'
+              ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
     relationships:
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-master
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-node
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            establish:
+              implementation: ansible.cloudify_ansible.tasks.run
+              inputs:
+                site_yaml_path: { get_input: kubespray_ansible_playbook_path_scale }
+                remerge_sources: true
+                run_data:
+                  dns_mode: { get_input: kubespray_dns_mode}
+                  kube_network_plugin: { get_input: kubespray_kube_network_plugin }
+                  kube_api_anonymous_auth: true
+                options_config:
+                  skip_tags:
+                    - localhost
+                    - check
+                    - bastion
+                  ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
 
 groups:
 
