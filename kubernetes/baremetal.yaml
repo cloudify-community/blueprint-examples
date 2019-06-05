@@ -1,0 +1,86 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin
+  - includes/application.yaml
+  - includes/kube-config.yaml
+
+inputs:
+
+
+  master_ip:
+    description: >
+      The ip address used for the master.
+    default: { get_secret: k8s_master_ip }
+
+  node_ip:
+    description: >
+      The ip address used for the node. This blueprint supports one node
+    default: { get_secret: k8s_node_ip }
+
+  agent_key_private:
+    description: >
+      ssh key that is able to ssh into the master and the node hosts with the agent user.
+    default: { get_secret: agent_key_private }
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'centos'
+
+
+node_types:
+
+  k8s-cluster: &k8s-cluster
+    derived_from: cloudify.nodes.Compute
+    properties:
+      agent_config:
+        default:
+          install_method: remote
+          user: { get_input: agent_user }
+          port: 22
+          key: { get_input: agent_key_private }
+
+
+  kube-master: *k8s-cluster
+
+  kube-node: *k8s-cluster
+
+node_templates:
+
+  kube-master:
+    type: kube-master
+    properties:
+      ip: { get_input: master_ip }
+
+  kube-node:
+    type: kube-node
+    properties:
+      ip: { get_input: node_ip }
+
+
+groups:
+
+  kube-master-group:
+    members:
+    - kube-master
+
+  kube-node-group:
+    members:
+    - kube-node
+
+policies:
+
+  kube-master-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-master-group]
+
+  kube-node-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-node-group]

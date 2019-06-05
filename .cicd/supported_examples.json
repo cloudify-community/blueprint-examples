@@ -35,7 +35,8 @@
   "kubernetes": [
     "aws.yaml",
     "azure.yaml",
-    "openstack.yaml"
+    "openstack.yaml",
+    "baremetal.yaml"
   ],
   "infoblox-example": ["example-infoblox-blueprint.yaml"],
   "open-source-vnf/connected-host": ["openstack.yaml"],
