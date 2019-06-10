@@ -49,7 +49,7 @@ node_templates:
               new_database_user: { get_input: database_user }
               new_database_password: { get_input: database_password }
     relationships:
-      - type: cloudify.relationships.depends_on
+      - type: cloudify.relationships.contained_in
         target: infrastructure--host
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
