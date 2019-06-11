@@ -75,6 +75,22 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: dashboard-token-and-port
 
+  kube-helm:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: fabric.fabric_plugin.tasks.run_task
+          inputs:
+            tasks_file: scripts/tasks.py
+            task_name: setup_helm
+            fabric_env: *fabric_env_ni
+            task_properties:
+              username: { get_input: agent_user }
+              resource: get_helm.sh
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kube-config
 
 outputs:
 

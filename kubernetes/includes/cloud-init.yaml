@@ -10,7 +10,8 @@ node_templates:
     properties:
       resource_config:
         groups:
-        - docker
+          - docker
+          - { get_input: agent_user }
         users:
           - name: { get_input: agent_user }
             primary-group: { get_input: agent_user }
