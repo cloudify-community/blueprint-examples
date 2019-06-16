@@ -17,3 +17,6 @@
 [submodule "prometheus/includes/prometheus/ansible-prometheus"]
 	path = prometheus/includes/prometheus/ansible-prometheus
 	url = https://github.com/EarthmanT/ansible-prometheus.git
+[submodule "kubernetes/ansible-helm"]
+	path = kubernetes/ansible-helm
+	url = https://github.com/mabuaisha/ansible-install-helm.git

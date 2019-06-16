@@ -3,6 +3,13 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - plugin:cloudify-fabric-plugin
 
+
+inputs:
+
+  kubernetes_helm_ansible_playbook_path:
+    type: string
+    default: ansible-helm/install.yml
+
 node_templates:
 
   kube-config:
@@ -75,22 +82,27 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: dashboard-token-and-port
 
-  kube-helm:
-    type: cloudify.nodes.Root
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        start:
-          implementation: fabric.fabric_plugin.tasks.run_task
-          inputs:
-            tasks_file: scripts/tasks.py
-            task_name: setup_helm
-            fabric_env: *fabric_env_ni
-            task_properties:
-              username: { get_input: agent_user }
-              resource: get_helm.sh
+  kubernetes-helm:
+    type: cloudify.nodes.ansible.Executor
+    properties:
+      site_yaml_path: { get_input: kubernetes_helm_ansible_playbook_path }
     relationships:
       - type: cloudify.relationships.depends_on
         target: kube-config
+      - type: cloudify.ansible.relationships.connected_to_host
+        target: kube-master
+        source_interfaces:
+           cloudify.interfaces.relationship_lifecycle:
+             preconfigure:
+              inputs:
+                group_name: k8s-master
+                hostname: master
+                host_config:
+                  ansible_host: { get_attribute: [ kube-master, ip ] }
+                  ansible_user: { get_property: [ kube-master, agent_config, user ] }
+                  ansible_ssh_private_key_file: { get_property: [ kube-master, agent_config, key ] }
+                  ansible_become: true
+
 
 outputs:
 
