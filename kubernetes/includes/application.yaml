@@ -31,6 +31,67 @@ inputs:
     type: string
     default: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null'
 
+relationships:
+
+  node_attach:
+    derived_from: cloudify.ansible.relationships.connected_to_host
+    source_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        preconfigure:
+          implementation: ansible.cloudify_ansible.tasks.ansible_requires_host
+          inputs:
+            group_name:
+              default: ""
+              description: >
+                Ansible node group name
+            hostname:
+              default: ""
+              description: >
+                Hostname
+            host_config:
+              default: {}
+              description: >
+                Host configuration:
+                  ansible_host: The hostname or IP address of the host to SSH
+                    into.
+                  ansible_user: The username to SSH with.
+                  ansible_ssh_private_key_file: The private key file to SSH
+                    with.
+                  ansible_become: A boolean value, `true` or `false` whether
+                    to assume the user privileges.
+                  ansible_ssh_common_args: Additional arguments to the SSH
+                    command, by default: '-o StrictHostKeyChecking=no'
+        establish:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            site_yaml_path:
+              default: { get_input: kubespray_ansible_playbook_path_scale }
+            remerge_sources:
+              default: true
+            run_data:
+              default:
+                dns_mode: { get_input: kubespray_dns_mode}
+                kube_network_plugin: { get_input: kubespray_kube_network_plugin }
+                kube_api_anonymous_auth: true
+            options_config:
+              default:
+                skip_tags:
+                  - localhost
+                  - check
+                  - bastion
+                ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
+        unlink:
+          implementation: ansible.cloudify_ansible.tasks.ansible_remove_host
+          inputs:
+            group_name:
+              default: ""
+              description: >
+                Ansible node group name
+            hostname:
+              default: ""
+              description: >
+                Hostname
+
 node_templates:
 
   kube-base-config:
@@ -52,27 +113,12 @@ node_templates:
                 - bastion
               ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
     relationships:
+      # master can't be scalled
       - type: cloudify.ansible.relationships.connected_to_host
         target: kube-master
-      - type: cloudify.ansible.relationships.connected_to_host
+      # scaling is possible
+      - type: node_attach
         target: kube-node
-        source_interfaces:
-          cloudify.interfaces.relationship_lifecycle:
-            establish:
-              implementation: ansible.cloudify_ansible.tasks.run
-              inputs:
-                site_yaml_path: { get_input: kubespray_ansible_playbook_path_scale }
-                remerge_sources: true
-                run_data:
-                  dns_mode: { get_input: kubespray_dns_mode}
-                  kube_network_plugin: { get_input: kubespray_kube_network_plugin }
-                  kube_api_anonymous_auth: true
-                options_config:
-                  skip_tags:
-                    - localhost
-                    - check
-                    - bastion
-                  ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
 
 groups:
 

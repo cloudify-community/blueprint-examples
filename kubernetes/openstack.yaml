@@ -185,6 +185,23 @@ node_templates:
         target: kube-node-port
       - type: cloudify.relationships.depends_on
         target: cloudify-host-cloud-config
+      # we need float ip for alive kube-node
+      - type: cloudify.relationships.depends_on
+        target: kube-node-ip-address
+      # we need master to be alive when any kube node is alive
+      - type: cloudify.relationships.depends_on
+        target: kube-master
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            unlink:
+              implementation: fabric.fabric_plugin.tasks.run_task
+              inputs:
+                tasks_file: scripts/clean_master.py
+                task_name: remove_node
+                fabric_env:
+                  host_string: { get_attribute: [ kube-master-ip-address, floating_ip_address ] }
+                  key: { get_secret: agent_key_private }
+                  user: { get_input: agent_user }
 
   kube-master-port:
     type: cloudify.nodes.openstack.Port
@@ -221,6 +238,9 @@ node_templates:
         target: kube-master-port
       - type: cloudify.relationships.depends_on
         target: cloudify-host-cloud-config
+      # we need float ip for alive kube-master
+      - type: cloudify.relationships.depends_on
+        target: kube-master-ip-address
 
 groups:
 
