@@ -92,6 +92,20 @@ groups:
       - infrastructure--scalable_compute
       - mariadb
 
+policies:
+
+  scalable_compute_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [infrastructure--scalable_compute]
+
+  scalable_cluster_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [scalable_cluster]
+
 capabilities:
 
   endpoints:
