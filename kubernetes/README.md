@@ -1,6 +1,5 @@
 # Kubernetes Example
 
-
 ## Prerequisites:
 
   * Cloudify Manager host requires `python-netaddr` rpm: `yum install python-netaddr`. You also need the `netaddr` package: `pip install netaddr`.

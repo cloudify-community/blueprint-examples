@@ -49,7 +49,7 @@ node_templates:
               new_database_user: { get_input: database_user }
               new_database_password: { get_input: database_password }
     relationships:
-      - type: cloudify.relationships.depends_on
+      - type: cloudify.relationships.contained_in
         target: infrastructure--host
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
@@ -90,6 +90,20 @@ groups:
     members:
       - infrastructure--scalable_compute
       - mariadb
+
+policies:
+
+  scalable_compute_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [infrastructure--scalable_compute]
+
+  scalable_cluster_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [scalable_cluster]
 
 capabilities:
 
