@@ -81,7 +81,7 @@ node_templates:
             site_yaml_path: mariadb/galera_bootstrap.yml
             sources: { get_attribute: [ mariadb, sources ] }
     relationships:
-      - type: cloudify.relationships.depends_on
+      - type: cloudify.relationships.contained_in
         target: mariadb
 
 groups:
