@@ -5,7 +5,7 @@ description: >
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.1.0
+  - plugin:cloudify-openstack-plugin?version=3.2.0
   - plugin:cloudify-utilities-plugin
 
 inputs:
