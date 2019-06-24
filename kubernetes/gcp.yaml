@@ -13,6 +13,7 @@ inputs:
   region:
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
+    default: { get_secret: gcp_region }
 
   network_name:
     type: string

@@ -12,7 +12,7 @@ except ImportError:
 
 from cloudify import manager
 from cloudify import ctx
-from cloudify.exceptions import RecoverableError
+from cloudify.exceptions import (RecoverableError, NonRecoverableError)
 
 from fabric.api import sudo, get, put, shell_env, run
 
@@ -27,6 +27,24 @@ def create_secret(key, val):
         key=key,
         value=val,
         update_if_exists=True)
+
+
+def handle_fabric_response(fabric_response):
+    if not fabric_response:
+        raise NonRecoverableError('Unknown error when trying to run remote '
+                                  'command')
+
+    if fabric_response.failed:
+        err_msg = '{0} failed with error: {1}'.format(
+            fabric_response.command,
+            fabric_response.stderr)
+        ctx.logger.error(err_msg)
+        raise NonRecoverableError(err_msg)
+
+    success_msg = 'Running command: {0} successfully {1}'.format(
+        fabric_response.command, fabric_response.stdout)
+
+    ctx.logger.info(success_msg)
 
 
 def create_cluster_secrets(cluster, rp):
@@ -97,3 +115,46 @@ def kubectl_apply(username, resource):
                 os.path.dirname(kube_config_path)
             ), resource
         ))
+
+
+def setup_helm(username, resource):
+    """
+    This task will install.setup helm inside K8S cluster and will init the
+    tiller server
+    """
+
+    temp_file = NamedTemporaryFile()
+    # Download helm script file to the home directory
+    helm_script_path = '/home/{0}/{1}'.format(username, resource)
+    ctx.download_resource('scripts/{0}'.format(resource), temp_file.name)
+
+    # Copy file to the home directory
+    ctx.logger.debug(
+        'Copy {0} to {1}'.format(temp_file.name, helm_script_path)
+    )
+    put(temp_file.name, helm_script_path)
+
+    # Change owner for the helm script file
+    ctx.logger.debug(
+        'Change file {0} owner to {1}'.format(helm_script_path, username)
+    )
+    sudo('chown {0} {1}'.format(username, helm_script_path))
+
+    # Update Permissions
+    ctx.logger.debug(
+        'Change file {0} permission to 700'.format(helm_script_path)
+    )
+    sudo('chmod 700 {0}'.format(helm_script_path))
+
+    # Install Helm client
+    ctx.logger.debug(
+        'Install helm client using script file {0}'.format(
+            helm_script_path)
+    )
+    response = run('bash {0}'.format(helm_script_path))
+    handle_fabric_response(response)
+
+    # Initialize helm and install tiller server
+    ctx.logger.debug('Initialize helm and install tiller server')
+    response = run('helm init')
+    handle_fabric_response(response)
