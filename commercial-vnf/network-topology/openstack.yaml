@@ -4,8 +4,8 @@ description: >
   Create an Example Openstack Network.
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.2.0
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - plugin:cloudify-openstack-plugin?version=3.1.0
 
 inputs:
 
@@ -101,7 +101,6 @@ node_templates:
             - { get_input: resource_prefix }
             - '_mgmt_net'
             - { get_input: resource_suffix }
-
 
   public_network:
     type: cloudify.nodes.openstack.Network

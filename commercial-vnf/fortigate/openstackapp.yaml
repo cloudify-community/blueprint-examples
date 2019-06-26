@@ -4,7 +4,7 @@ description: >
    Applies base configuration for newly created FortiGate VM.
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:
@@ -15,6 +15,13 @@ inputs:
     default: VNFM-Fortigate-Prov-Openstack-vm
 
 node_templates:
+
+  fortigate_vm_deployment:
+    type: cloudify.nodes.SharedResource
+    properties:
+      resource_config:
+        deployment:
+          id: { get_input: fortigate_vm_deployment_name }
 
   fortigate_vnf_config:
     type: cloudify.terminal.raw
@@ -38,6 +45,9 @@ node_templates:
             terminal_auth: *terminal_auth
             calls:
               - template: Resources/templates/fortigate-baseline.txt
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: fortigate_vm_deployment
 
 
 capabilities:
