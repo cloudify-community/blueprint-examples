@@ -29,16 +29,19 @@ jobs:
             git submodule update --remote
       - run:
           name: install cloudify
-          command: pip install -U cloudify==4.5.5 pytest pyyaml==3.10
+          command: pip install --disable-pip-version-check -U cloudify pytest pyyaml==3.10
       - run:
           name: download manager docker image
           command: wget http://repository.cloudifysource.org/cloudify/4.5.5/ga-release/cloudify-docker-manager-4.5.5ga.tar
       - run:
+          name: rename cloudify image
+          command: mv cloudify-docker-manager-4.5.5ga.tar cloudify-docker-image.tar
+      - run:
           name: load docker image
-          command: docker load -i cloudify-docker-manager-4.5.5ga.tar
+          command: docker load -i cloudify-docker-image.tar
       - run:
           name: retain space by dumping the tar
-          command: rm cloudify-docker-manager-4.5.5ga.tar
+          command: rm cloudify-docker-image.tar
       - run:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host docker-cfy-manager:latest
