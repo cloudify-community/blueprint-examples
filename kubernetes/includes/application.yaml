@@ -100,6 +100,7 @@ node_templates:
       cloudify.interfaces.lifecycle:
         create:
           implementation: scripts/install_netaddr.sh
+          executor: central_deployment_agent
         configure:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
