@@ -5,7 +5,7 @@ imports:
   - plugin:cloudify-openstack-plugin?version=3.2.1
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
-  - ansible.yaml
+  - includes/ansible.yaml
 
 inputs:
 
