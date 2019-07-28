@@ -166,7 +166,6 @@ node_templates:
           - { get_secret: agent_key_public }
 
 outputs:
-
   application_endpoint:
     description: The external endpoint of the application.
     value: { concat: [ 'http://', { get_attribute: [ ip, floating_ip_address ] }, ':80' ] }
