@@ -4,24 +4,13 @@
     - name: restart apache2
       service: name=apache2 state=restarted
   tasks:
-  
-    - name: retry if needed using command apt-get update
-      command: apt-get update
-      sudo: yes
-      when: apt_result|failed
 
     - name: install apache2
-      apt: name={{item}} update_cache=yes state=latest cache_valid_time=3600
+      apt: name={{item}} update_cache=yes state=latest
       with_items:
            - apache2-doc
            - apache2-utils
            - apache2
-      register: apt_result
-      until: apt_result|success
-      retries: 3
-      delay: 1
-      sudo: yes
-      ignore_errors: yes
 
     - name: enabled mod_rewrite
       apache2_module: name=rewrite state=present
