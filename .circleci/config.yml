@@ -57,7 +57,7 @@ jobs:
           command: cfy plugins bundle-upload
       - run:
           name: install updated openstack
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.1/cloudify_openstack_plugin-3.2.1-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.1/plugin.yaml || true
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.2/cloudify_openstack_plugin-3.2.2-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.2/plugin.yaml || true
       - run:
           name: install updated utilities
           command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-utilities-plugin/1.14.0/cloudify_utilities_plugin-1.14.0-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/utilities-plugin/1.13.0/plugin.yaml || true
