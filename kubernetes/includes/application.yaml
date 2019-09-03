@@ -80,6 +80,9 @@ relationships:
                   - check
                   - bastion
                 ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
+            ansible_env_vars:
+              default:
+                ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
         unlink:
           implementation: ansible.cloudify_ansible.tasks.ansible_remove_host
           inputs:
@@ -115,6 +118,8 @@ node_templates:
                 - check
                 - bastion
               ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
+            ansible_env_vars:
+              ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
     relationships:
       # master can't be scalled
       - type: cloudify.ansible.relationships.connected_to_host
