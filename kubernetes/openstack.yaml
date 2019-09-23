@@ -59,7 +59,7 @@ inputs:
     default: centos
     
   client_config_dict:
-    type: dict
+#    type: dict
     description: A dictionary containing the client configuration for Openstack. Default is for keystone v2. Provide an alternate input for keystone v3.
     default:
       username: { get_input: username }
