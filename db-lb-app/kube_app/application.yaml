@@ -95,15 +95,52 @@ node_templates:
         target: pv-claim
 
   deploy:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.kubernetes.resources.Deployment
     properties:
-      file:
-        resource_path: resources/deploy.yaml
-        template_variables:
-          WORDPRESS_DB_HOST: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
-          WORDPRESS_DB_USER: { get_input: database_user }
-          WORDPRESS_DB_PASSWORD: { get_input: database_password }
-          WORDPRESS_DB_NAME: { get_input: database_name }
+      definition:
+        apiVersion: extensions/v1beta1
+        kind: Deployment
+        metadata:
+          name: wordpress
+          labels:
+            app: wordpress
+        spec:
+          strategy:
+            type: Recreate
+          template:
+            metadata:
+              labels:
+                app: wordpress
+                tier: frontend
+            spec:
+              containers:
+              - image: wordpress:4.8.0-apache
+                name: wordpress
+                env:
+                  - name: WORDPRESS_DB_HOST
+                    value: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
+                  - name: WORDPRESS_DB_USER
+                    value: { get_input: database_user }
+                  - name: WORDPRESS_DB_PASSWORD
+                    value: { get_input: database_password }
+                  - name: WORDPRESS_DB_NAME
+                    value: { get_input: database_name }
+                  - name: WORDPRESS_TABLE_PREFIX
+                    value: cfy
+                ports:
+                  - containerPort: 80
+                    name: wordpress
+                volumeMounts:
+                  - name: wordpress-persistent-storage
+                    mountPath: /var/www/html
+              volumes:
+                - name: wordpress-persistent-storage
+                  persistentVolumeClaim:
+                    claimName: wp-pv-claim
+      options:
+        grace_period_seconds: 5
+        propagation_policy: 'Foreground'
+        namespace: 'default'
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
