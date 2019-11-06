@@ -4,7 +4,7 @@ description: Install Kubernetes using Kubespray on Openstack.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.2.0
+  - plugin:cloudify-openstack-plugin?version=3.2.2
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
@@ -57,15 +57,18 @@ inputs:
   agent_user:
     type: string
     default: centos
+    
+  client_config_dict:
+#    type: dict
+    description: A dictionary containing the client configuration for Openstack. Default is for keystone v2. Provide an alternate input for keystone v3.
+    default:
+      username: { get_input: username }
+      password: { get_input: password }
+      project_name: { get_input: project_name }
+      auth_url: { get_input: auth_url }
+      region_name: { get_input: region }
 
 dsl_definitions:
-
-  client_config: &client_config
-    auth_url: { get_input: auth_url }
-    username: { get_input: username }
-    password: { get_input: password }
-    project_name: { get_input: project_name }
-    region_name: { get_input: region_name }
 
 node_types:
 
@@ -73,7 +76,7 @@ node_types:
     derived_from: cloudify.nodes.openstack.Server
     properties:
       client_config:
-        default: *client_config
+        default: { get_input: client_config_dict }
       agent_config:
         default:
           install_method: none
@@ -91,7 +94,7 @@ node_templates:
   external-network:
     type: cloudify.nodes.openstack.Network
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       use_external_resource: true
       resource_config:
         id: { get_input: external_network_id }
@@ -102,7 +105,7 @@ node_templates:
   router:
     type: cloudify.nodes.openstack.Router
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external-network
@@ -110,14 +113,14 @@ node_templates:
   network:
     type: cloudify.nodes.openstack.Network
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         name: network
 
   public-subnet:
     type: cloudify.nodes.openstack.Subnet
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         cidr: { get_input: public_subnet_cidr }
         enable_dhcp: true
@@ -132,7 +135,7 @@ node_templates:
   security-group:
     type: cloudify.nodes.openstack.SecurityGroup
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         name: kubernetes-security-group
         description: 'Kubernetes Openstack Group'
@@ -153,7 +156,7 @@ node_templates:
   kube-node-port:
     type: cloudify.nodes.openstack.Port
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         network_id: { get_attribute: [ network, id ] }
     relationships:
@@ -165,7 +168,7 @@ node_templates:
   kube-node-ip-address:
     type: cloudify.nodes.openstack.FloatingIP
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external-network
@@ -206,7 +209,7 @@ node_templates:
   kube-master-port:
     type: cloudify.nodes.openstack.Port
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         network_id: { get_attribute: [ network, id ] }
     relationships:
@@ -218,7 +221,7 @@ node_templates:
   kube-master-ip-address:
     type: cloudify.nodes.openstack.FloatingIP
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external-network

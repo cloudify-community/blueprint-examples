@@ -1,10 +1,10 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
-description: A simple Openstack example network.
+description: A example Openstack network.
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.2.0
+  - plugin:cloudify-openstack-plugin?version=3.2.2
 
 inputs:
 
@@ -50,21 +50,26 @@ inputs:
     - start: 10.10.1.2
       end: 10.10.1.254
 
+  client_config_dict:
+#    type: dict
+    description: A dictionary containing the client configuration for Openstack. Default is for keystone v2. Provide an alternate input for keystone v3.
+    default:
+      username: { get_input: username }
+      password: { get_input: password }
+      project_name: { get_input: project_name }
+      auth_url: { get_input: auth_url }
+      region_name: { get_input: region }
+
+
 dsl_definitions:
 
-  client_config: &client_config
-    username: { get_input: username }
-    password: { get_input: password }
-    project_name: { get_input: project_name }
-    auth_url: { get_input: auth_url }
-    region_name: { get_input: region }
 
 node_templates:
 
   external-network:
     type: cloudify.nodes.openstack.Network
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       use_external_resource: true
       resource_config:
         name: { get_input: external_network_id }
@@ -75,21 +80,21 @@ node_templates:
   public-network:
     type: cloudify.nodes.openstack.Network
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         name: public-network
 
   private-network:
     type: cloudify.nodes.openstack.Network
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         name: private-network
 
   public-network-router:
     type: cloudify.nodes.openstack.Router
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external-network
@@ -97,7 +102,7 @@ node_templates:
   public-subnet:
     type: cloudify.nodes.openstack.Subnet
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         name: public-subnet
         ip_version: 4
@@ -113,7 +118,7 @@ node_templates:
   private-subnet:
     type: cloudify.nodes.openstack.Subnet
     properties:
-      client_config: *client_config
+      client_config: { get_input: client_config_dict }
       resource_config:
         ip_version: 4
         name: private-subnet

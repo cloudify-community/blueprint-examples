@@ -2,10 +2,10 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.2.0
+  - plugin:cloudify-openstack-plugin?version=3.2.2
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
-  - ansible.yaml
+  - includes/ansible.yaml
 
 inputs:
 
@@ -166,7 +166,6 @@ node_templates:
           - { get_secret: agent_key_public }
 
 outputs:
-
   application_endpoint:
     description: The external endpoint of the application.
     value: { concat: [ 'http://', { get_attribute: [ ip, floating_ip_address ] }, ':80' ] }
