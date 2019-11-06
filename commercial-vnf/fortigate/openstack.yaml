@@ -1,7 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
   - plugin:cloudify-openstack-plugin?version=3.2.2
   - plugin:cloudify-utilities-plugin
 
@@ -34,7 +34,7 @@ inputs:
   fortigate_license_filename:
     type: string
     description: Name of the Fortigate license file (It will be uploaded to Fortigate VM with this name). It should have .lic file extension.
-    default: FGVM02TM19000054.lic
+    default: FGVM02TM19003772.lic
 
 
 dsl_definitions:
@@ -48,6 +48,13 @@ dsl_definitions:
 
 node_templates:
 
+  network_topology:
+    type: cloudify.nodes.SharedResource
+    properties:
+      resource_config:
+        deployment:
+          id: { get_input: openstack_network_deployment_name }
+
   external_network:
     type: cloudify.nodes.openstack.Network
     properties:
@@ -55,9 +62,9 @@ node_templates:
       use_external_resource: true
       resource_config:
         id: { get_capability: [{ get_input: openstack_network_deployment_name }, external_network] }
-        kwargs:
-          routing:
-            external: true
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_topology
 
   mgmt_network:
     type: cloudify.nodes.openstack.Network
@@ -66,6 +73,9 @@ node_templates:
       use_external_resource: true
       resource_config:
         id: { get_capability: [{ get_input: openstack_network_deployment_name }, mgmt_network] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_topology
 
   wan_network:
     type: cloudify.nodes.openstack.Network
@@ -74,6 +84,9 @@ node_templates:
       use_external_resource: true
       resource_config:
         id: { get_capability: [{ get_input: openstack_network_deployment_name }, wan_network] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_topology
 
   lan_network:
     type: cloudify.nodes.openstack.Network
@@ -90,6 +103,9 @@ node_templates:
       use_external_resource: true
       resource_config:
         id: { get_capability: [{ get_input: openstack_network_deployment_name }, network_security_group] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: network_topology
 
   mgmt_floating_ip_address:
     type: cloudify.nodes.openstack.FloatingIP

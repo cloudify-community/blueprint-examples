@@ -3,15 +3,23 @@ description: >
     Starts HTTPD process on VM.
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:
+
   httpd_vm_deployment_name:
     description: Name of HTTPD Provisioning deployment
     default: VNFM-HTTPD-Prov-Openstack-vm
 
 node_templates:
+
+  httpd_vm_deployment:
+    type: cloudify.nodes.SharedResource
+    properties:
+      resource_config:
+        deployment:
+          id: { get_input: httpd_vm_deployment_name }
 
   web_server:
     type: cloudify.terminal.raw
@@ -26,3 +34,6 @@ node_templates:
               errors: []
             calls:
               - action: 'screen -dmS -X python3 -m http.server 8080'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: httpd_vm_deployment

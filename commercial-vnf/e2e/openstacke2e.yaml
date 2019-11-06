@@ -18,8 +18,7 @@ description: >
 # to allow using the Deployment Proxy mechanism.
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
-  - plugin:cloudify-utilities-plugin
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
 
 # The inputs section includes the names of the particular blueprints and
 # deployments which this blueprint will leverage.
@@ -60,7 +59,7 @@ inputs:
     default: NS-LB-Firewall-F5-Fortigate-HTTPD
 
 # In the node_templates section, we define the nodes that will be instanciated.
-# We use DeploymentProxy nodes to deploy other blueprints representing the example
+# We use Component nodes to deploy other blueprints representing the example
 # building blocks.
 node_templates:
 
@@ -68,12 +67,12 @@ node_templates:
   #   This blueprint is responsible for creating all of the common resources,
   #   which are later used in other blueprints. Especially: router,
   #   networks, subnets and security groups.
-  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   There's no relationships defined under this node, which means that during
   #   install it will be instantiated at first.
   network_prov:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -91,14 +90,14 @@ node_templates:
   # F5 Provisioning:
   #   This blueprint is responsible for provisioning the F5 BIG-IP VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
-  #   DeploymentProxy is used for the blueprint uploading and the
+  #   Component is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "f5_prov" node will be instantiated
   #   after "network_prov" node will. That will alllow the "f5_prov" node to create network
   #   interfaces in the networks created by "network_prov" blueprint.
   f5_prov:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -114,14 +113,14 @@ node_templates:
   # FortiGate Provisioning:
   #   This blueprint is responsible for provisioning the FortiGate VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
-  #   DeploymentProxy is used for the blueprint uploading and the
+  #   Component is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "fg_prov" node will be instantiated
   #   after "network_prov" node will. That will alllow the "fg_prov" node to create network
   #   interfaces in the networks created by "network_prov" blueprint.
   fg_prov:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -137,14 +136,14 @@ node_templates:
   # HTTPD Provisioning:
   #   This blueprint is responsible for provisioning the HTTPD VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
-  #   DeploymentProxy is used for the blueprint uploading and the
+  #   Component is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
   #   It means, that during the install workflow, "httpd_prov" node will be instantiated
   #   after "network_prov" node will. That will alllow the "httpd_prov" node to create network
   #   interfaces in the networks created by "network_prov" blueprint.
   httpd_prov:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -162,7 +161,7 @@ node_templates:
   # F5 Configuration:
   #   This blueprint is responsible for configuration of the F5 BIG-IP VM
   #   created by the "f5_prov" node.
-  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   In relationships section, there's a "depends_on" relationship defined,
   #   which targets the "f5_prov" node. It means, that during install
@@ -170,7 +169,7 @@ node_templates:
   #   It prevents the situation, when Cloudify Manager starts to configure
   #   F5 BIG-IP VM before it gets instantiated by "f5_prov" node.
   f5_conf:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -179,6 +178,8 @@ node_templates:
           main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: f5_conf_name }
+          inputs:
+            f5_vm_deployment_name: { get_input: f5_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
         target: f5_prov
@@ -186,7 +187,7 @@ node_templates:
   # FortiGate Configuration:
   #   This blueprint is responsible for configuration of the FortiGate VM
   #   created by the "fg_prov" node.
-  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   In relationships section, there's a "depends_on" relationship defined,
   #   which targets the "fg_prov" node. It means, that during install
@@ -194,7 +195,7 @@ node_templates:
   #   It prevents the situation, when Cloudify Manager starts to configure
   #   FortiGate VM before it gets instantiated by "fg_prov" node.
   fg_conf:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -203,6 +204,8 @@ node_templates:
           main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: fg_conf_name }
+          inputs:
+            fortigate_vm_deployment_name: { get_input: fg_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
         target: fg_prov
@@ -210,7 +213,7 @@ node_templates:
   # HTTPD Configuration:
   #   This blueprint is responsible for configuration of the HTTPD VM
   #   created by the "httpd_prov" node.
-  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   In relationships section, there's a "depends_on" relationship defined,
   #   which targets the "httpd_prov" node. It means, that during install
@@ -218,7 +221,7 @@ node_templates:
   #   It prevents the situation, when Cloudify Manager starts to configure
   #   HTTPD VM before it gets instantiated by "httpd_prov" node.
   httpd_conf:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -227,6 +230,8 @@ node_templates:
           main_file_name: openstackapp.yaml
         deployment:
           id: { get_input: httpd_conf_name }
+          inputs:
+            httpd_vm_deployment_name: { get_input: httpd_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
         target: httpd_prov
@@ -237,14 +242,14 @@ node_templates:
   #   the F5 BIG-IP VM and sets a port-forwarding policy on FortiGate VM to
   #   expose a website served by HTTPD VM on the public interface of the F5
   #   BIG-IP VM.
-  #   DeploymentProxy is being used for the blueprint uploading and the
+  #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   In the relationships section, there are several "depends_on"
   #   relationships defined. As a result, Cloudify Manager will be waiting
   #   with the service chain creation until all of the particular VNFs, which are
   #   going to be a part of this chain, are properly provisioned & configured
   service_prov:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
