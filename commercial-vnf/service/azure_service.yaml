@@ -4,7 +4,7 @@ description: >
   Creates port forwading on Fortigate and load balancing rule on BIG-IP LTM to allow traffic forwarding
 
 imports:
-  - http://cloudify.co/spec/cloudify/4.5.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:
