@@ -4,7 +4,7 @@ description: Install Prometheus on Openstack.
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
-  - plugin:cloudify-openstack-plugin?version=3.2.8
+  - plugin:cloudify-openstack-plugin?version= >=3.2.2
   - plugin:cloudify-ansible-plugin
   - includes/cloud-init.yaml
   - includes/application.yaml
