@@ -28,6 +28,11 @@ inputs:
     description: The deployment ID of the Kubernetes deployment.
     default: kubernetes
 
+  current_suffix_index:
+    type: String
+    description: The index of the deployment from a components composition
+    default: '1'
+
 node_types:
 
   cloudify.kubernetes.resources.PersistentVolumeClaim:
@@ -68,9 +73,9 @@ node_templates:
         apiVersion: v1
         kind: PersistentVolumeClaim
         metadata:
-          name: wp-pv-claim
+          name: { concat: [  'wp-pv-claim-', { get_input: current_suffix_index } ] }
           labels:
-            app: wordpress
+            app:  { concat: [  'wordpress-',  { get_input: current_suffix_index } ] }
         spec:
           accessModes:
             - ReadWriteOnce
@@ -88,6 +93,11 @@ node_templates:
     properties:
       file:
         resource_path: resources/service.yaml
+      definition:
+        spec:
+          ports:
+            - port: { concat: [  '8', { get_input: current_suffix_index } ] }
+              nodePort:  { concat: [  '3008', { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -101,21 +111,21 @@ node_templates:
         apiVersion: extensions/v1beta1
         kind: Deployment
         metadata:
-          name: wordpress
+          name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
           labels:
-            app: wordpress
+            app: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
         spec:
           strategy:
             type: Recreate
           template:
             metadata:
               labels:
-                app: wordpress
+                app: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
                 tier: frontend
             spec:
               containers:
               - image: wordpress:4.8.0-apache
-                name: wordpress
+                name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
                 env:
                   - name: WORDPRESS_DB_HOST
                     value: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
@@ -129,14 +139,14 @@ node_templates:
                     value: cfy
                 ports:
                   - containerPort: 80
-                    name: wordpress
+                    name: { concat: [  'wordpress-', get_input: current_suffix_index } ] }
                 volumeMounts:
-                  - name: wordpress-persistent-storage
+                  - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
                     mountPath: /var/www/html
               volumes:
-                - name: wordpress-persistent-storage
+                - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
                   persistentVolumeClaim:
-                    claimName: wp-pv-claim
+                    claimName: { concat: [  'wp-pv-claim-', { get_input: current_suffix_index } ] }
       options:
         grace_period_seconds: 5
         propagation_policy: 'Foreground'
