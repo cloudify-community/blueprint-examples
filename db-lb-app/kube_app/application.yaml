@@ -29,7 +29,7 @@ inputs:
     default: kubernetes
 
   current_suffix_index:
-    type: String
+    type: string
     description: The index of the deployment from a components composition
     default: '1'
 
@@ -93,11 +93,10 @@ node_templates:
     properties:
       file:
         resource_path: resources/service.yaml
-      definition:
-        spec:
-          ports:
-            - port: { concat: [  '8', { get_input: current_suffix_index } ] }
-              nodePort:  { concat: [  '3008', { get_input: current_suffix_index } ] }
+        template_variables:
+          NODE_PORT: { concat: [  '3008', { get_input: current_suffix_index } ] }
+          PORT: { concat: [  '8', { get_input: current_suffix_index } ] }
+          NAME: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -139,7 +138,7 @@ node_templates:
                     value: cfy
                 ports:
                   - containerPort: 80
-                    name: { concat: [  'wordpress-', get_input: current_suffix_index } ] }
+                    name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
                 volumeMounts:
                   - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
                     mountPath: /var/www/html
