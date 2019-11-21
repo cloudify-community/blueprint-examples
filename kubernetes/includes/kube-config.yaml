@@ -147,5 +147,8 @@ capabilities:
   endpoint:
     value: { get_attribute: [ kube-master, ip ] }
 
+  node-endpoint:
+    value: { get_attribute: [ kube-node, ip ] }
+
   token:
     value: { get_attribute: [dashboard-token-and-port, bearer_token] }

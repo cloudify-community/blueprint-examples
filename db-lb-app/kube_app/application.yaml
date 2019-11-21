@@ -62,6 +62,8 @@ node_templates:
     properties:
       file:
         resource_path: resources/pv.yaml
+        template_variables:
+          NAME: { concat: [  'wordpress-',  { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -110,7 +112,7 @@ node_templates:
         apiVersion: extensions/v1beta1
         kind: Deployment
         metadata:
-          name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+          name: { concat:  [  'wordpress-', { get_input: current_suffix_index } ] }
           labels:
             app: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
         spec:
@@ -137,7 +139,7 @@ node_templates:
                   - name: WORDPRESS_TABLE_PREFIX
                     value: cfy
                 ports:
-                  - containerPort: 80
+                  - containerPort: { concat: [  '8', { get_input: current_suffix_index } ] }
                     name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
                 volumeMounts:
                   - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
@@ -165,3 +167,13 @@ node_templates:
           api_key: { get_capability: [ { get_input: kubernetes_deployment }, token ] }
           debug: false
           verify_ssl: false
+
+
+#outputs:
+#  app_login:
+#    value:
+#      concat:
+#      - 'http://'
+#      - { get_capability: [ { get_input: kubernetes_deployment }, node-endpoint ] }
+#      - ':'
+#      - { concat: [  '3008', { get_input: current_suffix_index } ] }
