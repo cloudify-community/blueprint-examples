@@ -1,5 +1,0 @@
----
-crio_packages:
-  - containers-basic
-
-crio_service: crio
