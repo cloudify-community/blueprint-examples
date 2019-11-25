@@ -31,7 +31,7 @@ inputs:
   current_suffix_index:
     type: string
     description: The index of the deployment from a components composition
-    default: '1'
+    default: '0'
 
 node_types:
 
@@ -63,7 +63,8 @@ node_templates:
       file:
         resource_path: resources/pv.yaml
         template_variables:
-          NAME: { concat: [  'wordpress-',  { get_input: current_suffix_index } ] }
+          NAME: { concat: [  'wp-pv-',  { get_input: current_suffix_index } ] }
+          PATH:  { concat: [  '/tmp/data/wp-pv-',  { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -97,7 +98,7 @@ node_templates:
         resource_path: resources/service.yaml
         template_variables:
           NODE_PORT: { concat: [  '3008', { get_input: current_suffix_index } ] }
-          PORT: { concat: [  '8', { get_input: current_suffix_index } ] }
+          PORT: 80
           NAME: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
@@ -139,7 +140,7 @@ node_templates:
                   - name: WORDPRESS_TABLE_PREFIX
                     value: cfy
                 ports:
-                  - containerPort: { concat: [  '8', { get_input: current_suffix_index } ] }
+                  - containerPort: 80
                     name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
                 volumeMounts:
                   - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
@@ -152,6 +153,15 @@ node_templates:
         grace_period_seconds: 5
         propagation_policy: 'Foreground'
         namespace: 'default'
+###### marked out- unmark if need to change ctx parameyters pre-execute        
+#    interfaces:
+#      cloudify.interfaces.lifecycle:
+#        precreate:
+#          inputs:
+#          #  PORT: { concat: [  '8', { get_input: current_suffix_index } ] }
+#          implementation: scripts/set.py
+#          executor: central_deployment_agent
+#          max_retries: 0
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -169,11 +179,11 @@ node_templates:
           verify_ssl: false
 
 
-#outputs:
-#  app_login:
-#    value:
-#      concat:
-#      - 'http://'
-#      - { get_capability: [ { get_input: kubernetes_deployment }, node-endpoint ] }
-#      - ':'
-#      - { concat: [  '3008', { get_input: current_suffix_index } ] }
+outputs:
+  app_login:
+    value:
+      concat:
+      - 'http://'
+      - { get_capability: [ { get_input: kubernetes_deployment }, node-endpoint ] }
+      - ':'
+      - { concat: [  '3008', { get_input: current_suffix_index } ] }
