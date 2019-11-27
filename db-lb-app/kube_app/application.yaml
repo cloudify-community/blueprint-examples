@@ -97,9 +97,18 @@ node_templates:
       file:
         resource_path: resources/service.yaml
         template_variables:
-          NODE_PORT: { concat: [  '3008', { get_input: current_suffix_index } ] }
+          NODE_PORT: { get_attribute: [ service, node_port ] }
           PORT: 80
           NAME: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+    interfaces:
+         cloudify.interfaces.lifecycle:
+            precreate:
+              implementation: scripts/setPort.py
+              inputs:
+                EXTERNAL_NODE_PORT_BASE: 30080
+                INSTANCE_INDEX: { get_input: current_suffix_index }
+              executor: central_deployment_agent
+              max_retries: 0
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -153,15 +162,6 @@ node_templates:
         grace_period_seconds: 5
         propagation_policy: 'Foreground'
         namespace: 'default'
-###### marked out- unmark if need to change ctx parameyters pre-execute        
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        precreate:
-#          inputs:
-#          #  PORT: { concat: [  '8', { get_input: current_suffix_index } ] }
-#          implementation: scripts/set.py
-#          executor: central_deployment_agent
-#          max_retries: 0
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -186,4 +186,4 @@ outputs:
       - 'http://'
       - { get_capability: [ { get_input: kubernetes_deployment }, node-endpoint ] }
       - ':'
-      - { concat: [  '3008', { get_input: current_suffix_index } ] }
+      - { get_attribute: [ service, node_port ] }
