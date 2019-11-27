@@ -28,11 +28,6 @@ inputs:
     description: The deployment ID of the Kubernetes deployment.
     default: kubernetes
 
-  current_suffix_index:
-    type: string
-    description: The index of the deployment from a components composition
-    default: '0'
-
 node_types:
 
   cloudify.kubernetes.resources.PersistentVolumeClaim:
@@ -62,9 +57,6 @@ node_templates:
     properties:
       file:
         resource_path: resources/pv.yaml
-        template_variables:
-          NAME: { concat: [  'wp-pv-',  { get_input: current_suffix_index } ] }
-          PATH:  { concat: [  '/tmp/data/wp-pv-',  { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -76,9 +68,9 @@ node_templates:
         apiVersion: v1
         kind: PersistentVolumeClaim
         metadata:
-          name: { concat: [  'wp-pv-claim-', { get_input: current_suffix_index } ] }
+          name: wp-pv-claim
           labels:
-            app:  { concat: [  'wordpress-',  { get_input: current_suffix_index } ] }
+            app: wordpress
         spec:
           accessModes:
             - ReadWriteOnce
@@ -96,10 +88,6 @@ node_templates:
     properties:
       file:
         resource_path: resources/service.yaml
-        template_variables:
-          NODE_PORT: { concat: [  '3008', { get_input: current_suffix_index } ] }
-          PORT: 80
-          NAME: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -113,21 +101,21 @@ node_templates:
         apiVersion: extensions/v1beta1
         kind: Deployment
         metadata:
-          name: { concat:  [  'wordpress-', { get_input: current_suffix_index } ] }
+          name: wordpress
           labels:
-            app: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+            app: wordpress
         spec:
           strategy:
             type: Recreate
           template:
             metadata:
               labels:
-                app: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+                app: wordpress
                 tier: frontend
             spec:
               containers:
               - image: wordpress:4.8.0-apache
-                name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+                name: wordpress
                 env:
                   - name: WORDPRESS_DB_HOST
                     value: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
@@ -141,27 +129,18 @@ node_templates:
                     value: cfy
                 ports:
                   - containerPort: 80
-                    name: { concat: [  'wordpress-', { get_input: current_suffix_index } ] }
+                    name: wordpress
                 volumeMounts:
-                  - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
+                  - name: wordpress-persistent-storage
                     mountPath: /var/www/html
               volumes:
-                - name:  { concat: [  'wordpress-persistent-storage-', { get_input: current_suffix_index } ] }
+                - name: wordpress-persistent-storage
                   persistentVolumeClaim:
-                    claimName: { concat: [  'wp-pv-claim-', { get_input: current_suffix_index } ] }
+                    claimName: wp-pv-claim
       options:
         grace_period_seconds: 5
         propagation_policy: 'Foreground'
         namespace: 'default'
-###### marked out- unmark if need to change ctx parameyters pre-execute        
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        precreate:
-#          inputs:
-#          #  PORT: { concat: [  '8', { get_input: current_suffix_index } ] }
-#          implementation: scripts/set.py
-#          executor: central_deployment_agent
-#          max_retries: 0
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: master
@@ -177,13 +156,3 @@ node_templates:
           api_key: { get_capability: [ { get_input: kubernetes_deployment }, token ] }
           debug: false
           verify_ssl: false
-
-
-outputs:
-  app_login:
-    value:
-      concat:
-      - 'http://'
-      - { get_capability: [ { get_input: kubernetes_deployment }, node-endpoint ] }
-      - ':'
-      - { concat: [  '3008', { get_input: current_suffix_index } ] }
