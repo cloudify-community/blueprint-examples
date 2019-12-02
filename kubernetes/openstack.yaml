@@ -66,7 +66,7 @@ inputs:
       password: { get_input: password }
       project_name: { get_input: project_name }
       auth_url: { get_input: auth_url }
-      region_name: { get_input: region }
+      region_name: { get_input: region_name }
 
 dsl_definitions:
 
