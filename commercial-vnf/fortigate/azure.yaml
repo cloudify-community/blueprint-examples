@@ -51,7 +51,7 @@ inputs:
   vm_image_version:
     type: string
     required: true
-    default: 6.0.3
+    default: 6.0.7
 
   vnf_vm_name:
     type: string
