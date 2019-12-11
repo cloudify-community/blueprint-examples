@@ -1,0 +1,92 @@
+[
+  {
+    "id": "openstack-example-network",
+    "name": "openstack-example-network",
+    "description": "Deploy Openstack Example Network",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/openstack-example-network",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/openstack-example-network.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/openstack-example-network/README.md ",
+    "created_at": "2018-01-25T13:25:31Z",
+    "updated_at": "2018-05-10T12:45:57Z"
+  },
+  {
+    "id": "aws-example-network",
+    "name": "aws-example-network",
+    "description": "Deploy AWS VPC Scenario 2 Network.",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/aws-example-network",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/aws-example-network.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/aws-example-network/README.md",
+    "created_at": "2018-01-25T13:25:31Z",
+    "updated_at": "2018-05-10T12:45:57Z"
+  },
+  {
+    "id": "azure-example-network",
+    "name": "azure-example-network",
+    "description": "Deploy Azure Example Network",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/azure-example-network",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/azure-example-network.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/azure-example-network/README.md",
+    "created_at": "2018-01-25T12:08:07Z",
+    "updated_at": "2018-05-10T12:46:00Z"
+  },
+  {
+    "id": "hello-world-blueprint",
+    "name": "hello-world-blueprint",
+    "description": "Deploy Cloudify Hello World Application",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/hello-world-blueprint",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/hello-world-example.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/hello-world-blueprint/README.md",
+    "created_at": "2017-05-11T19:32:13Z",
+    "updated_at": "2018-06-06T14:25:37Z"
+  },
+  {
+    "id": "db-lb-app-infrastructure-blueprint",
+    "name": "db-lb-app-infrastructure-blueprint",
+    "description": "DB LB App Infrastructure Blueprint",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/tree/master/db-lb-app",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/db-lb-app-infrastructure.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/db-lb-app/README.md",
+    "created_at": "2017-05-11T19:32:13Z",
+    "updated_at": "2018-06-06T14:25:37Z"
+  },
+  {
+    "id": "mariadb-blueprint",
+    "name": "mariadb-blueprint",
+    "description": "Deploy a MariaDB",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/tree/master/db-lb-app",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/db-lb-app-db.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/db-lb-app/README.md",
+    "created_at": "2017-09-11T16:55:38Z",
+    "updated_at": "2018-06-20T13:36:09Z"
+  },
+  {
+    "id": "haproxy-blueprint",
+    "name": "haproxy-blueprint",
+    "description": "Generic HAProxy Load Balancer",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/tree/master/db-lb-app",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/db-lb-app-lb.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/db-lb-app/README.md",
+    "created_at": "2017-09-28T10:07:37Z",
+    "updated_at": "2018-06-06T14:25:27Z"
+  },
+  {
+    "id": "drupal-blueprint",
+    "name": "drupal-blueprint",
+    "description": "Creates a Drupal 8 Website",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/tree/master/db-lb-app",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/db-lb-app-app.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/db-lb-app/README.md",
+    "created_at": "2016-08-03T12:42:46Z",
+    "updated_at": "2018-06-06T14:25:46Z"
+  },
+  {
+    "id": "kubernetes-blueprint",
+    "name": "kubernetes-blueprint",
+    "description": "Deploy Kubernetes",
+    "html_url": "https://github.com/cloudify-community/blueprint-examples/tree/master/kubernetes",
+    "zip_url": "https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-8/kubernetes.zip",
+    "readme_url": "https://raw.githubusercontent.com/cloudify-community/blueprint-examples/master/kubernetes/README.md",
+    "created_at": "2017-10-19T12:44:56Z",
+    "updated_at": "2018-05-16T17:26:16Z"
+  }
+]
