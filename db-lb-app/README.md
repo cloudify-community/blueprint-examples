@@ -26,8 +26,8 @@ The components are:
       - `aws_access_key_id` AWS Access Key, e.g.: `cfy secrets create -u aws_access_key_id -s ...................`.
       - `aws_secret_access_key`: AWS Secret Access Key, e.g.: `cfy secrets create -u aws_secret_access_key -s ...................`.
       - `aws_region_name`: AWS region name Key, e.g.: `cfy secrets create -u aws_region_name -s us-east-1`.
-      - `ec2_region_endpoint`: AWS region endpoint, e.g.: `cfy secrets create -u aws_secret_access_key -s ec2.us-east-1.amazonaws.com`.
-      - `aws_availability_zone` AWS availability zone, e.g.: `cfy secrets create -u aws_secret_access_key -s eu-central-1b`.
+      - `ec2_region_endpoint`: AWS region endpoint, e.g.: `cfy secrets create -u ec2_region_endpoint -s ec2.us-east-1.amazonaws.com`.
+      - `aws_availability_zone` AWS availability zone, e.g.: `cfy secrets create -u aws_availability_zone -s eu-central-1b`.
     - Azure:
       - `azure_subscription_id`: Azure subscription ID: `cfy secrets create -u azure_subscription_id -s 00000000-0000-0000-0000-000000000000`.
       - `azure_tenant_id`: Azure subscription ID: `cfy secrets create -u azure_tenant_id -s 00000000-0000-0000-0000-000000000000`.
