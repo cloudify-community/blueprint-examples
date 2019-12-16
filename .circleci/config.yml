@@ -32,7 +32,7 @@ jobs:
           command: pip install -U pip
       - run:
           name: Install JQ
-          command: apt-get install -y jq
+          command: sudo apt-get install -y jq
       - run:
           name: install cloudify
           command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
@@ -281,20 +281,19 @@ workflows:
   version: 2
   tests:
     jobs:
-      - getting-started
-#      - blueprint-validation
-#      - getting-started:
-#          requires:
-#            - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
-#      - blueprint-packaging:
-#          requires:
-#            - getting-started
-#          filters:
-#            branches:
-#              only: master
+      - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - blueprint-packaging:
+          requires:
+            - getting-started
+          filters:
+            branches:
+              only: master
   nightly:
     triggers:
     - schedule:
