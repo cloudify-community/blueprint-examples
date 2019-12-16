@@ -81,7 +81,7 @@ For **Openstack**:
 
 ```shell
 cfy install openstack.yaml \
-    -i region=RegionOne
+    -i region=RegionOne \
     -i external_network=external_network \
     -i image=05bb3a46-ca32-4032-bedd-8d7ebd5c8100 \
     -i flavor=4d798e17-3439-42e1-ad22-fb956ec22b54
