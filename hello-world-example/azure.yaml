@@ -9,20 +9,26 @@ imports:
 
 inputs:
 
+  resource_prefix:
+    default: cfyhw
+
+  resource_suffix:
+    default: '0'
+
   resource_group_name:
     type: string
     description: Your Azure Resource Group.
-    default: hellorg
+    default: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
 
   network_name:
     type: string
     description: Your Azure Virtual Network.
-    default: hellovnet
+    default: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
 
   subnet_name:
     type: string
     description: Your Azure Virtual Network Subnet.
-    default: hellosub
+    default: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
 
   location:
     type: string
@@ -37,12 +43,6 @@ inputs:
 
   size:
     default: Standard_A0
-
-  resource_prefix:
-    default: cfyhw
-
-  resource_suffix:
-    default: '0'
 
   retry_after:
     type: integer
