@@ -31,6 +31,9 @@ jobs:
           name: update pip
           command: pip install -U pip
       - run:
+          name: Install JQ
+          command: apt-get install -y jq
+      - run:
           name: install cloudify
           command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
       - run:
@@ -116,6 +119,8 @@ jobs:
             }
             trap cleanup EXIT
             cfy install hello-world-example/aws.yaml -n aws.yaml -i aws_region_name=`echo "${aws_region_name}" | base64 --decode` -b $DEP_ID -vv
+            sleep 5
+            curl -I `cfy dep out ${DEP_ID} --json | jq -r '.application_endpoint.value'`
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
@@ -133,6 +138,8 @@ jobs:
             }
             trap cleanup EXIT
             cfy install hello-world-example/azure.yaml -i location=`echo "${azure_location}" | base64 --decode` -i resource_suffix=${CIRCLE_BUILD_NUM} -b $DEP_ID -vv
+            sleep 5
+            curl -I `cfy dep out ${DEP_ID} --json | jq -r '.application_endpoint.value'`
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
@@ -150,6 +157,26 @@ jobs:
             }
             trap cleanup EXIT
             cfy install hello-world-example/gcp.yaml -i region=`echo "${gcp_region}" | base64 --decode` -b $DEP_ID -vv
+            sleep 5
+            curl -I `cfy dep out ${DEP_ID} --json | jq -r '.application_endpoint.value'`
+            cfy uninstall $DEP_ID
+            trap EXIT
+            set -x
+      - run:
+          name: Install Simple
+          command: |
+            DEP_ID=simple-hello-world-example
+            set +x
+            function cleanup()
+            {
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'` -vv
+                cfy executions cancel $EX_ID
+                sleep 5
+                cfy uninstall $DEP_ID -p ignore_failure=true --force
+            }
+            trap cleanup EXIT
+            cfy install simple-hello-world-example/blueprint.yaml -b $DEP_ID -vv
+            curl -I localhost:8000
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
@@ -254,19 +281,20 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprint-validation
-      - getting-started:
-          requires:
-            - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - blueprint-packaging:
-          requires:
-            - getting-started
-          filters:
-            branches:
-              only: master
+      - getting-started
+#      - blueprint-validation
+#      - getting-started:
+#          requires:
+#            - blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - blueprint-packaging:
+#          requires:
+#            - getting-started
+#          filters:
+#            branches:
+#              only: master
   nightly:
     triggers:
     - schedule:
