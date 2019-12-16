@@ -11,6 +11,147 @@ checkout:
 
 jobs:
 
+  getting-started:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: init CLI profile
+          command: |
+            counter=0
+            until [ $counter -ge 15 ]
+            do
+                cfy profiles use localhost -u admin -p admin -t default_tenant && break
+                counter=$[$counter+1]
+                sleep 2
+            done
+      - run:
+          name: upload license
+          command: |
+            set +x
+            echo ${TEST_LICENSE} | base64 --decode > license.yaml
+            set -x
+            cfy license upload license.yaml
+      - run:
+          name: install plugins bundle
+          command: |
+            cfy plugins bundle-upload
+            for plugin in `cfy executions list --include-system-workflows | grep install_plugin | awk '{print $2}'`; do cfy events list -vv $plugin; sleep 5; done
+      - run:
+          name: create iaas secrets
+          command: |
+
+            cfy secrets create aws_access_key_id -s `echo "${aws_access_key_id}" | base64 --decode`
+            cfy secrets create aws_secret_access_key -s `echo "${aws_secret_access_key}" | base64 --decode`
+            cfy secrets create aws_region_name -s `echo "${aws_region_name}" | base64 --decode`
+            cfy secrets create ec2_region_endpoint -s `echo "${ec2_region_endpoint}" | base64 --decode`
+
+            cfy secrets create azure_subscription_id -s `echo "${azure_subscription_id}" | base64 --decode`
+            cfy secrets create azure_tenant_id -s `echo "${azure_tenant_id}" | base64 --decode`
+            cfy secrets create azure_client_id -s `echo "${azure_client_id}" | base64 --decode`
+            cfy secrets create azure_client_secret -s `echo "${azure_client_secret}" | base64 --decode`
+            cfy secrets create azure_location -s `echo "${azure_location}" | base64 --decode`
+
+            echo "${gcp_private_key}" | base64 --decode > gcp_key
+
+            cfy secrets create gcp_client_x509_cert_url -s ${gcp_client_x509_cert_url}
+            cfy secrets create gcp_client_email -s `echo "${gcp_client_email}" | base64 --decode`
+            cfy secrets create gcp_client_id -s `echo "${gcp_client_id}" | base64 --decode`
+            cfy secrets create gcp_project_id -s `echo "${gcp_project_id}" | base64 --decode`
+            cfy secrets create gcp_private_key_id -s `echo "${gcp_private_key_id}" | base64 --decode`
+            cfy secrets create gcp_private_key -f gcp_key
+            cfy secrets create gcp_region -s `echo "${gcp_region}" | base64 --decode`
+            cfy secrets create gcp_zone -s `echo "${gcp_zone}" | base64 --decode`
+
+      - run:
+          name: create agent secrets
+          command: |
+            ssh-keygen -t rsa -N '' -f foo.rsa
+            cfy secrets create agent_key_private -f foo.rsa
+            cfy secrets create agent_key_public -f foo.rsa.pub
+      - run:
+          name: Install AWS
+          command: |
+            DEP_ID=hello-world-example.aws
+            set +x
+            function cleanup()
+            {
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
+                cfy executions cancel $EX_ID
+                cfy uninstall $DEP_ID -p ignore_failure=true
+            }
+            trap cleanup EXIT
+            cfy install hello-world-example/aws.yaml -n aws.yaml -i aws_region_name=`echo "${aws_region_name}" | base64 --decode` -b $DEP_ID
+            cfy uninstall $DEP_ID
+            trap EXIT
+            set -x
+      - run:
+          name: Install Azure
+          command: |
+            DEP_ID=hello-world-example.azure
+            set +x
+            function cleanup()
+            {
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
+                cfy executions cancel $EX_ID
+                cfy uninstall $DEP_ID -p ignore_failure=true
+            }
+            trap cleanup EXIT
+            cfy install hello-world-example/azure.yaml -i location=`echo "${azure_location}" | base64 --decode` -b $DEP_ID
+            cfy uninstall $DEP_ID
+            trap EXIT
+            set -x
+      - run:
+          name: Install GCP
+          command: |
+            DEP_ID=hello-world-example.gcp
+            set +x
+            function cleanup()
+            {
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
+                cfy executions cancel $EX_ID
+                cfy uninstall $DEP_ID -p ignore_failure=true
+            }
+            trap cleanup EXIT
+            cfy install hello-world-example/gcp.yaml -i region=`echo "${gcp_region}" | base64 --decode` -b $DEP_ID
+            cfy uninstall $DEP_ID
+            trap EXIT
+            set -x
+
+
   blueprint-validation:
     machine:
       enabled: true
@@ -69,8 +210,8 @@ jobs:
           name: install plugins bundle
           command: cfy plugins bundle-upload
       - run:
-          name: install updated openstack
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.8/cloudify_openstack_plugin-3.2.8-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.8/plugin.yaml || true
+          name: install openstack
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.9/cloudify_openstack_plugin-3.2.9-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.9/plugin.yaml || true
       - run:
           name: install updated utilities
           command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-utilities-plugin/1.14.0/cloudify_utilities_plugin-1.14.0-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/utilities-plugin/1.13.0/plugin.yaml || true
@@ -105,14 +246,21 @@ jobs:
           command: pip install --user pygithub pyyaml==3.10
       - run: python .cicd/package_examples.py
 
+
 workflows:
   version: 2
   tests:
     jobs:
       - blueprint-validation
-      - blueprint-packaging:
+      - getting-started:
           requires:
             - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - blueprint-packaging:
+          requires:
+            - getting-started
           filters:
             branches:
               only: master
@@ -126,3 +274,9 @@ workflows:
               - master
     jobs:
       - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
