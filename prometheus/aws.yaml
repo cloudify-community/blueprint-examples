@@ -40,10 +40,6 @@ inputs:
   ebs_volume_attachment_device:
     default: /dev/sdh
 
-  image_id:
-    type: string
-    description: The AWS AMI.
-
   instance_type:
     type: string
     description: The AWS instance type.
@@ -285,6 +281,20 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: prometheus-host
 
+  centos_core_ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: owner-id
+            Values:
+            - "057448758665"
+          - Name: name
+            Values:
+            - "CentOS 7.7.1908 x86_64 with cloud-init (HVM)"
+
   prometheus-host:
     type: cloudify.nodes.aws.ec2.Instances
     properties:
@@ -295,7 +305,7 @@ node_templates:
         user: { get_input: agent_user }
       use_public_ip: true
       resource_config:
-        ImageId: { get_input: image_id }
+        ImageId: { get_attribute: [ centos_core_ami, aws_resource_id ] }
         InstanceType: { get_input: instance_type}
         kwargs:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
@@ -306,3 +316,5 @@ node_templates:
         target: prometheus-host-ip
       - type: cloudify.relationships.depends_on
         target: cloud_init
+      - type: cloudify.relationships.depends_on
+        target: centos_core_ami
