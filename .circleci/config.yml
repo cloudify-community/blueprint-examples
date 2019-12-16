@@ -111,10 +111,11 @@ jobs:
             {
                 EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
                 cfy executions cancel $EX_ID
-                cfy uninstall $DEP_ID -p ignore_failure=true
+                sleep 5
+                cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
             }
             trap cleanup EXIT
-            cfy install hello-world-example/aws.yaml -n aws.yaml -i aws_region_name=`echo "${aws_region_name}" | base64 --decode` -b $DEP_ID
+            cfy install hello-world-example/aws.yaml -n aws.yaml -i aws_region_name=`echo "${aws_region_name}" | base64 --decode` -b $DEP_ID -vv
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
@@ -125,12 +126,13 @@ jobs:
             set +x
             function cleanup()
             {
-                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'` -vv
                 cfy executions cancel $EX_ID
-                cfy uninstall $DEP_ID -p ignore_failure=true
+                sleep 5
+                cfy uninstall $DEP_ID -p ignore_failure=true --force
             }
             trap cleanup EXIT
-            cfy install hello-world-example/azure.yaml -i location=`echo "${azure_location}" | base64 --decode` -b $DEP_ID
+            cfy install hello-world-example/azure.yaml -i location=`echo "${azure_location}" | base64 --decode` -i resource_suffix=${CIRCLE_BUILD_NUM} -b $DEP_ID -vv
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
@@ -141,12 +143,13 @@ jobs:
             set +x
             function cleanup()
             {
-                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'` -vv
                 cfy executions cancel $EX_ID
-                cfy uninstall $DEP_ID -p ignore_failure=true
+                sleep 5
+                cfy uninstall $DEP_ID -p ignore_failure=true --force
             }
             trap cleanup EXIT
-            cfy install hello-world-example/gcp.yaml -i region=`echo "${gcp_region}" | base64 --decode` -b $DEP_ID
+            cfy install hello-world-example/gcp.yaml -i region=`echo "${gcp_region}" | base64 --decode` -b $DEP_ID -vv
             cfy uninstall $DEP_ID
             trap EXIT
             set -x
