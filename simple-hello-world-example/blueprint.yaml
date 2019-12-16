@@ -1,0 +1,26 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+
+inputs:
+
+  webserver_port:
+    description: >
+      The HTTP web server port.
+    default: 8000
+
+node_templates:
+
+  http_web_server:
+    type: cloudify.nodes.WebServer
+    properties:
+      port: { get_input: webserver_port }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: 
+          implementation: install.py
+          executor: central_deployment_agent
+        delete: 
+          implementation: uninstall.py
+          executor: central_deployment_agent
