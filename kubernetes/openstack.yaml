@@ -142,11 +142,11 @@ node_templates:
       security_group_rules:
         - direction: ingress
           protocol: tcp
-          port_range_min: 0
+          port_range_min: 1
           port_range_max: 65535
         - direction: ingress
           protocol: udp
-          port_range_min: 0
+          port_range_min: 1
           port_range_max: 65535
         - direction: ingress
           protocol: icmp
