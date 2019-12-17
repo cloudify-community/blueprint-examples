@@ -99,6 +99,12 @@ jobs:
             cfy secrets create gcp_region -s `echo "${gcp_region}" | base64 --decode`
             cfy secrets create gcp_zone -s `echo "${gcp_zone}" | base64 --decode`
 
+            cfy secrets create -u openstack_username -s ${openstack_username}
+            cfy secrets create -u openstack_password -s ${openstack_password}
+            cfy secrets create -u openstack_tenant_name -s ${openstack_tenant_name}
+            cfy secrets create -u openstack_auth_url -s ${openstack_auth_url}
+            cfy secrets create -u openstack_region -s ${openstack_region}
+
       - run:
           name: create agent secrets
           command: |
@@ -157,6 +163,25 @@ jobs:
             }
             trap cleanup EXIT
             cfy install hello-world-example/gcp.yaml -i region=`echo "${gcp_region}" | base64 --decode` -b $DEP_ID -vv
+            sleep 5
+            curl -I `cfy dep out ${DEP_ID} --json | jq -r '.application_endpoint.value'`
+            cfy uninstall $DEP_ID
+            trap EXIT
+            set -x
+      - run:
+          name: Install OS
+          command: |
+            DEP_ID=hello-world-example.os
+            set +x
+            function cleanup()
+            {
+                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'` -vv
+                cfy executions cancel $EX_ID
+                sleep 5
+                cfy uninstall $DEP_ID -p ignore_failure=true --force
+            }
+            trap cleanup EXIT
+            cfy install hello-world-example/openstack.yaml -i external_network_id=84118763-dbe7-4e74-9a68-82d249c9060d -i image=ddbcbef3-4f2b-4101-9dd4-cc03d8979759 -i flavor=464c3b37-baac-427f-9835-5f9a243ee794 -i region=`echo "${openstack_region}" | base64 --decode` -b $DEP_ID -vv
             sleep 5
             curl -I `cfy dep out ${DEP_ID} --json | jq -r '.application_endpoint.value'`
             cfy uninstall $DEP_ID
