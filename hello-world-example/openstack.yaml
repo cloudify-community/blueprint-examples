@@ -38,7 +38,7 @@ inputs:
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
-    default: 'ubuntu'
+    default: ubuntu
 
 dsl_definitions:
 
@@ -166,6 +166,7 @@ node_templates:
           - { get_secret: agent_key_public }
 
 outputs:
+
   application_endpoint:
     description: The external endpoint of the application.
     value: { concat: [ 'http://', { get_attribute: [ ip, floating_ip_address ] }, ':80' ] }
