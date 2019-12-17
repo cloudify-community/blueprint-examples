@@ -99,11 +99,11 @@ jobs:
             cfy secrets create gcp_region -s `echo "${gcp_region}" | base64 --decode`
             cfy secrets create gcp_zone -s `echo "${gcp_zone}" | base64 --decode`
 
-            cfy secrets create -u openstack_username -s ${openstack_username}
-            cfy secrets create -u openstack_password -s ${openstack_password}
-            cfy secrets create -u openstack_tenant_name -s ${openstack_tenant_name}
-            cfy secrets create -u openstack_auth_url -s ${openstack_auth_url}
-            cfy secrets create -u openstack_region -s ${openstack_region}
+            cfy secrets create -u openstack_username -s `echo "${openstack_username}" | base64 --decode`
+            cfy secrets create -u openstack_password -s `echo "${openstack_password}" | base64 --decode`
+            cfy secrets create -u openstack_tenant_name -s `echo "${openstack_tenant_name}" | base64 --decode`
+            cfy secrets create -u openstack_auth_url -s `echo "${openstack_auth_url}" | base64 --decode`
+            cfy secrets create -u openstack_region -s `echo "${openstack_region}" | base64 --decode`
 
       - run:
           name: create agent secrets
