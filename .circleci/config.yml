@@ -169,6 +169,9 @@ jobs:
 #            trap EXIT
 #            set -x
       - run:
+          name: install openstack
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.9/cloudify_openstack_plugin-3.2.9-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.9/plugin.yaml || true
+      - run:
           name: Install OS
           command: |
             DEP_ID=hello-world-example.os
