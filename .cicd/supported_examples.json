@@ -9,6 +9,7 @@
     "gcp.yaml",
     "openstack.yaml"
   ],
+  "simple-hello-world-example": ["blueprint.yaml"],
   "db-lb-app/infrastructure": [
     "aws.yaml",
     "azure.yaml",
