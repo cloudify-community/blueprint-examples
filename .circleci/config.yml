@@ -12,6 +12,7 @@ checkout:
 jobs:
 
   getting-started:
+    # This job tests first time user's getting started experience.
     machine:
       enabled: true
       python:
@@ -46,13 +47,12 @@ jobs:
           name: retain space by dumping the tar
           command: rm cloudify-docker-manager-5.0.0.tar
       - run:
-          name: show images
-          command: docker images
-      - run:
           name: start docker container
+          description: This is the first user step, creating the manager.
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
       - run:
           name: init CLI profile
+          description: The user now needs to initialize their CLI profile.
           command: |
             counter=0
             until [ $counter -ge 15 ]
@@ -63,6 +63,7 @@ jobs:
             done
       - run:
           name: upload license
+          description: The user will not need to upload a license, they are most likely using cloudify community.
           command: |
             set +x
             echo ${TEST_LICENSE} | base64 --decode > license.yaml
@@ -70,11 +71,13 @@ jobs:
             cfy license upload license.yaml
       - run:
           name: install plugins bundle
+          description: The user will need to upload all plugins.
           command: |
             cfy plugins bundle-upload
             for plugin in `cfy executions list --include-system-workflows | grep install_plugin | awk '{print $2}'`; do cfy events list -vv $plugin; sleep 5; done
       - run:
           name: create iaas secrets
+          description: The user needs to create the secrets.
           command: |
 
             cfy secrets create aws_access_key_id -s `echo "${aws_access_key_id}" | base64 --decode`
@@ -107,12 +110,15 @@ jobs:
 
       - run:
           name: create agent secrets
+          description: >
+            These examples use Ansible to setup all applications. Since Ansible is primarily a SSH-centered tool, we need an SSH authentication method. We use key-based authentication, because it is easy to automate. In this step, we create the keys and then upload them as secrets.
           command: |
             ssh-keygen -t rsa -N '' -f foo.rsa
             cfy secrets create agent_key_private -f foo.rsa
             cfy secrets create agent_key_public -f foo.rsa.pub
       - run:
           name: Install AWS
+          description: the user executes aws install.
           command: |
             DEP_ID=hello-world-example.aws
             set +x
@@ -132,6 +138,7 @@ jobs:
             set -x
       - run:
           name: Install Azure
+          description: the user executes azure install.
           command: |
             DEP_ID=hello-world-example.azure
             set +x
@@ -151,6 +158,7 @@ jobs:
             set -x
       - run:
           name: Install GCP
+          description: the user executes gcp install.
           command: |
             DEP_ID=hello-world-example.gcp
             set +x
@@ -170,9 +178,11 @@ jobs:
             set -x
       - run:
           name: install openstack
+          description: The user needs the 3.x OS plugin, which is not included in this package.
           command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.9/cloudify_openstack_plugin-3.2.9-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.9/plugin.yaml || true
       - run:
           name: Install OS
+          description: the user executes openstack install.
           command: |
             DEP_ID=hello-world-example.os
             set +x
