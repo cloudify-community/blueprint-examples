@@ -65,6 +65,8 @@ node_templates:
     - type: cloudify.relationships.depends_on
       target: nic
     - type: cloudify.relationships.depends_on
+      target: ip
+    - type: cloudify.relationships.depends_on
       target: cloud_init
 
   ami:
