@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
+  <local-check-config name="maven-checkstyle-plugin onap-license" location="jar:file:/home/dewayne/.m2/repository/org/onap/oparent/checkstyle/2.0.0/checkstyle-2.0.0.jar!/onap-checkstyle/check-license.xml" type="remote" description="maven-checkstyle-plugin configuration onap-license">
+    <property name="checkstyle.cache.file" value="${project_loc}/target/checkstyle-cachefile"/>
+    <property name="checkstyle.header.file" value="/home/dewayne/eclipse-camunda/.metadata/.plugins/org.eclipse.core.resources/.projects/cloudify-client/com.basistech.m2e.code.quality.checkstyleConfigurator/checkstyle-header-onap-license.txt"/>
+  </local-check-config>
+  <local-check-config name="maven-checkstyle-plugin onap-java-style" location="jar:file:/home/dewayne/.m2/repository/org/onap/oparent/checkstyle/2.0.0/checkstyle-2.0.0.jar!/onap-checkstyle/onap-java-style.xml" type="remote" description="maven-checkstyle-plugin configuration onap-java-style">
+    <property name="checkstyle.cache.file" value="${project_loc}/target/checkstyle-cachefile"/>
+    <property name="checkstyle.header.file" value="/home/dewayne/eclipse-camunda/.metadata/.plugins/org.eclipse.core.resources/.projects/cloudify-client/com.basistech.m2e.code.quality.checkstyleConfigurator/checkstyle-header-onap-java-style.txt"/>
+  </local-check-config>
+  <fileset name="java-sources-onap-license" enabled="true" check-config-name="maven-checkstyle-plugin onap-license" local="true">
+    <file-match-pattern match-pattern="^src/test/java/.*org/openecomp/.*\.java" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/main/java/.*org/openecomp/.*\.java" include-pattern="true"/>
+  </fileset>
+  <fileset name="java-sources-onap-java-style" enabled="true" check-config-name="maven-checkstyle-plugin onap-java-style" local="true">
+    <file-match-pattern match-pattern="^src/test/java/.*org/openecomp/.*\.java" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/main/java/.*org/openecomp/.*\.java" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/main/resources.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^target/generated-sources/license.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^target/generated-resources/licenses.*\.properties" include-pattern="true"/>
+    <file-match-pattern match-pattern="^src/test/resources.*\.properties" include-pattern="true"/>
+  </fileset>
+</fileset-config>
