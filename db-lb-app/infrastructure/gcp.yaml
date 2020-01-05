@@ -62,7 +62,7 @@ node_templates:
     - type: cloudify.relationships.depends_on
       target: subnet
     - type: cloudify.relationships.depends_on
-      target: cloud-init
+      target: cloud_init
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
