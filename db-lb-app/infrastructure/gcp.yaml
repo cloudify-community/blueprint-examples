@@ -45,7 +45,7 @@ dsl_definitions:
 
 node_templates:
 
-  vm:
+  host:
     type: cloudify.gcp.nodes.Instance
     properties:
       gcp_config: *gcp_config
