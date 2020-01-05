@@ -3,11 +3,13 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
   - plugin:cloudify-gcp-plugin
-  - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
 inputs:
+
+  resource_name_prefix:
+    default: infra_
 
   image:
     type: string
