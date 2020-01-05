@@ -13,7 +13,8 @@
   "db-lb-app/infrastructure": [
     "aws.yaml",
     "azure.yaml",
-    "openstack.yaml"
+    "openstack.yaml",
+    "gcp.yaml"
   ],
   "db-lb-app/db": [
     "application.yaml",
@@ -72,5 +73,13 @@
   ],
   "commercial-vnf/service": [
     "azure_service.yaml"
+  ],
+  "getting-started/step1": [
+    "aws.yaml",
+    "openstack.yaml",
+    "azure.yaml"
+  ],
+  "getting-started/step2": [
+    "multi-cloud.yaml"
   ]
 }
