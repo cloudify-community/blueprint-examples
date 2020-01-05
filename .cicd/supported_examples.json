@@ -73,13 +73,5 @@
   ],
   "commercial-vnf/service": [
     "azure_service.yaml"
-  ],
-  "getting-started/step1": [
-    "aws.yaml",
-    "openstack.yaml",
-    "azure.yaml"
-  ],
-  "getting-started/step2": [
-    "multi-cloud.yaml"
   ]
 }
