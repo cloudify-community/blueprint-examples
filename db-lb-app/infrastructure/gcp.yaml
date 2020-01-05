@@ -110,8 +110,14 @@ node_templates:
       gcp_config: *gcp_config
       auto_subnets: false
 
-outputs:
+groups:
 
-  application_endpoint:
-    description: The external endpoint of the application.
-    value: { concat: [ 'http://', { get_attribute: [ vm, ip ] }, ':80' ] }
+  scalable_compute:
+    members:
+      - host
+
+capabilities:
+
+  ip:
+    description: Host IP
+    value: { get_attribute: [ host, ip ] }
