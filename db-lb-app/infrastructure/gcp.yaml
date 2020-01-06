@@ -58,6 +58,12 @@ node_templates:
       instance_type: { get_input: instance_type }
       zone: { get_capability: [ gcp, zone ] }
       external_ip: true
+      block_project_ssh_keys: true
+      startup_script:
+        type: string
+        script: |
+          #!/bin/bash
+          yum -t -y install libsemanage-python
     relationships:
     - type: cloudify.relationships.depends_on
       target: subnet
