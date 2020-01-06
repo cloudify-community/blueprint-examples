@@ -95,6 +95,7 @@ node_templates:
   subnet:
     type: cloudify.gcp.nodes.SubNetwork
     properties:
+      use_external_resource: true
       name: { get_capability: [ gcp, subnet ] }
       region: { get_capability: [ gcp, region ] }
       subnet: 10.11.12.0/22
@@ -106,6 +107,7 @@ node_templates:
   network:
     type: cloudify.gcp.nodes.Network
     properties:
+      use_external_resource: true
       name: { get_capability: [ gcp, network ] }
       gcp_config: *gcp_config
       auto_subnets: false
