@@ -13,7 +13,8 @@
   "db-lb-app/infrastructure": [
     "aws.yaml",
     "azure.yaml",
-    "openstack.yaml"
+    "openstack.yaml",
+    "gcp.yaml"
   ],
   "db-lb-app/db": [
     "application.yaml",
