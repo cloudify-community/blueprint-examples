@@ -31,6 +31,8 @@ ASSET_TYPE = 'zip'
 RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
 This is package number {1} to be released for this version of Cloudify.
 Always try to use the latest package for your version of Cloudify."""
+GETTING_STARTED_B = None
+GETTING_STARTED_URL = None
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,6 +123,21 @@ class NewRelease(object):
         except (IndexError, KeyError):
             return None
 
+    def update_getting_started(self, file_path):
+        if not path.exists(file_path):
+            raise Exception('Tried to update getting started but failed.')
+        old_url = GETTING_STARTED_URL.format(self._get_last_version())
+        new_url = GETTING_STARTED_URL.format(self.version)
+        self.replace_string_in_file(file_path, old_url, new_url)
+
+    @staticmethod
+    def replace_string_in_file(file_path, old_string, new_string):
+        lines = open(file_path, 'r').read()
+        lines.replace(old_string, new_string)
+        f = open(file_path)
+        f.write(lines)
+        f.close()
+
 
 class BlueprintArchive(object):
     """Handles creating zip archives of blueprints."""
@@ -164,7 +181,9 @@ if __name__ == "__main__":
         logging.info('No new release to upload new archives to.')
         sys.exit()
 
-    for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
+    new_release.update_getting_started(GETTING_STARTED_B)
+
+    for blueprint_id, file_path in SUPPORTED_EXAMPLES.items():
         logging.info('Attempting to create new zip {0}.'.format(blueprint_id))
         new_archive = BlueprintArchive(
             blueprint_id,
