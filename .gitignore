@@ -46,4 +46,4 @@ nosetests.xml
 .DS_Store
 .vagrant/
 .coverage*
-.idea/
+.idea
