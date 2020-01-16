@@ -1,0 +1,191 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - plugin:cloudify-openstack-plugin?version= >=3.2.2
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  region:
+    type: string
+    description: The Openstack region.
+    default: RegionOne
+
+  external_network_id:
+    type: string
+    description: A network that provisions floating IPs.
+    default: dda079ce-12cf-4309-879a-8e67aec94de4
+
+  image:
+    type: string
+    description: The UUID of an Ubuntu Trusty 14.04 image in your Openstack account.
+    default: 70de1e0f-2951-4eae-9a8f-05afd97cd036
+
+  flavor:
+    type: string
+    description: The UUID of small flavor in your Openstack account.
+    default: 3
+
+  network_id:
+    type: string
+    description: A name for your new Openstack Network.
+    default: cloudify-demo-network
+
+  subnet_id:
+    type: string
+    description: A name for your new Openstack Subnet.
+    default: cloudify-demo-subnet
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: centos
+
+dsl_definitions:
+
+  openstack_config: &openstack_config
+    auth_url: { get_secret: openstack_auth_url }
+    region_name: { get_input: region }
+    project_name: { get_secret: openstack_tenant_name }
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+
+node_templates:
+
+  vm:
+    type: cloudify.nodes.openstack.Server
+    properties:
+      client_config: *openstack_config
+      agent_config:
+        install_method: none
+        key: { get_secret: agent_key_private }
+        user: { get_input: agent_user }
+      resource_config:
+        name: vm
+        image_id: { get_input: image }
+        flavor_id: { get_input: flavor }
+        user_data: { get_attribute: [ cloud_init, cloud_config ] }
+      use_public_ip: true
+    relationships:
+      - type: cloudify.relationships.openstack.server_connected_to_port
+        target: port
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+
+  port:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        network_id: { get_attribute: [ network, id ] }
+    relationships:
+      - type: cloudify.relationships.openstack.port_connected_to_subnet
+        target: subnet
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
+        target: security-group
+      - type: cloudify.relationships.openstack.port_connected_to_floating_ip
+        target: ip
+
+  subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        name: { get_input: subnet_id }
+        ip_version: 4
+        cidr: 10.10.4.0/24
+        dns_nameservers: [8.8.4.4, 8.8.8.8]
+        allocation_pools:
+        - start: 10.10.4.2
+          end: 10.10.4.254
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: network
+      - type: cloudify.relationships.openstack.subnet_connected_to_router
+        target: router
+
+  network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        name: { get_input: network_id }
+
+  router:
+    type: cloudify.nodes.openstack.Router
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external-network
+
+  security-group:
+    type: cloudify.nodes.openstack.SecurityGroup
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        name: hello-security-group
+        description: 'hello security group'
+      security_group_rules:
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 80
+          port_range_max: 80
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 8080
+          port_range_max: 8080
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 9990
+          port_range_max: 9990
+
+  ip:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: external-network
+
+  external-network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_input: external_network_id }
+        kwargs:
+          routing:
+            external: true
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_secret: agent_key_public }
+
+capabilities:
+
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ ip, floating_ip_address ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_filename:
+    description: Private agent key
+    value: { get_secret: agent_key_private }
+
