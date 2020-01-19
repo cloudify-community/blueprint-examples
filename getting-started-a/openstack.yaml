@@ -19,7 +19,7 @@ inputs:
 
   image:
     type: string
-    description: The UUID of an Ubuntu Trusty 14.04 image in your Openstack account.
+    description: centos UUID image.
     default: 70de1e0f-2951-4eae-9a8f-05afd97cd036
 
   flavor:
