@@ -6,14 +6,15 @@ There are three components to this getting started guide:
 
   - Infrastructure blueprints (there is a separate blueprint for AWS, Azure, Openstack, and GCP).
   - JBoss Application blueprint
-  - Nodejs Application bluepring
-
+  - Nodejs Application blueprint
 
 ## Requirements
 
+If you have already ensured these requirements are met, skip to [installation steps](#installation-steps).
+
   - You will need a Cloudify Manager v5.0.5 or higher.
 
-  - The following plugins should be installed on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
+  - You must install the following plugins on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
 
     - [ ] `cloudify-aws-plugin`, version 2.3.0 or higher.
     - [ ] `cloudify-azure-plugin`, version 2.1.7 or higher.
@@ -22,7 +23,9 @@ There are three components to this getting started guide:
     - [ ] `cloudify-utilites-plugin`, version 1.14.0 or higher.
     - [ ] `cloudify-fabric-plugin`, version 1.5.3 or higher.
 
-  - You will need to create the following secrets, however, you may skip the Cloud secrets if the Cloud is not relevant to you.
+To learn how to upload plugins, see [uploading plugins](#how-to-upload-plugins).
+
+  - You must create the following secrets, however, you may skip those cloud secrets that are not for your cloud.
 
     - Common:
       - [ ] `agent_key_public`: Public key content, e.g: `cfy secrets create -u agent_key_public -f ~/.ssh/id_rsa.pub`.
@@ -63,30 +66,86 @@ There are three components to this getting started guide:
       - [ ] `base_image_id`: The image ID of a Centos 7 that supports Cloud Init.
       - [ ] `base_flavor_id`: The flavor ID of an Openstack flavor that is appropriate for your Centos 7 "base_image_id".
 
-## Steps
+To learn how to create secrets, see [creating secrets](#how-to-create-secrets).
 
+## Installation steps
 
-### Via the Cloudify CLI
+First you will need to make sure that you have the latest getting-started blueprint. These are located at [Blueprint Examples Releases](https://github.com/cloudify-community/blueprint-examples/releases). Look for the zip archive with a name similar to __getting-started-5.0.5-0.zip__. Copy the link URL. You will need it to complete these steps.
 
-After you have uploaded you plugins to your Cloudify Manager and created your secrets (see ["requirements" above](#Requirements)), you will need to upload the application blueprint to your Cloudify Manager.
+There are two methods to install the getting started application:
 
-Find the blueprint URL, which is located (here)[https://github.com/cloudify-community/blueprint-examples/releases]. Search for a zip package named "getting-started-X.X.X.zip", where "X.X.X" is some number like "5.0.0-15".
+1. [Install getting started with the CLI](#install-getting-started-with-the-cli).
+1. [Install getting started with the UI](#install-getting-started-with-the-ui).
 
-Copy the URL and paste it in the following command in place of <BLUEPRINT URL>:
+#### Install Getting Started with the CLI
 
-```shell
-cfy blueprints upload -b getting-started <BLUEPRINT URL>
-```
-
-You must now gather the inputs to your deployment.
+Upload the blueprint to you Cloudify Manager with the following command:
 
 ```shell
-cfy deployments create -b getting-started
+cfy blueprints upload [BLUEPRINT URL] -b [BLUEPRINT ID]
 ```
 
-You should now execute the install workflow, which will actually create all of the resources including the application.
+You can provide any ID you like for the blueprint. You will need it in the following steps.
+
+Create the deployment on your Cloudify Manager with the following command:
 
 ```shell
-cfy executions start install -d getting-started
+cfy deployments create -b [BLUEPRINT ID]
 ```
 
+Execute the install workflow on your deployment:
+
+```shell
+cfy executions start install -d [BLUEPRINT ID]
+```
+
+#### Install Getting Started with the UI
+
+<UPDATE>
+
+
+## How to upload plugins
+
+There are two methods to upload a plugin on your Cloudify manager:
+
+1. [Uploading plugins with the Cloudify CLI](#Uploading-plugins-with-the-cloudify-cli).
+1. [Uploading plugins with the Cloudify UI](#Uploading-plugins-with-the-cloudify-ui).
+
+#### Uploading plugins with the Cloudify CLI
+
+If you know the path or URL of the Cloudify Plugin Wagon and Plugin YAML, then you may run the following command:
+
+```shell
+cfy plugins upload [URL OR PATH TO PLUGIN WAGON] -y [URL OR PATH TO PLUGIN YAML]
+```
+
+#### Uploading plugins with the Cloudify UI
+
+<UPDATE>
+
+## How to create secrets
+
+There are two methods to create a secret on your Cloudify manager:
+
+1. [Create secrets with the Cloudify CLI](#Creating-secrets-with-the-cloudify-cli).
+1. [Create secrets with the Cloudify UI](#Creating-secrets-with-the-cloudify-ui).
+
+#### Creating secrets with the Cloudify CLI
+
+You can create secrets with the following CLI commands.
+
+If the secret content is a string:
+
+```shell
+cfy secrets create [SECRET NAME] -s [SECRET CONTENT]
+```
+
+If the secret content is in a file, for example if the secret is a RSA key:
+
+```shell
+cfy secrets create [SECRET NAME] -f [PATH TO FILE CONTAINING SECRET CONTENT]
+```
+
+#### Creating secrets with the Cloudify UI
+
+<UPDATE>
