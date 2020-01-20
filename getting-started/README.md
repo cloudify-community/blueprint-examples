@@ -111,6 +111,8 @@ There are two methods to upload a plugin on your Cloudify manager:
 1. [Uploading plugins with the Cloudify CLI](#Uploading-plugins-with-the-cloudify-cli).
 1. [Uploading plugins with the Cloudify UI](#Uploading-plugins-with-the-cloudify-ui).
 
+[Return to requirements](#Requirements).
+
 #### Uploading plugins with the Cloudify CLI
 
 If you know the path or URL of the Cloudify Plugin Wagon and Plugin YAML, then you may run the following command:
@@ -129,6 +131,8 @@ There are two methods to create a secret on your Cloudify manager:
 
 1. [Create secrets with the Cloudify CLI](#Creating-secrets-with-the-cloudify-cli).
 1. [Create secrets with the Cloudify UI](#Creating-secrets-with-the-cloudify-ui).
+
+[Return to requirements](#Requirements).
 
 #### Creating secrets with the Cloudify CLI
 
