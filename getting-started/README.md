@@ -4,15 +4,14 @@ This is a suite of blueprints that demonstrates how to design a Cloudify bluepri
 
 There are three components to this getting started guide:
 
-  - Infrastructure blueprints (there is a separate blueprint for AWS, Azure, Openstack, and GCP).
+  - Infrastructure blueprints (there is a separate blueprint for AWS, Azure, Openstack, and GCP). These blueprints are not directly deployed, rather, the application blueprint leverages infrastructure blueprints to deploy the application on the Cloud of the user's choice.
   - JBoss Application blueprint
-  - Nodejs Application blueprint
 
 ## Requirements
 
 If you have already ensured these requirements are met, skip to [installation steps](#installation-steps).
 
-- [ ] You will need a Cloudify Manager v5.0.5 or higher.
+- [ ] You will need a Cloudify Manager v5.0.5 or higher. See [install Cloudify Manager](#install-cloudify-manager-with-docker).
 
 - [ ] You must install the following plugins on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
 
@@ -69,10 +68,45 @@ cfy executions start install -d [BLUEPRINT ID]
 
 #### Install Getting Started with the UI
 
-<UPDATE>
+Select **Local Blueprints** from the menu on the left.
 
+On the right side of the local blueprints page, select **Upload**.
 
-## How to upload plugins
+Paste the URL of the blueprint package in the **URL** field. Provide any name you like.
+
+Select *mc-jboss.yaml* from the **Blueprint YAML file** menu.
+
+You can leave the **Blueprint icon** field blank. It is only for decoration.
+
+Click **Upload**.
+
+The blueprint should appear in the blueprint list under the name you provided.
+
+On the right, you will see a rocket icon. Select, the rocket icon and you will enter the create deployment dialog.
+
+Provide a name you like in the **Deployment name** field.
+
+You can skip the **Site name** field.
+
+Provide values for any inputs that you would like to change.
+
+Click **Deploy**.
+
+The blueprint should appear in the deployment list under the name you provided.
+
+You can now select **Install** from the workflow menu under your deployment.
+
+# Appendix
+
+### Install Cloudify Manager with Docker
+
+If you have Docker, you can install a Cloudify Manager with the following command:
+
+```shell
+sudo docker run --name cfy_manager_local -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN -p 80:80 -p 8000:8000 cloudifyplatform/community-cloudify-manager-aio
+```
+
+### How to upload plugins
 
 There are two methods to upload a plugin on your Cloudify manager:
 
@@ -91,9 +125,19 @@ cfy plugins upload [URL OR PATH TO PLUGIN WAGON] -y [URL OR PATH TO PLUGIN YAML]
 
 #### Uploading plugins with the Cloudify UI
 
-<UPDATE>
+Select **System Resources** from the menu on the left.
 
-## How to create secrets
+Find the **Plugins** widget. By default, this is the first widget on the system resources page.
+
+Click on **Upload**.
+
+Paste the URL of a plugin wagon in the **Wagon file** field.
+
+Paste the URL of the plugin YAML in the **YAML file** field.
+
+Click **Upload**.
+
+### How to create secrets
 
 There are two methods to create a secret on your Cloudify manager:
 
@@ -120,10 +164,17 @@ cfy secrets create [SECRET NAME] -f [PATH TO FILE CONTAINING SECRET CONTENT]
 
 #### Creating secrets with the Cloudify UI
 
-<UPDATE>
+Select **System Resources** from the menu on the left.
 
+Find the **Plugins** widget. By default, this is the first widget on the system resources page.
 
-## Appendix
+Click on **Secrets**.
+
+Provide the secret key in the **Secret key** field.
+
+Provide the secret value in the **Secret value** field. Alternately, provide a local file path in the **Get secret value from file** menu.
+
+Click **Create**.
 
 #### AWS secrets checklist
 
