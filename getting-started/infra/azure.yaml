@@ -33,7 +33,6 @@ inputs:
     description: Your Azure Region.
     default: eastus2
 
-
   image:
     description: >
       Image to use.

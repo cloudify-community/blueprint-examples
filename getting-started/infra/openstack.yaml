@@ -15,17 +15,17 @@ inputs:
   external_network_id:
     type: string
     description: A network that provisions floating IPs.
-    default: dda079ce-12cf-4309-879a-8e67aec94de4
+    default: { get_secret: openstack_external_network }
 
   image:
     type: string
     description: centos UUID image.
-    default: 70de1e0f-2951-4eae-9a8f-05afd97cd036
+    default: { get_secret: base_image_id }
 
   flavor:
     type: string
     description: The UUID of small flavor in your Openstack account.
-    default: 3
+    default: { get_secret: base_flavor_id }
 
   network_id:
     type: string

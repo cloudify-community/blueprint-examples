@@ -23,14 +23,15 @@ inputs:
     description: >
       URL of infra zip file.
     type: string
-    default: ''
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-15/getting-started-infra.zip'
 
   infra_exists:
     description: >
-      Infrastructure created or not?
-    default: true
+      Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
+    default: false
 
 node_templates:
+
   infrastructure:
     type: cloudify.nodes.Component
     properties:
@@ -39,7 +40,6 @@ node_templates:
           id: { get_input: infra_blueprint }
           blueprint_archive: { get_input: infra_archive }
           external_resource: { get_input: infra_exists }
-
 
   jboss:
     type: cloudify.nodes.ApplicationServer
