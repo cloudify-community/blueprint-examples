@@ -12,59 +12,27 @@ There are three components to this getting started guide:
 
 If you have already ensured these requirements are met, skip to [installation steps](#installation-steps).
 
-  - You will need a Cloudify Manager v5.0.5 or higher.
+- [ ] You will need a Cloudify Manager v5.0.5 or higher.
 
-  - You must install the following plugins on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
+- [ ] You must install the following plugins on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
 
-    - [ ] `cloudify-aws-plugin`, version 2.3.0 or higher.
-    - [ ] `cloudify-azure-plugin`, version 2.1.7 or higher.
-    - [ ] `cloudify-gcp-plugin`, version 1.4.4 or higher.
-    - [ ] `cloudify-openstack-plugin`, version 3.2.2 or higher.
-    - [ ] `cloudify-utilites-plugin`, version 1.14.0 or higher.
-    - [ ] `cloudify-fabric-plugin`, version 1.5.3 or higher.
+    - [ ] `cloudify-aws-plugin`, version 2.3.0 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-aws-plugin/releases).
+    - [ ] `cloudify-azure-plugin`, version 2.1.7 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-azure-plugin/releases).
+    - [ ] `cloudify-gcp-plugin`, version 1.4.4 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-gcp-plugin/releases).
+    - [ ] `cloudify-openstack-plugin`, version 3.2.2 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases).
+    - [ ] `cloudify-utilites-plugin`, version 1.14.0 or higher, see [releases](https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases).
+    - [ ] `cloudify-fabric-plugin`, version 1.5.3 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-fabric-plugin/releases).
 
 To learn how to upload plugins, see [uploading plugins](#how-to-upload-plugins).
 
-  - You must create the following secrets, however, you may skip those cloud secrets that are not for your cloud.
+- [ ] You must create the following secrets, however, you may skip those cloud secrets that are not for your cloud.
 
-    - Common:
-      - [ ] `agent_key_public`: Public key content, e.g: `cfy secrets create -u agent_key_public -f ~/.ssh/id_rsa.pub`.
-      - [ ] `agent_key_private`: Private key content, e.g: `cfy secrets create -u agent_key_private -f ~/.ssh/id_rsa`.
-
-    - AWS, see [AWS Access Key](https://aws.amazon.com/blogs/security/wheres-my-secret-access-key/).
-      - [ ] `aws_access_key_id` AWS Access Key, e.g.: `cfy secrets create -u aws_access_key_id -s ...................`.
-      - [ ] `aws_secret_access_key`: AWS Secret Access Key, e.g.: `cfy secrets create -u aws_secret_access_key -s ...................`.
-      - [ ] `aws_region_name`: AWS region name Key, e.g.: `cfy secrets create -u aws_region_name -s us-east-1`.
-      - [ ] `ec2_region_endpoint`: AWS region endpoint, e.g.: `cfy secrets create -u ec2_region_endpoint -s ec2.us-east-1.amazonaws.com`.
-      - [ ] `aws_availability_zone` AWS availability zone, e.g.: `cfy secrets create -u aws_availability_zone -s eu-central-1b`.
-
-    - Azure, see [Azure Plugin Configuration](https://docs.cloudify.co/5.0.0/working_with/official_plugins/infrastructure/azure/#providing-credentials-as-secrets):
-      - [ ] `azure_subscription_id`: Azure subscription ID: `cfy secrets create -u azure_subscription_id -s 00000000-0000-0000-0000-000000000000`.
-      - [ ] `azure_tenant_id`: Azure subscription ID: `cfy secrets create -u azure_tenant_id -s 00000000-0000-0000-0000-000000000000`.
-      - [ ] `azure_client_id`: Azure subscription ID: `cfy secrets create -u azure_client_id -s 00000000-0000-0000-0000-000000000000`.
-      - [ ] `azure_client_secret`: Azure subscription ID: `cfy secrets create -u azure_client_secret -s ...........`.
-      - [ ] `azure_location`: Azure subscription ID: `cfy secrets create -u azure_location -s westeurope`.
-
-    - GCP, see [GCP Plugin Configuration](https://docs.cloudify.co/5.0.0/working_with/official_plugins/infrastructure/gcp/).
-      - [ ] `gcp_client_x509_cert_url`: A GCP Service Account Client Cert URL: `cfy secrets create gcp_client_x509_cert_url -s client_cert_url`
-      - [ ] `gcp_client_email`: A GCP Service Account client email: `cfy secrets create gcp_client_email -s client_email`
-      - [ ] `gcp_client_id`: A GCP Service Account Client ID: `cfy secrets create gcp_client_id -s client_id`
-      - [ ] `gcp_project_id`: A GCP Project ID: `cfy secrets create gcp_project_id -s project_id`
-      - [ ] `gcp_private_key_id`: A GCP Project Private Key ID: `cfy secrets create gcp_private_key_id -s private_key_id`
-      - [ ] `gcp_private_key`: A GCP project Private Key: `cfy secrets create gcp_private_key -f ./path/to/private-key`.
-      - [ ] `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`
-      - [ ] `gcp_zone`: A GCP Zone such as `us-east1-b`: `cfy secrets create gcp_zone -s zone`
-
-    - Openstack, see [Openstack RC File](https://docs.openstack.org/zh_CN/user-guide/common/cli-set-environment-variables-using-openstack-rc.html), although sourcing is not enough, these values must be created as secrets:
-      - [ ] `openstack_auth_url`: Openstack Auth URL: `cfy secrets create -u openstack_auth_url -s https://my.openstack.com:5000/v2.0`
-      - [ ] `openstack_project_name`: Openstack Project Name: `cfy secrets create -u openstack_project_name -s project`
-      - [ ] `openstack_tenant_name`: Openstack Tenant Name: `cfy secrets create -u openstack_tenant_name -s tenant`
-      - [ ] `openstack_username`: Openstack Username: `cfy secrets create -u openstack_username -s janedoe`
-      - [ ] `openstack_password`: Openstack Password: `cfy secrets create -u openstack_password -s peacelove`
-      - [ ] `openstack_region`: Openstack Region Name: `cfy secrets create -u openstack_region -s RegionOne`
-      - [ ] `openstack_external_network`: The ID of the floating IP network that you will use to connect to the internet.
-      - [ ] `base_image_id`: The image ID of a Centos 7 that supports Cloud Init.
-      - [ ] `base_flavor_id`: The flavor ID of an Openstack flavor that is appropriate for your Centos 7 "base_image_id".
+    - [ ] `agent_key_public`: Public key content, e.g: `cfy secrets create -u agent_key_public -f ~/.ssh/id_rsa.pub`.
+    - [ ] `agent_key_private`: Private key content, e.g: `cfy secrets create -u agent_key_private -f ~/.ssh/id_rsa`.
+    - [ ] If you wish to use AWS, please create the [required AWS secrets](#aws-secrets-checklist).
+    - [ ] If you wish to use Azure, please create the [required Azure secrets](#azure-secrets-checklist).
+    - [ ] If you wish to use GCP, please create the [required GCP secrets](#gcp-secrets-checklist).
+    - [ ] If you wish to use Openstack, please create the [required Openstack secrets](#openstack-secrets-checklist).
 
 To learn how to create secrets, see [creating secrets](#how-to-create-secrets).
 
@@ -111,7 +79,7 @@ There are two methods to upload a plugin on your Cloudify manager:
 1. [Uploading plugins with the Cloudify CLI](#Uploading-plugins-with-the-cloudify-cli).
 1. [Uploading plugins with the Cloudify UI](#Uploading-plugins-with-the-cloudify-ui).
 
-[Return to requirements](#Requirements).
+[Return to requirements](#requirements).
 
 #### Uploading plugins with the Cloudify CLI
 
@@ -132,7 +100,7 @@ There are two methods to create a secret on your Cloudify manager:
 1. [Create secrets with the Cloudify CLI](#Creating-secrets-with-the-cloudify-cli).
 1. [Create secrets with the Cloudify UI](#Creating-secrets-with-the-cloudify-ui).
 
-[Return to requirements](#Requirements).
+[Return to requirements](#requirements).
 
 #### Creating secrets with the Cloudify CLI
 
@@ -153,3 +121,69 @@ cfy secrets create [SECRET NAME] -f [PATH TO FILE CONTAINING SECRET CONTENT]
 #### Creating secrets with the Cloudify UI
 
 <UPDATE>
+
+
+## Appendix
+
+#### AWS secrets checklist
+
+If you are an AWS user, you must create the following secrets:
+
+  - [ ] `aws_access_key_id` AWS Access Key, e.g.: `cfy secrets create -u aws_access_key_id -s ...................`.
+  - [ ] `aws_secret_access_key`: AWS Secret Access Key, e.g.: `cfy secrets create -u aws_secret_access_key -s ...................`.
+  - [ ] `aws_region_name`: AWS region name Key, e.g.: `cfy secrets create -u aws_region_name -s us-east-1`.
+  - [ ] `ec2_region_endpoint`: AWS region endpoint, e.g.: `cfy secrets create -u ec2_region_endpoint -s ec2.us-east-1.amazonaws.com`.
+  - [ ] `aws_availability_zone` AWS availability zone, e.g.: `cfy secrets create -u aws_availability_zone -s eu-central-1b`.
+
+If you need help locating your credentials, read about [AWS Access Key](https://aws.amazon.com/blogs/security/wheres-my-secret-access-key/).
+
+[Return to requirements](#requirements).
+
+#### Azure secrets checklist
+
+If you are an Azure user, you must create the following secrets:
+
+  - [ ] `azure_subscription_id`: Azure subscription ID: `cfy secrets create -u azure_subscription_id -s 00000000-0000-0000-0000-000000000000`.
+  - [ ] `azure_tenant_id`: Azure subscription ID: `cfy secrets create -u azure_tenant_id -s 00000000-0000-0000-0000-000000000000`.
+  - [ ] `azure_client_id`: Azure subscription ID: `cfy secrets create -u azure_client_id -s 00000000-0000-0000-0000-000000000000`.
+  - [ ] `azure_client_secret`: Azure subscription ID: `cfy secrets create -u azure_client_secret -s ...........`.
+  - [ ] `azure_location`: Azure subscription ID: `cfy secrets create -u azure_location -s westeurope`.
+
+If you need help locating your credentials, read about [Azure Plugin Configuration](https://docs.cloudify.co/5.0.0/working_with/official_plugins/infrastructure/azure/#providing-credentials-as-secrets):
+
+[Return to requirements](#requirements).
+
+#### GCP secrets checklist
+
+If you are a GCP user, you must create the following secrets:
+
+  - [ ] `gcp_client_x509_cert_url`: A GCP Service Account Client Cert URL: `cfy secrets create gcp_client_x509_cert_url -s client_cert_url`
+  - [ ] `gcp_client_email`: A GCP Service Account client email: `cfy secrets create gcp_client_email -s client_email`
+  - [ ] `gcp_client_id`: A GCP Service Account Client ID: `cfy secrets create gcp_client_id -s client_id`
+  - [ ] `gcp_project_id`: A GCP Project ID: `cfy secrets create gcp_project_id -s project_id`
+  - [ ] `gcp_private_key_id`: A GCP Project Private Key ID: `cfy secrets create gcp_private_key_id -s private_key_id`
+  - [ ] `gcp_private_key`: A GCP project Private Key: `cfy secrets create gcp_private_key -f ./path/to/private-key`.
+  - [ ] `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`
+  - [ ] `gcp_zone`: A GCP Zone such as `us-east1-b`: `cfy secrets create gcp_zone -s zone`
+
+If you need help locating your credentials, read about [GCP Plugin Configuration](https://docs.cloudify.co/5.0.0/working_with/official_plugins/infrastructure/gcp/).
+
+[Return to requirements](#requirements).
+
+#### Openstack secrets checklist
+
+If you are an Openstack user, you must create the following secrets:
+
+  - [ ] `openstack_auth_url`: Openstack Auth URL: `cfy secrets create -u openstack_auth_url -s https://my.openstack.com:5000/v2.0`
+  - [ ] `openstack_project_name`: Openstack Project Name: `cfy secrets create -u openstack_project_name -s project`
+  - [ ] `openstack_tenant_name`: Openstack Tenant Name: `cfy secrets create -u openstack_tenant_name -s tenant`
+  - [ ] `openstack_username`: Openstack Username: `cfy secrets create -u openstack_username -s janedoe`
+  - [ ] `openstack_password`: Openstack Password: `cfy secrets create -u openstack_password -s peacelove`
+  - [ ] `openstack_region`: Openstack Region Name: `cfy secrets create -u openstack_region -s RegionOne`
+  - [ ] `openstack_external_network`: The ID of the floating IP network that you will use to connect to the internet.
+  - [ ] `base_image_id`: The image ID of a Centos 7 that supports Cloud Init.
+  - [ ] `base_flavor_id`: The flavor ID of an Openstack flavor that is appropriate for your Centos 7 "base_image_id".
+
+If you need help locating your credentials, read about [Openstack RC File](https://docs.openstack.org/zh_CN/user-guide/common/cli-set-environment-variables-using-openstack-rc.html), although sourcing is not enough, these values must be created as secrets:
+
+[Return to requirements](#requirements).
