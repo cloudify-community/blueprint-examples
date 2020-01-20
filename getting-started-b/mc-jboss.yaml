@@ -17,6 +17,7 @@ inputs:
           - infra-openstack
           - infra-azure
           - infra-aws
+          - infra-gcp
 
   infra_archive:
     description: >
