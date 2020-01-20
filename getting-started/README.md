@@ -12,7 +12,7 @@ There are three components to this getting started guide:
 
 If you have already ensured these requirements are met, skip to [installation steps](#installation-steps).
 
-- [ ] You will need a Cloudify Manager v5.0.5 or higher.
+- [ ] You will need a Cloudify Manager v5.0.5 or higher. See [install Cloudify Manager](#install-cloudify-manager-with-docker).
 
 - [ ] You must install the following plugins on your Cloudify Manager, however you may skip the Cloud plugin if the Cloud is not relevant to you.
 
@@ -71,8 +71,17 @@ cfy executions start install -d [BLUEPRINT ID]
 
 <UPDATE>
 
+# Appendix
 
-## How to upload plugins
+### Install Cloudify Manager with Docker
+
+If you have Docker, you can install a Cloudify Manager with the following command:
+
+```shell
+sudo docker run --name cfy_manager_local -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN -p 80:80 -p 8000:8000 cloudifyplatform/community-cloudify-manager-aio
+```
+
+### How to upload plugins
 
 There are two methods to upload a plugin on your Cloudify manager:
 
@@ -93,7 +102,7 @@ cfy plugins upload [URL OR PATH TO PLUGIN WAGON] -y [URL OR PATH TO PLUGIN YAML]
 
 <UPDATE>
 
-## How to create secrets
+### How to create secrets
 
 There are two methods to create a secret on your Cloudify manager:
 
@@ -122,8 +131,6 @@ cfy secrets create [SECRET NAME] -f [PATH TO FILE CONTAINING SECRET CONTENT]
 
 <UPDATE>
 
-
-## Appendix
 
 #### AWS secrets checklist
 
