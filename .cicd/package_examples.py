@@ -15,6 +15,7 @@
 
 import logging
 from os import environ, path, walk, remove
+from re import sub
 import shutil
 import sys
 from tempfile import NamedTemporaryFile
@@ -31,6 +32,7 @@ ASSET_TYPE = 'zip'
 RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
 This is package number {1} to be released for this version of Cloudify.
 Always try to use the latest package for your version of Cloudify."""
+GETTING_STARTED = ['getting-started/mc-jboss.yaml']
 
 logging.basicConfig(level=logging.INFO)
 
@@ -121,6 +123,15 @@ class NewRelease(object):
         except (IndexError, KeyError):
             return None
 
+    def update_getting_started(self, file_path):
+        if not path.exists(file_path):
+            raise Exception('Tried to update getting started but failed.')
+        lines = open(file_path, 'r').read()
+        lines = [sub(r"[\d\.]+\-[\d]+", self.version, l) for l in lines]
+        f = open(file_path)
+        f.writelines(lines)
+        f.close()
+
 
 class BlueprintArchive(object):
     """Handles creating zip archives of blueprints."""
@@ -164,7 +175,10 @@ if __name__ == "__main__":
         logging.info('No new release to upload new archives to.')
         sys.exit()
 
-    for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
+    for gs in GETTING_STARTED:
+        new_release.update_getting_started(gs)
+
+    for blueprint_id, file_path in SUPPORTED_EXAMPLES.items():
         logging.info('Attempting to create new zip {0}.'.format(blueprint_id))
         new_archive = BlueprintArchive(
             blueprint_id,

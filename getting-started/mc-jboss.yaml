@@ -1,0 +1,80 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Deploys JBoss.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - plugin:cloudify-fabric-plugin
+
+inputs:
+  infra_blueprint:
+    description: >
+      Name of infrastructure blueprint to deploy.
+    type: string
+    constraints:
+      - valid_values:
+          - infra-openstack
+          - infra-azure
+          - infra-aws
+          - infra-gcp
+
+  infra_archive:
+    description: >
+      URL of infra zip file.
+    type: string
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-15/getting-started-infra.zip'
+
+  infra_exists:
+    description: >
+      Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
+    default: false
+
+node_templates:
+
+  infrastructure:
+    type: cloudify.nodes.Component
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: infra_blueprint }
+          blueprint_archive: { get_input: infra_archive }
+          external_resource: { get_input: infra_exists }
+
+  jboss:
+    type: cloudify.nodes.ApplicationServer
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/create.sh
+            fabric_env: &fabric_env
+              host_string: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ]}
+              user: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, user ]}
+              key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_filename ]}
+
+        configure:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/configure.sh
+            fabric_env: *fabric_env
+        start:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/start.sh
+            fabric_env: *fabric_env
+        stop:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/stop.sh
+            fabric_env: *fabric_env
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: infrastructure
+
+outputs:
+  admin_url:
+    description: Administration console URL
+    value: { concat: [ 'http://', { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ] }, ':9990/console' ] }
+

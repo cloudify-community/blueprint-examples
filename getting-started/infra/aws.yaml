@@ -1,0 +1,221 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates an AWS infrastructure environment.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - plugin:cloudify-aws-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  availability_zone:
+    type: string
+    description: The availability zone in the AWS Region.
+    default: { concat: [ { get_secret: aws_region_name }, 'b' ] }
+
+  ami_owner_filter:
+    type: string
+    description: The AWS AMI owner number.
+    default: '057448758665'
+
+  ami_name_filter:
+    type: string
+    description: The name of the AWS AMI in the AWS region.
+    default: 'CentOS 7.7.1908 x86_64 with cloud-init (HVM)'
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'centos'
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_secret: aws_access_key_id }
+    aws_secret_access_key: { get_secret: aws_secret_access_key }
+    region_name: { get_secret: aws_region_name }
+
+node_templates:
+
+  vm:
+    type: cloudify.nodes.aws.ec2.Instances
+    properties:
+      client_config: *client_config
+      agent_config:
+        install_method: none
+        user: { get_input: agent_user }
+        key: { get_secret: agent_key_private }
+      resource_config:
+        ImageId: { get_attribute: [ ami, aws_resource_id ] }
+        InstanceType: t2.micro
+        kwargs:
+          UserData: { get_attribute: [ cloud_init, cloud_config ] }
+      use_public_ip: true
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: ami
+    - type: cloudify.relationships.depends_on
+      target: nic
+    - type: cloudify.relationships.depends_on
+      target: ip
+    - type: cloudify.relationships.depends_on
+      target: cloud_init
+
+  ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: name
+            Values:
+            - { get_input: ami_name_filter }
+          - Name: owner-id
+            Values:
+            - { get_input: ami_owner_filter }
+      client_config: *client_config
+
+  ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: nic
+
+  nic:
+    type: cloudify.nodes.aws.ec2.Interface
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Description: Created by cloudify-getting-started-example.
+          SubnetId: { get_attribute: [ subnet, aws_resource_id ] }
+          Groups:
+          - { get_attribute: [ security_group, aws_resource_id ] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: security_group
+    - type: cloudify.relationships.depends_on
+      target: subnet
+
+  security_group_rules:
+    type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
+    properties:
+      client_config: *client_config
+      resource_config:
+        IpPermissions:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          IpRanges:
+          - CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          IpRanges:
+          - CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          IpRanges:
+          - CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9990
+          ToPort: 9990
+          IpRanges:
+          - CidrIp: 0.0.0.0/0
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: security_group
+
+  security_group:
+    type: cloudify.nodes.aws.ec2.SecurityGroup
+    properties:
+      client_config: *client_config
+      resource_config:
+        GroupName: CloudifyHelloWorldGroup
+        Description: Created by cloudify-hello-world-example.
+        VpcId: { get_attribute: [ vpc, aws_resource_id ] }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: vpc
+
+  route_public_subnet_internet_gateway:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: routetable
+    - type: cloudify.relationships.connected_to
+      target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  routetable:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+    relationships:
+    - type: cloudify.relationships.contained_in
+      target: vpc
+    - type: cloudify.relationships.connected_to
+      target: subnet
+
+  subnet:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      client_config: *client_config
+      resource_config:
+        CidrBlock: 10.10.4.0/24
+        AvailabilityZone: { get_input: availability_zone }
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: vpc
+
+  internet_gateway:
+    type: cloudify.nodes.aws.ec2.InternetGateway
+    properties:
+      client_config: *client_config
+    relationships:
+    - type: cloudify.relationships.connected_to
+      target: vpc
+
+  vpc:
+    type: cloudify.nodes.aws.ec2.Vpc
+    properties:
+      client_config: *client_config
+      resource_config:
+        CidrBlock: 10.10.0.0/16
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_secret: agent_key_public }
+
+capabilities:
+
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ ip, aws_resource_id ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_filename:
+    description: Private agent key
+    value: { get_secret: agent_key_private }

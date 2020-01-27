@@ -73,5 +73,14 @@
   ],
   "commercial-vnf/service": [
     "azure_service.yaml"
+  ],
+  "getting-started/infra": [
+    "aws.yaml",
+    "azure.yaml",
+    "openstack.yaml",
+    "gcp.yaml"
+  ],
+  "getting-started": [
+    "mc-jboss.yaml"
   ]
 }
