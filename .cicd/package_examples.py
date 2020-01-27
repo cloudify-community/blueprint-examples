@@ -128,7 +128,7 @@ class NewRelease(object):
             raise Exception('Tried to update getting started but failed.')
         lines = open(file_path, 'r').read()
         lines = [sub(r"[\d\.]+\-[\d]+", self.version, l) for l in lines]
-        f = open(file_path)
+        f = open(file_path, 'w')
         f.writelines(lines)
         f.close()
 
