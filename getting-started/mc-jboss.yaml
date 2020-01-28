@@ -7,7 +7,7 @@ imports:
   - plugin:cloudify-fabric-plugin
 
 inputs:
-  infra_blueprint:
+  infra_name:
     description: >
       Name of infrastructure blueprint to deploy.
     type: string
