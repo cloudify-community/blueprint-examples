@@ -31,7 +31,7 @@ inputs:
 
   infra_deployment_id:
     description: The blueprint name, the deployment name.
-    default: { concat: [ 'infra', { get_input: infra_name } ] }
+    default: { concat: [ 'infra-', { get_input: infra_name } ] }
 
 node_templates:
 
