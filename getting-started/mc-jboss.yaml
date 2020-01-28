@@ -42,7 +42,7 @@ node_templates:
         blueprint:
           id: { get_input: infra_deployment_id }
           blueprint_archive: { get_input: infra_archive }
-          blueprint_name: { concat: [ { get_input: infra_name }, '.yaml' ] }
+          main_file_name: { concat: [ { get_input: infra_name }, '.yaml' ] }
           external_resource: { get_input: infra_exists }
         deployment:
           id: { get_input: infra_deployment_id }
