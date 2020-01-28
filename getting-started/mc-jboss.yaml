@@ -22,7 +22,7 @@ inputs:
     description: >
       URL of infra zip file.
     type: string
-    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-17/getting-started-infra.zip'
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-18/getting-started-infra.zip'
 
   infra_exists:
     description: >

@@ -319,19 +319,20 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprint-validation
-      - getting-started:
-          requires:
-            - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - blueprint-packaging:
-          requires:
-            - getting-started
-          filters:
-            branches:
-              only: master
+      - blueprint-packaging
+#      - blueprint-validation
+#      - getting-started:
+#          requires:
+#            - blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - blueprint-packaging:
+#          requires:
+#            - getting-started
+#          filters:
+#            branches:
+#              only: master
   nightly:
     triggers:
     - schedule:
