@@ -37,7 +37,7 @@ To learn how to create secrets, see [creating secrets](#how-to-create-secrets).
 
 ## Installation steps
 
-First you will need to make sure that you have the latest getting-started blueprint. These are located at [Blueprint Examples Releases](https://github.com/cloudify-community/blueprint-examples/releases). Look for the zip archive with a name similar to __getting-started-5.0.5-0.zip__. Copy the link URL. You will need it to complete these steps.
+First you will need to make sure that you have the latest getting-started blueprint. These are located at [Blueprint Examples Releases](https://github.com/cloudify-community/blueprint-examples/releases). Look for the zip archive with a name similar to __getting-started-5.0.5-24.zip__. Copy the link URL. You will need it to complete these steps.
 
 There are two methods to install the getting started application:
 
