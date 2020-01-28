@@ -128,7 +128,7 @@ class NewRelease(object):
         logging.info('Updating Getting Started!')
         if not path.exists(file_path):
             raise Exception('Tried to update getting started but failed.')
-        lines = open(file_path, 'r').read()
+        lines = open(file_path, 'r').readlines()
         lines = [sub(r"[\d\.]+\-[\d]+", self.version, l) for l in lines]
         for line in lines:
             logging.info('Line: {0}'.format(line))
