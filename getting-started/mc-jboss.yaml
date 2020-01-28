@@ -82,5 +82,5 @@ node_templates:
 outputs:
   admin_url:
     description: Administration console URL
-    value: { concat: [ 'http://', { get_input: infra_deployment_id }, endpoint ] }, ':9990/console' ] }
+    value: { concat: [ 'http://', { get_capability: [ { get_input: infra_deployment_id }, endpoint] }, ':9990/console' ] }
 
