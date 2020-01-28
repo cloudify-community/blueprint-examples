@@ -7,11 +7,6 @@ imports:
 
 inputs:
 
-  region:
-    type: string
-    description: The Openstack region.
-    default: RegionOne
-
   external_network_id:
     type: string
     description: A network that provisions floating IPs.
@@ -46,7 +41,7 @@ dsl_definitions:
 
   openstack_config: &openstack_config
     auth_url: { get_secret: openstack_auth_url }
-    region_name: { get_input: region }
+    region_name: { get_secret: openstack_region }
     project_name: { get_secret: openstack_tenant_name }
     username: { get_secret: openstack_username }
     password: { get_secret: openstack_password }

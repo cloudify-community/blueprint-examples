@@ -13,21 +13,25 @@ inputs:
     type: string
     constraints:
       - valid_values:
-          - infra-openstack
-          - infra-azure
-          - infra-aws
-          - infra-gcp
+          - openstack
+          - azure
+          - aws
+          - gcp
 
   infra_archive:
     description: >
       URL of infra zip file.
     type: string
-    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-19/getting-started-infra.zip'
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-20/getting-started-infra.zip'
 
   infra_exists:
     description: >
       Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
     default: false
+
+  infra_deployment_id:
+    description: The blueprint name, the deployment name.
+    default: { concat: [ 'infra', { get_input: infra_name } ] }
 
 node_templates:
 
@@ -36,9 +40,12 @@ node_templates:
     properties:
       resource_config:
         blueprint:
-          id: { get_input: infra_blueprint }
+          id: { get_input: infra_deployment_id }
           blueprint_archive: { get_input: infra_archive }
+          blueprint_name: { concat: [ { get_input: infra_name }, '.yaml' ] }
           external_resource: { get_input: infra_exists }
+        deployment:
+          id: { get_input: infra_deployment_id }
 
   jboss:
     type: cloudify.nodes.ApplicationServer
@@ -49,9 +56,9 @@ node_templates:
           inputs:
             script_path: scripts/create.sh
             fabric_env: &fabric_env
-              host_string: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ]}
-              user: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, user ]}
-              key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_filename ]}
+              host_string: { get_capability: [ { get_input: infra_deployment_id } , endpoint ] }
+              user: { get_capability: [ { get_input: infra_deployment_id }, user ] }
+              key: { get_capability: [ { get_input: infra_deployment_id }, key_filename ] }
 
         configure:
           implementation: fabric.fabric_plugin.tasks.run_script
@@ -75,5 +82,5 @@ node_templates:
 outputs:
   admin_url:
     description: Administration console URL
-    value: { concat: [ 'http://', { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ] }, ':9990/console' ] }
+    value: { concat: [ 'http://', { get_input: infra_deployment_id }, endpoint ] }, ':9990/console' ] }
 
