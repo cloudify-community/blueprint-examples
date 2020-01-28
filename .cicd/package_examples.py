@@ -70,20 +70,21 @@ class NewRelease(object):
 
     @property
     def version(self):
-        if not self._version:
-            blueprints_version = get_cloudify_version()
-            version = self._get_last_version()
-            logging.info(
-                'Old version: {0}. New version: {1}'.format(
-                    blueprints_version, version))
-            if blueprints_version > version:
-                version = blueprints_version
-            try:
-                self._version = '{0}-{1}'.format(
-                    version.split('-')[0],
-                    str(int(version.split('-')[1]) + 1))
-            except IndexError:
-                self._version = '{0}-{1}'.format(version, str(0))
+        if self._version:
+            return self._version
+        blueprints_version = get_cloudify_version()
+        version = self._get_last_version()
+        logging.info(
+            'Old version: {0}. New version: {1}'.format(
+                blueprints_version, version))
+        if blueprints_version > version:
+            version = blueprints_version
+        try:
+            self._version = '{0}-{1}'.format(
+                version.split('-')[0],
+                str(int(version.split('-')[1]) + 1))
+        except IndexError:
+            self._version = '{0}-{1}'.format(version, str(0))
         return self._version
 
     @property
@@ -126,8 +127,9 @@ class NewRelease(object):
     def update_getting_started(self, file_path):
         if not path.exists(file_path):
             raise Exception('Tried to update getting started but failed.')
+        last_version = self._get_last_version() or r"[\d\.]+\-[\d]+"
         lines = open(file_path, 'r').read()
-        lines = [sub(r"[\d\.]+\-[\d]+", self.version, l) for l in lines]
+        lines = [sub(last_version, self.version, l) for l in lines]
         f = open(file_path, 'w')
         f.writelines(lines)
         f.close()
