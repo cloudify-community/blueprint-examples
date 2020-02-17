@@ -36,9 +36,8 @@ inputs:
     default: n1-standard-2
 
   agent_user:
-    description: >
-      The username of the agent running on the instance created from the image.
-    default: 'centos'
+    description: The username of the agent running on the instance created from the image.
+    default: centos
 
 dsl_definitions:
 

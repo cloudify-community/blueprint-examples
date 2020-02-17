@@ -21,7 +21,7 @@ inputs:
 
   kubespray_dns_mode:
     type: string
-    default: kubedns
+    default: coredns
 
   kubespray_kube_network_plugin:
     type: string
@@ -29,7 +29,12 @@ inputs:
 
   kubespray_ansible_ssh_common_args:
     type: string
-    default: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null'
+    default: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null -o "StrictHostKeyChecking no"'
+
+  ansible_env_vars:
+    default:
+      ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+      ANSIBLE_HOST_KEY_CHECKING: "False"
 
 relationships:
 
@@ -73,16 +78,19 @@ relationships:
                 dns_mode: { get_input: kubespray_dns_mode}
                 kube_network_plugin: { get_input: kubespray_kube_network_plugin }
                 kube_api_anonymous_auth: true
+#                upstream_dns_servers:
+#                - 8.8.8.8
+#                - 8.8.4.4
+
             options_config:
               default:
                 skip_tags:
-                  - localhost
+                  # - localhost
                   - check
                   - bastion
                 ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
             ansible_env_vars:
-              default:
-                ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+              default: { get_input: ansible_env_vars }
         unlink:
           implementation: ansible.cloudify_ansible.tasks.ansible_remove_host
           inputs:
@@ -112,14 +120,16 @@ node_templates:
               dns_mode: { get_input: kubespray_dns_mode}
               kube_network_plugin: { get_input: kubespray_kube_network_plugin }
               kube_api_anonymous_auth: true
+#              upstream_dns_servers:
+#              - 8.8.8.8
+#              - 8.8.4.4
             options_config:
               skip_tags:
                 - localhost
                 - check
                 - bastion
               ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
-            ansible_env_vars:
-              ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+            ansible_env_vars: { get_input: ansible_env_vars }
     relationships:
       # master can't be scalled
       - type: cloudify.ansible.relationships.connected_to_host
