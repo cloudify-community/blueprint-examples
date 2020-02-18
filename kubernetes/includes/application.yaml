@@ -1,6 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
-description: Install Kubernetes on kube-master and kube-node.
+description: Install Kubernetes on kube-master and kube-node with kubespray.
 
 imports:
   - plugin:cloudify-ansible-plugin
