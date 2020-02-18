@@ -6,8 +6,7 @@ imports:
 inputs:
 
   webserver_port:
-    description: >
-      The HTTP web server port.
+    description: The HTTP web server port.
     default: 8000
 
 node_templates:
