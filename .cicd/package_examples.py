@@ -32,7 +32,8 @@ ASSET_TYPE = 'zip'
 RELEASE_MESSAGE = """Example blueprints for use with Cloudify version {0}.
 This is package number {1} to be released for this version of Cloudify.
 Always try to use the latest package for your version of Cloudify."""
-GETTING_STARTED = ['getting-started/mc-jboss.yaml']
+GETTING_STARTED = ['getting-started/mc-jboss.yaml',
+                   'getting-started/mc-nodejs.yaml']
 
 logging.basicConfig(level=logging.INFO)
 

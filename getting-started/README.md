@@ -70,7 +70,6 @@ cfy executions start install -d [BLUEPRINT ID]
 
 Select **Local Blueprints** from the menu on the left.
 
-<<<<<<< HEAD
 On the right side of the local blueprints page, select **Upload**.
 
 Paste the URL of the blueprint package in the **URL** field. Provide any name you like.
