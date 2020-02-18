@@ -1,7 +1,7 @@
 [submodule "kubernetes/kubespray"]
-    branch = cloudify-blueprint-examples
+    branch = release-2.12
     path = kubernetes/kubespray
-    url = https://github.com/EarthmanT/kubespray.git
+    url = https://github.com/kubernetes-sigs/kubespray.git
 [submodule "db-lb-app/db/mariadb"]
 	path = db-lb-app/db/mariadb
 	url = https://github.com/EarthmanT/mariadb-ansible-galera-cluster.git

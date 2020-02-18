@@ -102,6 +102,7 @@ node_templates:
                   ansible_user: { get_property: [ kube-master, agent_config, user ] }
                   ansible_ssh_private_key_file: { get_property: [ kube-master, agent_config, key ] }
                   ansible_become: true
+                  ansible_ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
 
 
 outputs:
