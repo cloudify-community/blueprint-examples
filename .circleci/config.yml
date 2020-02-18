@@ -320,12 +320,12 @@ workflows:
   tests:
     jobs:
       - blueprint-validation
-      - getting-started:
-          requires:
-            - blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - getting-started:
+#          requires:
+#            - blueprint-validation
+#          filters:
+#            branches:
+#              only: master
       - blueprint-packaging:
           requires:
             - getting-started
