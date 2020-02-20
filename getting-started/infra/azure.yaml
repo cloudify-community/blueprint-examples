@@ -159,7 +159,7 @@ node_templates:
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 101
-            access: Allo:q:w
+            access: Allow
             direction: Inbound
         - name: http_jboss
           properties:
