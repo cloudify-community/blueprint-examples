@@ -201,6 +201,10 @@ jobs:
             trap EXIT
             set -x
       - run:
+          name: Install Terraform
+          description: The user needs the Terraform plugin, which is not included out-of-the-box.
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-terraform-plugin/0.7/cloudify_terraform_plugin-0.7-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/terraform-plugin/0.7/plugin.yaml || true
+      - run:
           name: Install Simple
           command: |
             DEP_ID=simple-hello-world-example
