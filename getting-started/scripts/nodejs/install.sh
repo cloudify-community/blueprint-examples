@@ -9,10 +9,3 @@ EOF
 
 sudo yum -y install nodejs
 sudo npm install http-server -g
-ctx download-resource-and-render resources/index.html /home/centos/index.html
-
-
-
-
-
-
