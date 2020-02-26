@@ -284,6 +284,9 @@ jobs:
           name: install updated utilities
           command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-utilities-plugin/1.14.0/cloudify_utilities_plugin-1.14.0-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/utilities-plugin/1.13.0/plugin.yaml || true
       - run:
+          name: install updated terraform
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-terraform-plugin/0.7/cloudify_terraform_plugin-0.7-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/terraform-plugin/0.7/plugin.yaml || true
+      - run:
           name: execute test
           command: pytest -s .cicd/test_examples.py
 
