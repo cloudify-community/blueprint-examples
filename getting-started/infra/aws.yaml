@@ -4,7 +4,7 @@ description: >
   This blueprint creates an AWS infrastructure environment.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-utilities-plugin
 

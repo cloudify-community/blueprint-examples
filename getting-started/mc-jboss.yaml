@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Cloudify Getting Started blueprint. Deploys JBoss.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-fabric-plugin
 
 inputs:
@@ -15,7 +15,9 @@ inputs:
       - valid_values:
           - openstack
           - azure
+          - azure-arm
           - aws
+          - aws-terraform
           - gcp
 
   infra_archive:
@@ -54,7 +56,7 @@ node_templates:
         create:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/create.sh
+            script_path: scripts/jboss/create.sh
             fabric_env: &fabric_env
               host_string: { get_capability: [ { get_input: infra_deployment_id } , endpoint ] }
               user: { get_capability: [ { get_input: infra_deployment_id }, user ] }
@@ -63,17 +65,17 @@ node_templates:
         configure:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/configure.sh
+            script_path: scripts/jboss/configure.sh
             fabric_env: *fabric_env
         start:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/start.sh
+            script_path: scripts/jboss/start.sh
             fabric_env: *fabric_env
         stop:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/stop.sh
+            script_path: scripts/jboss/stop.sh
             fabric_env: *fabric_env
     relationships:
       - type: cloudify.relationships.depends_on

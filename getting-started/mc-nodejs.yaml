@@ -4,7 +4,7 @@ description: >
   Deploys Nodejs.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-utilities-plugin
 
@@ -17,13 +17,16 @@ inputs:
       - valid_values:
           - openstack
           - azure
+          - azure-arm
           - aws
+          - aws-terraform
           - gcp
 
   infra_archive:
     description: >
       URL of infra zip file.
     type: string
+    # Don't update this line - it is being updated automatically during merging.
     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.0-24/getting-started-infra.zip'
 
   infra_exists:
@@ -49,7 +52,6 @@ node_templates:
         deployment:
           id: { get_input: infra_deployment_id }
 
-
   nodejs:
     type: cloudify.nodes.ApplicationServer
     interfaces:
@@ -57,11 +59,11 @@ node_templates:
         create:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/nodejs.sh
+            script_path: scripts/nodejs/install.sh
             fabric_env: &fabric_env
               host_string: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ]}
               user: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, user ]}
-              key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_filename ]}
+              key_filename: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_filename ]}
               always_use_pty: false
     relationships:
       - type: cloudify.relationships.depends_on
@@ -74,16 +76,34 @@ node_templates:
         create:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/http_server.sh
+            script_path: scripts/http-server/install.sh
             fabric_env: *fabric_env
         stop:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/http_server_stop.sh
+            script_path: scripts/http-server/stop.sh
             fabric_env: *fabric_env
     relationships:
       - type: cloudify.relationships.contained_in
         target: nodejs
+
+  sample_app:
+    type: cloudify.nodes.SoftwareComponent
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/app/install.sh
+            fabric_env: *fabric_env
+        delete:
+          implementation: fabric.fabric_plugin.tasks.run_script
+          inputs:
+            script_path: scripts/app/delete.sh
+            fabric_env: *fabric_env
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: http_server
 
 outputs:
   admin_url:

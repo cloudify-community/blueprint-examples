@@ -1,0 +1,76 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates infrastructure on AWS using Terraform.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-terraform-plugin
+
+inputs:
+  terraform_installation_source:
+    description: >
+      Where to get Terraform from.
+    type: string
+    default: 'https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip'
+  terraform_plugins:
+    type: list
+    default:
+      - 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
+      - 'https://releases.hashicorp.com/terraform-provider-aws/2.49.0/terraform-provider-aws_2.49.0_linux_amd64.zip'
+  terraform_executable:
+    type: string
+    default: '/tmp/terraform/bin/terraform'
+  terraform_plugins_dir:
+    type: string
+    default: '/tmp/terraform/plugins'
+  terraform_storage_path:
+    type: string
+    default: '/tmp/terraform/storage'
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'centos'
+
+node_templates:
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      use_existing_resource: false
+      installation_source: { get_input: terraform_installation_source }
+      plugins: { get_input: terraform_plugins }
+      executable_path: { get_input: terraform_executable }
+      plugins_dir: { get_input: terraform_plugins_dir }
+      storage_path: { get_input: terraform_storage_path }
+
+  cloud_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      executable_path: { get_property: [ terraform, executable_path ] }
+      plugins_dir: { get_property: [ terraform, plugins_dir ] }
+      storage_path: { get_property: [ terraform, storage_path ] }
+      resource_config:
+        variables:
+          access_key: { get_secret: aws_access_key_id }
+          secret_key: { get_secret: aws_secret_access_key }
+          aws_region: { get_secret: aws_region_name }
+          admin_user: { get_input: agent_user }
+          admin_key_public: { get_secret: agent_key_public }
+        source: resources/terraform/template.zip
+    relationships:
+      - target: terraform
+        type: cloudify.relationships.depends_on
+
+capabilities:
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ cloud_resources, resources, eip, instances, 0, attributes, public_ip ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_filename:
+    description: Private agent key
+    value: { get_secret: agent_key_private }
