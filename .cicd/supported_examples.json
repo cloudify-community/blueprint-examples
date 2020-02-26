@@ -78,6 +78,7 @@
     "aws.yaml",
     "aws-terraform.yaml",
     "azure.yaml",
+    "azure-arm.yaml",
     "openstack.yaml",
     "gcp.yaml"
   ],
