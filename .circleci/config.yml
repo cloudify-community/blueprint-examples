@@ -219,7 +219,6 @@ jobs:
             trap EXIT
             set -x
 
-
   blueprint-validation:
     machine:
       enabled: true
@@ -322,16 +321,16 @@ workflows:
   version: 2
   tests:
     jobs:
-#      - blueprint-validation
-#      - getting-started:
-#          requires:
-#            - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
+      - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
       - blueprint-packaging:
-#          requires:
-#            - getting-started
+          requires:
+            - getting-started
           filters:
             branches:
               only: master
