@@ -16,7 +16,7 @@ dsl_definitions:
 
 imports:
 
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
 
 inputs:

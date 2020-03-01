@@ -4,7 +4,7 @@ description: >
   Fetch existing: Resource group, security group, network and 4 subnets.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-azure-plugin
 
 inputs:
