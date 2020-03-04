@@ -17,6 +17,7 @@ inputs:
       - valid_values:
           - openstack
           - azure
+          - azure-arm
           - aws
           - aws-terraform
           - gcp

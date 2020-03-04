@@ -18,7 +18,7 @@ description: >
 # to allow using the Deployment Proxy mechanism.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
 
 # The inputs section includes the names of the particular blueprints and
 # deployments which this blueprint will leverage.

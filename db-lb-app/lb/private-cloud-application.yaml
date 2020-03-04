@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Install HAProxy on infrastructure.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.0/types.yaml
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - infrastructure--blueprint:private-cloud-vm
   - plugin:cloudify-ansible-plugin
 
