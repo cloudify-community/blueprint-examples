@@ -2,6 +2,8 @@
 
 Upon completion of this example we will have a complete running network service.
 
+For detailed documentation, please see [VNF Guide](https://docs.cloudify.co/5.0.5/bestpractices/vnfguide/).
+
 ![ns](https://user-images.githubusercontent.com/30900001/52050834-12889e00-2552-11e9-9a68-452e92cc7014.png)
 
 This series of blueprints demonstrates how to install a simple network service consisting of a load balancer and a firewall. To make it a tad more interesting we will be deploying a simple web service to allow for complete user experience. All of the examples are currently implemented only for Azure and OpenStack.
