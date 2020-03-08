@@ -130,7 +130,7 @@ jobs:
                 cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
             }
             trap cleanup EXIT
-            cfy install getting-started/ -n mc-jboss.yaml -i infra_name=aws -b $DEP_ID -vv
+            cfy install getting-started/mc-jboss.yaml -i infra_name=aws -b $DEP_ID -vv
             sleep 5
             curl -I `cfy dep out ${DEP_ID} --json | jq -r '.admin_url'`
             cfy uninstall $DEP_ID
@@ -150,7 +150,7 @@ jobs:
                 cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
             }
             trap cleanup EXIT
-            cfy install getting-started/ -n mc-jboss.yaml -i infra_name=azure -b $DEP_ID -vv
+            cfy install getting-started/mc-jboss.yaml -i infra_name=azure -b $DEP_ID -vv
             sleep 5
             curl -I `cfy dep out ${DEP_ID} --json | jq -r '.admin_url'`
             cfy uninstall $DEP_ID
@@ -170,7 +170,7 @@ jobs:
                 cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
             }
             trap cleanup EXIT
-            cfy install getting-started/ -n mc-jboss.yaml -i infra_name=gcp -b $DEP_ID -vv
+            cfy install getting-started/mc-jboss.yaml -i infra_name=gcp -b $DEP_ID -vv
             sleep 5
             curl -I `cfy dep out ${DEP_ID} --json | jq -r '.admin_url'`
             cfy uninstall $DEP_ID
@@ -194,7 +194,7 @@ jobs:
                 cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
             }
             trap cleanup EXIT
-            cfy install getting-started/ -n mc-jboss.yaml -i infra_name=openstack -b $DEP_ID -vv
+            cfy install getting-started/mc-jboss.yaml -i infra_name=openstack -b $DEP_ID -vv
             sleep 5
             curl -I `cfy dep out ${DEP_ID} --json | jq -r '.admin_url'`
             cfy uninstall $DEP_ID
