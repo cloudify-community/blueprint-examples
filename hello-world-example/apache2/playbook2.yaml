@@ -1,0 +1,59 @@
+- hosts: all
+  become: true
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+  tasks:
+
+    - name: install apache2
+      apt:
+        update_cache: yes
+        state: latest
+        name:
+          - apache2-doc
+          - apache2-utils
+          - apache2
+
+    - name: enabled mod_rewrite
+      apache2_module: name=rewrite state=present
+
+    - name: execute a2dissite
+      command: a2dissite 000-default.conf
+
+    - name: Make sure the dir exists.
+      file:
+        path: "/var/www/example.com/{{item}}"
+        owner: root
+        group: root
+        mode: 0755
+        recurse: yes
+        state: directory
+      with_items: ["public_html", "logs"]
+
+    - name: Make sure the log file exists.
+      file:
+        path: "/var/www/example.com/logs/{{item}}"
+        owner: root
+        group: root
+        mode: 0775
+        state: touch
+      with_items: ["access.log", "error.log"]
+
+    - name: Make sure image
+      copy:
+        src: cloudify-logo.png
+        dest: /var/www/example.com/public_html/image.png
+
+    - name: Make sure index html
+      copy:
+        src: index2.html
+        dest: /var/www/example.com/public_html/index.html
+
+    - name: Make sure vhost
+      copy:
+        src: vhost
+        dest: /etc/apache2/sites-available/example.com.conf
+
+    - name: a2dissite
+      command: a2ensite example.com.conf
+      notify: restart apache2
