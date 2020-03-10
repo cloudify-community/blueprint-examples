@@ -1,0 +1,580 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - plugin:cloudify-aws-plugin
+  - plugin:cloudify-kubernetes-plugin
+
+inputs:
+
+  aws_access_key_id:
+    type: string
+    default: { get_secret: aws_access_key_id }
+
+  aws_secret_access_key:
+    type: string
+    default: { get_secret: aws_secret_access_key }
+
+  aws_region_name:
+    type: string
+    default: { get_secret: ec2_region_name }
+
+  ssh_keypair:
+    type: string
+    default: { get_secret: aws_keypair }
+
+  eks_cluster_name:
+    type: string
+    default: eks_cluster
+
+  eks_nodegroup_name:
+    type: string
+    default: eks_node_group
+
+  kubernetes_version:
+    type: string
+    default: '1.14'
+
+  service_account_name:
+    type: string
+    default: examples-user
+
+  service_account_namespace:
+    type: string
+    default: default
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_input: aws_access_key_id }
+    aws_secret_access_key: { get_input: aws_secret_access_key }
+    region_name: { get_input: aws_region_name }
+
+
+node_templates:
+
+  eks_service_iam_role:
+    type: cloudify.nodes.aws.iam.Role
+    properties:
+      resource_id: eks_service_iam_role
+      client_config: *client_config
+      resource_config:
+        RoleName: eks_test_role
+        Path: !!str /
+        AssumeRolePolicyDocument:
+          Version: !!str 2012-10-17
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: !!str eks.amazonaws.com
+              Action: !!str sts:AssumeRole
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: aws.cloudify_aws.iam.resources.role.create
+          inputs:
+            modify_role_attribute_args:
+              - PolicyArn: arn:aws:iam::aws:policy/AmazonEKSServicePolicy
+              - PolicyArn: arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+
+  eks_nodegroup_iam_role:
+    type: cloudify.nodes.aws.iam.Role
+    properties:
+      resource_id: eks_nodegroup_iam_role
+      client_config: *client_config
+      resource_config:
+        RoleName: eks_nodegroup_test_role
+        Path: !!str /
+        AssumeRolePolicyDocument:
+          Version: !!str 2012-10-17
+          Statement:
+          - Effect: Allow
+            Principal:
+              Service: !!str ec2.amazonaws.com
+            Action: !!str sts:AssumeRole
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: aws.cloudify_aws.iam.resources.role.create
+          inputs:
+            modify_role_attribute_args:
+              - PolicyArn: arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+              - PolicyArn: arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+              - PolicyArn: arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+
+  # eks_vpc_stack:
+  #   type: cloudify.nodes.aws.CloudFormation.Stack
+  #   properties:
+  #     client_config: *client_config
+  #     resource_config:
+  #       kwargs:
+  #         StackName: EKS-VPC
+  #         Parameters:
+  #         - ParameterKey: VpcBlock
+  #           ParameterValue: '192.168.0.0/16'
+  #         - ParameterKey: PublicSubnet01Block
+  #           ParameterValue: '192.168.128.0/18'
+  #         - ParameterKey: PublicSubnet02Block
+  #           ParameterValue: '192.168.192.0/18'
+  #         - ParameterKey: PrivateSubnet01Block
+  #           ParameterValue: '192.168.0.0/18'
+  #         - ParameterKey: PrivateSubnet02Block
+  #           ParameterValue: '192.168.64.0/18'
+  #         TemplateURL: https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-11-15/amazon-eks-vpc-private-subnets.yaml
+
+
+  vpc:
+    type: cloudify.nodes.aws.ec2.Vpc
+    properties:
+      resource_config:
+        CidrBlock: '10.0.0.0/16'
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: VPC
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: shared
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure:
+          implementation: aws.cloudify_aws.ec2.resources.vpc.create
+          inputs:
+            modify_vpc_attribute_args:
+              EnableDnsHostnames:
+                Value: True
+
+  internet_gateway:
+    type: cloudify.nodes.aws.ec2.InternetGateway
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: vpc
+
+  private_subnet_01:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: '10.0.0.0/24'
+        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'a' ] }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: eks_private_subnet_01
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: shared
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  private_route_table_01:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: private_subnet_01
+
+  private_subnet_02:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: '10.0.1.0/24'
+        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'b' ] }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: eks_private_subnet_02
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: shared
+        - Key: kubernetes.io/role/internal-elb
+          Value: '1'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  private_route_table_02:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: private_subnet_02
+
+  public_subnet_01:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: '10.0.2.0/24'
+        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'a' ] }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: eks_public_subnet_01
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: shared
+        - Key: kubernetes.io/role/elb
+          Value: '1'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  public_subnet_02:
+    type: cloudify.nodes.aws.ec2.Subnet
+    properties:
+      resource_config:
+        CidrBlock: '10.0.3.0/24'
+        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'b' ] }
+      client_config: *client_config
+      Tags:
+        - Key: Name
+          Value: eks_public_subnet_02
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: shared
+        - Key: kubernetes.io/role/elb
+          Value: '1'
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+      - type: cloudify.relationships.depends_on
+        target: internet_gateway
+
+  public_route_table_01:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: public_subnet_01
+
+  public_route_internet_gateway_01:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_route_table_01
+      - type: cloudify.relationships.connected_to
+        target: internet_gateway
+
+  public_route_table_02:
+    type: cloudify.nodes.aws.ec2.RouteTable
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: public_subnet_02
+
+  public_route_internet_gateway_02:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_route_table_02
+      - type: cloudify.relationships.connected_to
+        target: internet_gateway
+
+  elastic_ip_01:
+   type: cloudify.nodes.aws.ec2.ElasticIP
+   properties:
+     resource_config:
+       kwargs:
+         Domain: 'vpc'
+     client_config: *client_config
+
+  private_nat_gateway_01:
+    type: cloudify.nodes.aws.ec2.NATGateway
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: public_subnet_01
+      - type: cloudify.relationships.depends_on
+        target: elastic_ip_01
+
+  elastic_ip_02:
+   type: cloudify.nodes.aws.ec2.ElasticIP
+   properties:
+     resource_config:
+       kwargs:
+         Domain: 'vpc'
+     client_config: *client_config
+
+  private_nat_gateway_02:
+    type: cloudify.nodes.aws.ec2.NATGateway
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: public_subnet_02
+      - type: cloudify.relationships.depends_on
+        target: elastic_ip_02
+
+  route_private_subnet_nat_gateway_01:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_route_table_01
+      - type: cloudify.relationships.connected_to
+        target: private_nat_gateway_01
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  route_private_subnet_nat_gateway_02:
+    type: cloudify.nodes.aws.ec2.Route
+    properties:
+      resource_config:
+        kwargs:
+          DestinationCidrBlock: '0.0.0.0/0'
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_route_table_02
+      - type: cloudify.relationships.connected_to
+        target: private_nat_gateway_02
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop: {}
+
+  security_group:
+    type: cloudify.nodes.aws.ec2.SecurityGroup
+    properties:
+      resource_config:
+        GroupName: EKS_Test_Group
+        Description: The group for EKS test.
+        VpcId: { get_attribute: [ vpc, aws_resource_id ]}
+      client_config: *client_config
+      Tags:
+        - Key:
+            concat:
+              - kubernetes.io/cluster/
+              - { get_input: eks_cluster_name }
+          Value: owned
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: vpc
+
+  security_group_rules:
+    type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          IpPermissions:
+           - IpProtocol: "-1"
+             FromPort: -1
+             ToPort: -1
+             IpRanges:
+              - CidrIp: 0.0.0.0/0
+             UserIdGroupPairs: [  { GroupId: { get_attribute: [ security_group, aws_resource_id ] } } ]
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: security_group
+
+  eks_cluster:
+    type: cloudify.nodes.aws.eks.Cluster
+    properties:
+      resource_config:
+        kwargs:
+          name: { get_input: eks_cluster_name }
+          version: { get_input: kubernetes_version }
+          roleArn: { get_attribute: [ eks_service_iam_role, aws_resource_arn ] }
+          resourcesVpcConfig:
+            subnetIds:
+              - { get_attribute: [ private_subnet_01, aws_resource_id ] }
+              - { get_attribute: [ private_subnet_02, aws_resource_id ] }
+              - { get_attribute: [ public_subnet_01, aws_resource_id ] }
+              - { get_attribute: [ public_subnet_02, aws_resource_id ] }
+            securityGroupIds:
+              - { get_attribute: [ security_group, aws_resource_id ] }
+            endpointPublicAccess: True
+            endpointPrivateAccess: False
+      client_config: *client_config
+      store_kube_config_in_runtime: True
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: eks_service_iam_role
+      - type: cloudify.relationships.depends_on
+        target: private_subnet_01
+      - type: cloudify.relationships.depends_on
+        target: private_subnet_02
+      - type: cloudify.relationships.depends_on
+        target: public_subnet_01
+      - type: cloudify.relationships.depends_on
+        target: public_subnet_02
+      - type: cloudify.relationships.depends_on
+        target: security_group
+      - type: cloudify.relationships.depends_on
+        target: private_nat_gateway_01
+      - type: cloudify.relationships.depends_on
+        target: private_nat_gateway_02
+      - type: cloudify.relationships.depends_on
+        target: public_route_internet_gateway_01
+      - type: cloudify.relationships.depends_on
+        target: public_route_internet_gateway_02
+
+  eks_node_group:
+    type: cloudify.nodes.aws.eks.NodeGroup
+    properties:
+      resource_config:
+        kwargs:
+          clusterName: { get_input: eks_cluster_name }
+          nodegroupName: { get_input: eks_nodegroup_name }
+          scalingConfig:
+            minSize: 1
+            maxSize: 1
+            desiredSize: 1
+          diskSize: 20
+          subnets:
+              - { get_attribute: [ private_subnet_01, aws_resource_id ] }
+              - { get_attribute: [ private_subnet_02, aws_resource_id ] }
+              - { get_attribute: [ public_subnet_01, aws_resource_id ] }
+              - { get_attribute: [ public_subnet_02, aws_resource_id ] }
+          instanceTypes:
+            - t3.medium
+          amiType: AL2_x86_64
+          nodeRole: { get_attribute: [ eks_nodegroup_iam_role, aws_resource_arn ] }
+          remoteAccess:
+            ec2SshKey: { get_input: ssh_keypair }
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: eks_nodegroup_iam_role
+      - type: cloudify.relationships.depends_on
+        target: eks_cluster
+
+  kubernetes_master:
+    type: cloudify.kubernetes.nodes.Master
+    properties:
+      configuration:
+        file_content: { get_attribute: [ eks_cluster, kubeconf ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: eks_node_group
+
+  new_service_account:
+    type: cloudify.kubernetes.resources.ServiceAccount
+    properties:
+      definition:
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: { get_input: service_account_name }
+          namespace: { get_input: service_account_namespace }
+      options:
+        namespace: { get_input: service_account_namespace }
+    relationships:
+      - type: cloudify.kubernetes.relationships.managed_by_master
+        target: kubernetes_master
+
+  new_role_binding:
+    type: cloudify.kubernetes.resources.RoleBinding
+    properties:
+      definition:
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: ClusterRoleBinding
+        metadata:
+          name: { get_input: service_account_name }
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+        subjects:
+        - kind: ServiceAccount
+          name: { get_input: service_account_name }
+          namespace: { get_input: service_account_namespace }
+      options:
+        namespace: { get_input: service_account_namespace }
+    relationships:
+      - type: cloudify.kubernetes.relationships.managed_by_master
+        target: kubernetes_master
+
+  secret:
+    type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+    properties:
+      use_external_resource: true
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: {get_attribute: [new_service_account, kubernetes, secrets, 0, name]}
+      api_mapping:
+        create:
+          api: CoreV1Api
+          method: create_namespaced_secret
+          payload: V1Secret
+        read:
+          api: CoreV1Api
+          method: read_namespaced_secret
+        update:
+          api: CoreV1Api
+          method: replace_namespaced_secret
+          payload: V1Secret
+        delete:
+          api: CoreV1Api
+          method: delete_namespaced_secret
+          payload: V1DeleteOptions
+    relationships:
+      - type: cloudify.kubernetes.relationships.managed_by_master
+        target: kubernetes_master
+      - type: cloudify.relationships.depends_on
+        target: new_role_binding
+      - type: cloudify.relationships.depends_on
+        target: new_service_account
+
+  store_token:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/store_kube_token.py
+          executor: central_deployment_agent
+          inputs:
+            kube_token: {get_attribute: [secret, kubernetes, data, token ]}
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: secret
