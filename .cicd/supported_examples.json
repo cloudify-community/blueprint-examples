@@ -47,6 +47,7 @@
     "gcp.yaml"
   ],
   "infoblox-example": ["example-infoblox-blueprint.yaml"],
+  "rest-plugin-cert": ["client-cert.yaml"],
   "open-source-vnf/connected-host": ["openstack.yaml"],
   "open-source-vnf/network-topology": ["openstack.yaml"],
   "open-source-vnf/httpd": ["openstack.yaml"],
