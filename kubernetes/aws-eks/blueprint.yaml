@@ -578,3 +578,32 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: secret
+
+  sanity_master:
+    type: cloudify.kubernetes.nodes.Master
+    properties:
+      configuration:
+        api_options:
+          host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
+          api_key: { get_secret: kubernetes_token }
+          debug: false
+          verify_ssl: false
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: store_token
+
+  sanity_pod:
+    type: cloudify.kubernetes.resources.Pod
+    properties:
+      definition:
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: nginx
+        spec:
+          containers:
+          - name: nginx
+            image: nginx:stable
+    relationships:
+      - type: cloudify.kubernetes.relationships.managed_by_master
+        target: sanity_master
