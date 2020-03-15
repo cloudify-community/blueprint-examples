@@ -17,19 +17,18 @@ inputs:
 
   aws_region_name:
     type: string
-    default: { get_secret: ec2_region_name }
+    default: { get_secret: aws_region_name }
 
-  ssh_keypair:
-    type: string
-    default: { get_secret: aws_keypair }
+  resource_suffix:
+    default: '-1'
 
   eks_cluster_name:
     type: string
-    default: eks_cluster
+    default: { concat: [ 'eks_cluster', { get_input: resource_suffix } ] }
 
   eks_nodegroup_name:
     type: string
-    default: eks_node_group
+    default: { concat: [ 'eks_node_group', { get_input: resource_suffix } ] }
 
   kubernetes_version:
     type: string
@@ -43,6 +42,10 @@ inputs:
     type: string
     default: default
 
+  ssh_keypair:
+    type: string
+    default: { concat: [ 'eks_key', { get_input: resource_suffix } ] }
+
 dsl_definitions:
 
   client_config: &client_config
@@ -50,16 +53,23 @@ dsl_definitions:
     aws_secret_access_key: { get_input: aws_secret_access_key }
     region_name: { get_input: aws_region_name }
 
-
 node_templates:
+
+  eks_keypair:
+    type: cloudify.nodes.aws.ec2.Keypair
+    properties:
+      client_config: *client_config
+      resource_config:
+        KeyName: { get_input: ssh_keypair }
+        PublicKeyMaterial: { get_secret: agent_key_public }
 
   eks_service_iam_role:
     type: cloudify.nodes.aws.iam.Role
     properties:
-      resource_id: eks_service_iam_role
+      resource_id: { concat: [ 'eks_service_iam_role', { get_input: resource_suffix } ] }
       client_config: *client_config
       resource_config:
-        RoleName: eks_test_role
+        RoleName: { concat: [ 'eks_test_role', { get_input: resource_suffix } ] }
         Path: !!str /
         AssumeRolePolicyDocument:
           Version: !!str 2012-10-17
@@ -80,10 +90,10 @@ node_templates:
   eks_nodegroup_iam_role:
     type: cloudify.nodes.aws.iam.Role
     properties:
-      resource_id: eks_nodegroup_iam_role
+      resource_id: { concat: [ 'eks_nodegroup_iam_role', { get_input: resource_suffix } ] }
       client_config: *client_config
       resource_config:
-        RoleName: eks_nodegroup_test_role
+        RoleName: { concat: [ 'eks_nodegroup_test_role', { get_input: resource_suffix } ] }
         Path: !!str /
         AssumeRolePolicyDocument:
           Version: !!str 2012-10-17
@@ -384,7 +394,7 @@ node_templates:
     type: cloudify.nodes.aws.ec2.SecurityGroup
     properties:
       resource_config:
-        GroupName: EKS_Test_Group
+        GroupName: { concat: [ 'EKS_Test_Group', { get_input: resource_suffix } ] }
         Description: The group for EKS test.
         VpcId: { get_attribute: [ vpc, aws_resource_id ]}
       client_config: *client_config
