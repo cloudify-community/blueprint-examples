@@ -14,7 +14,7 @@ The components are:
   - Plugins:
     - `cloudify-aws-plugin`
     - `cloudify-azure-plugin`
-    - `cloudify-gcp-plugin`
+    - `cloudify-gcp-plugin version 1.6.0 or higher `
     - `cloudify-openstack-plugin v3`
     - `cloudify-utilites-plugin`
     - `cloudify-ansible-plugin`
@@ -35,12 +35,7 @@ The components are:
       - `azure_client_secret`: Azure subscription ID: `cfy secrets create -u azure_client_secret -s ...........`.
       - `azure_location`: Azure subscription ID: `cfy secrets create -u azure_location -s westeurope`.
     - GCP:
-      - `gcp_client_x509_cert_url`: A GCP Service Account Client Cert URL: `cfy secrets create gcp_client_x509_cert_url -s client_cert_url`
-      - `gcp_client_email`: A GCP Service Account client email: `cfy secrets create gcp_client_email -s client_email`
-      - `gcp_client_id`: A GCP Service Account Client ID: `cfy secrets create gcp_client_id -s client_id`
-      - `gcp_project_id`: A GCP Project ID: `cfy secrets create gcp_project_id -s project_id`
-      - `gcp_private_key_id`: A GCP Project Private Key ID: `cfy secrets create gcp_private_key_id -s private_key_id`
-      - `gcp_private_key`: A GCP project Private Key: `cfy secrets create gcp_private_key -f ./path/to/private-key`.
+      - `gcp_credentials`: A GCP service account key in JSON format. **Hint: Create this secret from a file:** `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
       - `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`
       - `gcp_zone`: A GCP Zone such as `us-east1-b`: `cfy secrets create gcp_zone -s zone`
     - Openstack:
