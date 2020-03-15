@@ -33,11 +33,12 @@ inputs:
   location:
     type: string
     required: true
-    default: westus
     default: { get_secret: azure_location }
 
   resource_suffix:
-    default: '-1'
+    type: string
+    description: Must be a letter.
+    default: 'a'
 
   resource_group_name:
     type: string
@@ -49,7 +50,7 @@ inputs:
 
   public_key:
     type: string
-    default: ''
+    default: { get_secret: agent_key_public }
 
   service_account_name:
     type: string
