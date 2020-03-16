@@ -15,6 +15,7 @@ This document will guide you how to run the examples step by step.
 Download the example
 ```shell
 curl -L https://github.com/cloudify-cosmo/cloudify-hello-world-example/archive/master.zip -o cloudify-hello-world-example.zip
+i think its the wrong link!! fix that 
 ```
 
 Extract the example
@@ -87,7 +88,7 @@ cfy install azure.yaml -i location=eastus -i agent_password=OpenS3sVm3
 For **GCP**:
 
 ```shell
-cfy install gcp.yaml region=europe-west1
+cfy install gcp.yaml -i region=<region>
 ```
 
 For **Openstack**:
@@ -109,8 +110,14 @@ cfy install openstack.yaml \
      -i image=e41430f7-9131-495b-927f-e7dc4b8994c8 \
      -i flavor=2
 ```
-
-
+###Get deployment id:       
+```shell
+cfy deployments list         
+```
+###Get the URL of the webserver
+```shell
+cfy deployment outputs <deployment_id>
+```
 ## Using the Web UI
 
 ### Open the Web UI
