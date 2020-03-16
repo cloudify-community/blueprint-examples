@@ -301,12 +301,12 @@ workflows:
   tests:
     jobs:
 #      - blueprint-validation
-      - getting-started:
+#      - getting-started:
 #          requires:
 #            - blueprint-validation
-          filters:
-            branches:
-              only: master
+#          filters:
+#            branches:
+#              only: master
       - blueprint-packaging:
           requires:
             - getting-started

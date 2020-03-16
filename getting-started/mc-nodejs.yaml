@@ -63,7 +63,7 @@ node_templates:
             fabric_env: &fabric_env
               host_string: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ]}
               user: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, user ]}
-              key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_filename ]}
+              key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_content ]}
               always_use_pty: false
     relationships:
       - type: cloudify.relationships.depends_on
