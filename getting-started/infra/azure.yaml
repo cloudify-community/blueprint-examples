@@ -148,7 +148,7 @@ node_templates:
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 100
-            access: Allow
+            access: 'Allow'
             direction: Inbound
         - name: http
           properties:
@@ -159,7 +159,7 @@ node_templates:
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 101
-            access: Allow
+            access: 'Allow'
             direction: Inbound
         - name: http_jboss
           properties:
@@ -170,7 +170,7 @@ node_templates:
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 102
-            access: Allow
+            access: 'Allow'
             direction: Inbound
         - name: http_jboss_admin
           properties:
@@ -181,7 +181,7 @@ node_templates:
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
             priority: 103
-            access: Allow
+            access: 'Allow'
             direction: Inbound
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
