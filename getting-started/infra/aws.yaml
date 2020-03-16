@@ -216,6 +216,6 @@ capabilities:
     description: user ID.
     value: { get_input: agent_user }
 
-  key_filename:
+  key_content:
     description: Private agent key
     value: { get_secret: agent_key_private }
