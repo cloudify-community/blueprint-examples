@@ -60,7 +60,7 @@ node_templates:
             fabric_env: &fabric_env
               host_string: { get_capability: [ { get_input: infra_deployment_id } , endpoint ] }
               user: { get_capability: [ { get_input: infra_deployment_id }, user ] }
-              key: { get_capability: [ { get_input: infra_deployment_id }, key_filename ] }
+              key_filename: { get_capability: [ { get_input: infra_deployment_id }, key_filename ] }
 
         configure:
           implementation: fabric.fabric_plugin.tasks.run_script
