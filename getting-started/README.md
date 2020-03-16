@@ -207,14 +207,7 @@ If you need help locating your credentials, read about [Azure Plugin Configurati
 #### GCP secrets checklist
 
 If you are a GCP user, you must create the following secrets:
-
-  - [ ] `gcp_client_x509_cert_url`: A GCP Service Account Client Cert URL: `cfy secrets create gcp_client_x509_cert_url -s client_cert_url`
-  - [ ] `gcp_client_email`: A GCP Service Account client email: `cfy secrets create gcp_client_email -s client_email`
-  - [ ] `gcp_client_id`: A GCP Service Account Client ID: `cfy secrets create gcp_client_id -s client_id`
-  - [ ] `gcp_project_id`: A GCP Project ID: `cfy secrets create gcp_project_id -s project_id`
-  - [ ] `gcp_private_key_id`: A GCP Project Private Key ID: `cfy secrets create gcp_private_key_id -s private_key_id`
-  - [ ] `gcp_private_key`: A GCP project Private Key: `cfy secrets create gcp_private_key -f ./path/to/private-key`.
-  - [ ] `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`
+  - [ ] `gcp_credentials`: A GCP service account key in JSON format. **Hint: Create this secret from a file:** `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
   - [ ] `gcp_zone`: A GCP Zone such as `us-east1-b`: `cfy secrets create gcp_zone -s zone`
 
 If you need help locating your credentials, read about [GCP Plugin Configuration](https://docs.cloudify.co/5.0.0/working_with/official_plugins/infrastructure/gcp/).
@@ -238,3 +231,5 @@ If you are an Openstack user, you must create the following secrets:
 If you need help locating your credentials, read about [Openstack RC File](https://docs.openstack.org/zh_CN/user-guide/common/cli-set-environment-variables-using-openstack-rc.html), although sourcing is not enough, these values must be created as secrets:
 
 [Return to requirements](#requirements).
+
+add command to install the infra+app blueprints 
