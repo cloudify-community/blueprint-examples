@@ -308,8 +308,8 @@ workflows:
 #            branches:
 #              only: master
       - blueprint-packaging:
-          requires:
-            - getting-started
+#          requires:
+#            - getting-started
           filters:
             branches:
               only: master
