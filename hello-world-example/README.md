@@ -50,11 +50,15 @@ cfy secrets create azure_client_secret --secret-string <value>
 ```
 
 For **GCP**
-```shell
-gcp_credentials: A GCP service account key in JSON format. Hint: Create this secret from a file:
+
+gcp_credentials: A GCP service account key in JSON format. **Hint: Create this secret from a file:**
+```shell   
 `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
-gcp_zone: A GCP Zone such as `us-east1-b`: 
-`cfy secrets create gcp_zone --secret-string <zone>`
+```                                             
+gcp_zone: A GCP Zone such as `us-east1-b`:                                                              
+
+```shell
+cfy secrets create gcp_zone --secret-string <zone>                                                                                                                                              
 ```
 
 For **Openstack**
