@@ -1,0 +1,83 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-aws-plugin
+
+inputs:
+
+  aws_access_key_id:
+    type: string
+    default: { get_secret: aws_access_key_id }
+
+  aws_secret_access_key:
+    type: string
+    default: { get_secret: aws_secret_access_key }
+
+  aws_region_name:
+    type: string
+    default: { get_secret: ec2_region_name }
+
+  availability_zone:
+    type: string
+    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
+
+  vpc_cidr:
+    type: string
+    default: 172.30.0.0/16
+
+  subnet_cidr:
+    type: string
+    default: 172.30.0.0/24
+
+  resource_suffix:
+    default: '-a'
+
+  key_pair_name:
+    type: string
+    default: { concat: [ 'two_tier_key', { get_input: resource_suffix } ] }
+
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_input: aws_access_key_id }
+    aws_secret_access_key: { get_input: aws_secret_access_key }
+    region_name: { get_input: aws_region_name }
+
+node_templates:
+
+  two_tier_keypair:
+    type: cloudify.nodes.aws.ec2.Keypair
+    properties:
+      client_config: *client_config
+      resource_config:
+        KeyName: { get_input: key_pair_name }
+        PublicKeyMaterial: { get_secret: agent_key_public }
+
+  two_tier_stack:
+    type: cloudify.nodes.aws.CloudFormation.Stack
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          StackName: Two-Tier-Sample-Stack
+          Parameters:
+          - ParameterKey: InstanceType
+            ParameterValue: m1.small
+          - ParameterKey: KeyName
+            ParameterValue: { get_input: key_pair_name }
+          - ParameterKey: VpcCIDR
+            ParameterValue: { get_input: vpc_cidr }
+          - ParameterKey: SubnetCIDR
+            ParameterValue: { get_input: subnet_cidr }
+          TemplateURL: https://two-tier-example-cf.s3-eu-west-1.amazonaws.com/template.yaml
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: two_tier_keypair
+
+outputs:
+
+  ServerIP:
+    value:
+      { get_attribute: [ two_tier_stack, Outputs, 0, OutputValue ] }
