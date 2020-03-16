@@ -50,5 +50,5 @@ print requests.get("https://localhost:9999/authenticate", verify="nodejs/server_
 
 Check certificates by blueprint:
 ```shell
-cfy install rest-plugin-cert/client-cert.yaml
+cfy install rest-plugin-cert/client-cert.yaml -i rest-plugin-cert/client-cert-input.yaml
 ```
