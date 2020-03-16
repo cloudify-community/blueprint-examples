@@ -300,32 +300,32 @@ workflows:
   version: 2
   tests:
     jobs:
-#      - blueprint-validation
-#      - getting-started:
-#          requires:
-#            - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
-      - blueprint-packaging:
-#          requires:
-#            - getting-started
+      - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
           filters:
             branches:
               only: master
-#  nightly:
-#    triggers:
-#    - schedule:
-#        cron: "0 0 * * *"
-#        filters:
-#          branches:
-#            only:
-#              - master
-#    jobs:
-#      - blueprint-validation
-#      - getting-started:
-#          requires:
-#            - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
+      - blueprint-packaging:
+          requires:
+            - getting-started
+          filters:
+            branches:
+              only: master
+  nightly:
+    triggers:
+    - schedule:
+        cron: "0 0 * * *"
+        filters:
+          branches:
+            only:
+              - master
+    jobs:
+      - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
