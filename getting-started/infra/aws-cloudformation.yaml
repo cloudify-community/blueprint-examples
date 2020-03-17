@@ -16,7 +16,7 @@ inputs:
 
   aws_region_name:
     type: string
-    default: { get_secret: ec2_region_name }
+    default: { get_secret: aws_region_name }
 
   availability_zone:
     type: string
