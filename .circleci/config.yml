@@ -300,10 +300,10 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprint-validation
+#      - blueprint-validation
       - getting-started:
-          requires:
-            - blueprint-validation
+#          requires:
+#            - blueprint-validation
           filters:
             branches:
               only: master
