@@ -78,6 +78,14 @@ node_templates:
 
 outputs:
 
-  ServerIP:
-    value:
-      { get_attribute: [ two_tier_stack, Outputs, 0, OutputValue ] }
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ two_tier_stack, Outputs, 0, OutputValue ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_secret: agent_key_private }
