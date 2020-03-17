@@ -101,6 +101,10 @@ resource "aws_instance" "example_vm" {
 
   instance_type = "t2.micro"
 
+  tags = {
+    Name = "example-vm"
+  }
+
   # Lookup the correct AMI based on the region
   # we specified
   ami = lookup(var.aws_amis, var.aws_region)
