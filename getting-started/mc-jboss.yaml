@@ -18,6 +18,7 @@ inputs:
           - azure-arm
           - aws
           - aws-terraform
+          - aws-cloudformation
           - gcp
 
   infra_archive:
