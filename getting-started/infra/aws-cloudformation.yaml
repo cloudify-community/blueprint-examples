@@ -37,6 +37,10 @@ inputs:
     type: string
     default: { concat: [ 'two_tier_key', { get_input: resource_suffix } ] }
 
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'centos'
 
 dsl_definitions:
 
