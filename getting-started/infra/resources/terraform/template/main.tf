@@ -56,8 +56,8 @@ resource "aws_security_group" "example_security_group" {
   }
 
   ingress {
-    from_port   = 9090
-    to_port     = 9090
+    from_port   = 9990
+    to_port     = 9990
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
