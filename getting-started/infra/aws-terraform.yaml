@@ -63,6 +63,9 @@ node_templates:
         type: cloudify.relationships.depends_on
 
 capabilities:
+  name:
+    value: { get_attribute: [ cloud_resources, resources, example_vm, instances, 0, attributes, tags, Name ] }
+
   endpoint:
     description: The external endpoint of the application.
     value: { get_attribute: [ cloud_resources, resources, eip, instances, 0, attributes, public_ip ] }

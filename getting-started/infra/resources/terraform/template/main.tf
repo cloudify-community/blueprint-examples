@@ -56,8 +56,8 @@ resource "aws_security_group" "example_security_group" {
   }
 
   ingress {
-    from_port   = 9090
-    to_port     = 9090
+    from_port   = 9990
+    to_port     = 9990
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -100,6 +100,10 @@ resource "aws_instance" "example_vm" {
   }
 
   instance_type = "t2.micro"
+
+  tags = {
+    Name = "example-vm"
+  }
 
   # Lookup the correct AMI based on the region
   # we specified
