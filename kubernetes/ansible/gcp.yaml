@@ -2,7 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-gcp-plugin
+  - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin
   - includes/application.yaml
@@ -14,6 +14,11 @@ inputs:
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
     default: { get_secret: gcp_region }
+
+  zone:
+    type: string
+    description: The GCP zone to deploy the application in, such as europe-west1-b.
+    default: { get_secret: gcp_zone }
 
   network_name:
     type: string
@@ -43,7 +48,7 @@ dsl_definitions:
 
   client_config: &gcp_config
     auth: { get_secret: gcp_credentials }
-    zone: { get_secret: gcp_zone }
+    zone: { get_input: zone }
 
 node_types:
 
@@ -64,7 +69,7 @@ node_types:
       instance_type:
         default: { get_input: instance_type }
       zone:
-        default: { get_secret: gcp_zone }
+        default: { get_input: zone }
       external_ip:
         default: true
       startup_script:

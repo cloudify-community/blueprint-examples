@@ -2,7 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-gcp-plugin
+  - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
@@ -26,11 +26,21 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
+  region:
+    type: string
+    description: The GCP region to deploy the application in, such as europe-west1.
+    default: { get_secret: gcp_region }
+
+  zone:
+    type: string
+    description: The GCP zone to deploy the application in, such as europe-west1-b.
+    default: { get_secret: gcp_zone }
+
 dsl_definitions:
 
   client_config: &gcp_config
     auth: { get_secret: gcp_credentials }
-    zone: { get_secret: gcp_zone }
+    zone: { get_input: zone }
 
 node_templates:
 
