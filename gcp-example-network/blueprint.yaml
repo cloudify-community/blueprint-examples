@@ -4,7 +4,7 @@ description: A simple GCP example network.
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-gcp-plugin
+  - plugin:cloudify-gcp-plugin?version= >=1.6.0
 
 inputs:
   gcp_crdentials:
@@ -30,7 +30,7 @@ dsl_definitions:
 
   client_config: &client_config
     auth: { get_secret: gcp_credentials }
-    zone: { get_secret: gcp_zone }
+    zone: { get_input: zone }
 
 node_templates:
 
