@@ -34,12 +34,14 @@
   "db-lb-app/kube_app": [
     "application.yaml"
   ],
-  "kubernetes": [
+  "kubernetes/ansible": [
     "aws.yaml",
     "azure.yaml",
     "openstack.yaml",
     "baremetal.yaml"
   ],
+  "kubernetes/aws-eks": ["blueprint.yaml"],
+  "kubernetes/azure-aks": ["blueprint.yaml"],
   "prometheus": [
     "aws.yaml",
     "azure.yaml",
