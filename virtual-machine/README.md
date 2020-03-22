@@ -1,11 +1,8 @@
-# Cloudify Getting Started
+# Virtual Machine Examples
 
-This is a suite of blueprints that demonstrates how to design a Cloudify blueprint, while separating the infrastructure layer and the application layer.
+These blueprints demonstrate various methods for creating a virtual machine in different clouds.
 
-There are three components to this getting started guide:
-
-  - Infrastructure blueprints (there is a separate blueprint for AWS, Azure, Openstack, and GCP). These blueprints are not directly deployed, rather, the application blueprint leverages infrastructure blueprints to deploy the application on the Cloud of the user's choice. These infrastructure blueprints are available separately under `virtual-machine` example.
-  - JBoss Application blueprint
+For example, you may use the Cloudify node type for an AWS Instance in the `aws.yaml` or use a Cloud Formation template in `aws-cloudformation.yaml`.
 
 ## Requirements
 
@@ -66,35 +63,6 @@ Execute the install workflow on your deployment:
 cfy executions start install -d [BLUEPRINT ID]
 ```
 
-#### Install Getting Started with the UI
-
-Select **Local Blueprints** from the menu on the left.
-
-On the right side of the local blueprints page, select **Upload**.
-
-Paste the URL of the blueprint package in the **URL** field. Provide any name you like.
-
-Select *mc-jboss.yaml* from the **Blueprint YAML file** menu.
-
-You can leave the **Blueprint icon** field blank. It is only for decoration.
-
-Click **Upload**.
-
-The blueprint should appear in the blueprint list under the name you provided.
-
-On the right, you will see a rocket icon. Select, the rocket icon and you will enter the create deployment dialog.
-
-Provide a name you like in the **Deployment name** field.
-
-You can skip the **Site name** field.
-
-Provide values for any inputs that you would like to change.
-
-Click **Deploy**.
-
-The blueprint should appear in the deployment list under the name you provided.
-
-You can now select **Install** from the workflow menu under your deployment.
 
 # Appendix
 
