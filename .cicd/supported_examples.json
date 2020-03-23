@@ -56,25 +56,25 @@
   "open-source-vnf/haproxy": ["openstack.yaml"],
   "open-source-vnf/pfsense": ["openstack.yaml"],
   "open-source-vnf/service": ["openstack.yaml"],
-  "commercial-vnf/bigip": [
+  "network-automation-example/bigip": [
     "azure.yaml",
     "azureapp.yaml"
   ],
-  "commercial-vnf/e2e": [
+  "network-automation-example/e2e": [
     "azuree2e.yaml"
   ],
-  "commercial-vnf/fortigate": [
+  "network-automation-example/fortigate": [
     "azure.yaml",
     "azureapp.yaml"
   ],
-  "commercial-vnf/httpd": [
+  "network-automation-example/httpd": [
     "azure.yaml",
     "azureapp.yaml"
   ],
-  "commercial-vnf/network-topology": [
+  "network-automation-example/network-topology": [
     "azure.yaml"
   ],
-  "commercial-vnf/service": [
+  "network-automation-example/service": [
     "azure_service.yaml"
   ],
   "virtual-machine": [
