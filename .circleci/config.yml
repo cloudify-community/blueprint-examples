@@ -300,16 +300,17 @@ workflows:
   version: 2
   tests:
     jobs:
-#      - blueprint-validation
-      - getting-started:
+      - blueprint-validation
+#      - getting-started:
 #          requires:
 #            - blueprint-validation
-          filters:
-            branches:
-              only: master
+#          filters:
+#            branches:
+#              only: master
       - blueprint-packaging:
           requires:
-            - getting-started
+            - blueprint-validation
+#            - getting-started
           filters:
             branches:
               only: master
@@ -323,9 +324,9 @@ workflows:
               - master
     jobs:
       - blueprint-validation
-      - getting-started:
-          requires:
-            - blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - getting-started:
+#          requires:
+#            - blueprint-validation
+#          filters:
+#            branches:
+#              only: master

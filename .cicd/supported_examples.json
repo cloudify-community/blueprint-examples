@@ -76,7 +76,7 @@
   "commercial-vnf/service": [
     "azure_service.yaml"
   ],
-  "getting-started/infra": [
+  "virtual-machine": [
     "aws.yaml",
     "aws-terraform.yaml",
     "aws-cloudformation.yaml",
