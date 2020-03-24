@@ -91,16 +91,9 @@ jobs:
             cfy secrets create azure_client_secret -s `echo "${azure_client_secret}" | base64 --decode`
             cfy secrets create azure_location -s `echo "${azure_location}" | base64 --decode`
 
-            echo "${gcp_private_key}" | base64 --decode > gcp_key
+            echo "${gcp_credentials}" | base64 --decode > gcp_credentials.json
 
-            cfy secrets create gcp_client_x509_cert_url -s ${gcp_client_x509_cert_url}
-            cfy secrets create gcp_client_email -s `echo "${gcp_client_email}" | base64 --decode`
-            cfy secrets create gcp_client_id -s `echo "${gcp_client_id}" | base64 --decode`
-            cfy secrets create gcp_project_id -s `echo "${gcp_project_id}" | base64 --decode`
-            cfy secrets create gcp_private_key_id -s `echo "${gcp_private_key_id}" | base64 --decode`
-            cfy secrets create gcp_private_key -f gcp_key
-            cfy secrets create gcp_region -s `echo "${gcp_region}" | base64 --decode`
-            cfy secrets create gcp_zone -s `echo "${gcp_zone}" | base64 --decode`
+            cfy secrets create gcp_credentials -f gcp_credentials.json
 
             cfy secrets create -u openstack_username -s `echo "${openstack_username}" | base64 --decode`
             cfy secrets create -u openstack_password -s `echo "${openstack_password}" | base64 --decode`
