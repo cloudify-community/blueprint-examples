@@ -2,7 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-gcp-plugin
+  - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-ansible-plugin
   - includes/application.yaml
 
@@ -11,6 +11,12 @@ inputs:
   region:
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
+    default: { get_secret: gcp_region }
+
+  zone:
+    type: string
+    description: The GCP zone to deploy the application in, such as europe-west1-b.
+    default: { get_secret: gcp_zone }
 
   network_name:
     type: string
@@ -43,19 +49,8 @@ inputs:
 dsl_definitions:
 
   client_config: &gcp_config
-    auth:
-      type: service_account
-      auth_uri: https://accounts.google.com/o/oauth2/auth
-      token_uri: https://accounts.google.com/o/oauth2/token
-      auth_provider_x509_cert_url: https://www.googleapis.com/oauth2/v1/certs
-      client_x509_cert_url: { get_secret: gcp_client_x509_cert_url }
-      client_email: { get_secret: gcp_client_email }
-      client_id: { get_secret: gcp_client_id }
-      project_id: { get_secret: gcp_project_id }
-      private_key_id: { get_secret: gcp_private_key_id }
-      private_key: { get_secret: gcp_private_key }
-    project: { get_secret: gcp_project_id }
-    zone: { get_secret: gcp_zone }
+    auth: { get_secret: gcp_credentials }
+    zone: { get_input: zone }
 
 node_templates:
 
@@ -103,7 +98,7 @@ node_templates:
       use_public_ip: true
       image_id: { get_input: image }
       instance_type: { get_input: instance_type }
-      zone: { get_secret: gcp_zone }
+      zone: { get_input: zone }
       external_ip: true
     interfaces:
       cloudify.interfaces.lifecycle:

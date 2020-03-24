@@ -7,20 +7,6 @@
   * `kube-node` compute host minimum memory `1024` MB.
   * Openstack users require cloudify-openstack-plugin 3.0.0 or greater.
 
-
-### Install the Python modules:
-
-On your manager, before you create the deployment, execute the following:
-
-```bash
-sudo su
-yum install -y python-netaddr
-source /opt/mgmtworker/env/bin/activate
-pip install netaddr ipaddr
-```
-
-If you have already created a Cloudify Deployment on your Manager, you must delete the deployment and start over.
-
 ### Install the plugins
 
 Install Cloudify plugins
@@ -49,15 +35,15 @@ cfy secrets create azure_client_secret --secret-string <value>
 ```
 
 For **GCP**
+
+gcp_credentials: A GCP service account key in JSON format. **Hint: Create this secret from a file:**
+```shell   
+`cfy secrets create gcp_credentials -f ./path/to/JSON key`.
+```                                             
+gcp_zone: A GCP Zone such as `us-east1-b`:                                                              
+
 ```shell
-cfy secrets create gcp_client_x509_cert_url --secret-string <value>
-cfy secrets create gcp_client_email --secret-string <value>
-cfy secrets create gcp_client_id --secret-string <value>
-cfy secrets create gcp_project_id --secret-string <value>
-cfy secrets create gcp_private_key_id --secret-string <value>
-cfy secrets create gcp_private_key --secret-string <value>
-cfy secrets create gcp_project_id --secret-string <value>
-cfy secrets create gcp_zone --secret-string <value>
+cfy secrets create gcp_zone --secret-string <zone>                                                                                                                                              
 ```
 
 For **Openstack**
@@ -89,6 +75,12 @@ For **Azure**:
 
 ```shell
 cfy install azure.yaml -i location=westeurope
+```
+
+For **GCP**:
+
+```shell
+cfy install gcp.yaml -i region=<region>
 ```
 
 For **Openstack**:

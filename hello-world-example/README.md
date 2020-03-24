@@ -15,6 +15,7 @@ This document will guide you how to run the examples step by step.
 Download the example
 ```shell
 curl -L https://github.com/cloudify-cosmo/cloudify-hello-world-example/archive/master.zip -o cloudify-hello-world-example.zip
+i think its the wrong link!! fix that 
 ```
 
 Extract the example
@@ -49,15 +50,15 @@ cfy secrets create azure_client_secret --secret-string <value>
 ```
 
 For **GCP**
+
+gcp_credentials: A GCP service account key in JSON format. **Hint: Create this secret from a file:**
+```shell   
+`cfy secrets create gcp_credentials -f ./path/to/JSON key`.
+```                                             
+gcp_zone: A GCP Zone such as `us-east1-b`:                                                              
+
 ```shell
-cfy secrets create gcp_client_x509_cert_url --secret-string <value>
-cfy secrets create gcp_client_email --secret-string <value>
-cfy secrets create gcp_client_id --secret-string <value>
-cfy secrets create gcp_project_id --secret-string <value>
-cfy secrets create gcp_private_key_id --secret-string <value>
-cfy secrets create gcp_private_key --secret-string <value>
-cfy secrets create gcp_project_id --secret-string <value>
-cfy secrets create gcp_zone --secret-string <value>
+cfy secrets create gcp_zone --secret-string <zone>                                                                                                                                              
 ```
 
 For **Openstack**
@@ -87,7 +88,7 @@ cfy install azure.yaml -i location=eastus -i agent_password=OpenS3sVm3
 For **GCP**:
 
 ```shell
-cfy install gcp.yaml region=europe-west1
+cfy install gcp.yaml -i region=<region>
 ```
 
 For **Openstack**:
@@ -109,8 +110,14 @@ cfy install openstack.yaml \
      -i image=e41430f7-9131-495b-927f-e7dc4b8994c8 \
      -i flavor=2
 ```
-
-
+###Get deployment id:       
+```shell
+cfy deployments list         
+```
+###Get the URL of the webserver
+```shell
+cfy deployment outputs <deployment_id>
+```
 ## Using the Web UI
 
 ### Open the Web UI
