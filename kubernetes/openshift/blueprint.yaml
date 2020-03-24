@@ -1,0 +1,208 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Deploys an simple, unprivileged OpenShift service. 
+  Designed for use with Red Hat's OpenShift Online PaaS. 
+
+imports:
+- https://getcloudify.org/spec/cloudify/5.0.5/types.yaml
+- plugin:cloudify-kubernetes-plugin
+
+inputs:
+
+  kubernetes_master_configuration:
+    default:
+      host: { get_secret: kubernetes_endpoint }
+      api_key: { get_secret: kubernetes_token }
+      debug: false
+      verify_ssl: false
+
+  kubernetes_api_options:
+    description: >
+      kubernetes api options
+    default: { get_input: kubernetes_master_configuration }
+
+  app_name:
+    description: Prefix to use for application service / deployment names
+    default: exampleapp
+
+  namespace:
+    description: OpenShift namespace to use
+    default: eaas-demo
+
+  fqdn_suffix:
+    description: Domain name to append to form the final service endpoint URL. 
+    type: string
+    default: apps.us-west-1.starter.openshift-online.com
+
+  endpoint: 
+    description: Final service endpoint
+    type: string
+    default: { concat: [{ get_input: app_name }, '-', { get_input: namespace }, '.', { get_input: fqdn_suffix }] }
+
+  container:
+    description: Standard container reference
+    type: string
+    default: jcornutt/cloudify:latest
+  
+  container_port:
+    description: Exposed container port to reference
+    type: integer
+    default: 8080
+
+node_templates:
+
+  kubernetes_master:
+    type: cloudify.kubernetes.nodes.Master
+    properties:
+      configuration:
+        api_options: { get_input: kubernetes_api_options }
+
+  app_ingress:
+    type: cloudify.kubernetes.resources.BlueprintDefinedResource
+    properties:
+      definition:
+        apiVersion: networking.k8s.io/v1beta1
+        kind: Ingress
+        metadata:
+          name: { concat: [{ get_input: app_name }, '-ingress'] }
+          labels:
+            app: { get_input: app_name }
+            manager: cloudify
+        spec:
+          rules:
+          - host: { get_input: endpoint }
+            http:
+              paths:
+              - path: /
+                backend:
+                  serviceName: { get_property: [app_svc, definition, metadata, name] }
+                  servicePort: 80
+      options:
+        namespace: { get_input: namespace }
+    relationships:
+    - type: cloudify.kubernetes.relationships.managed_by_master
+      target: kubernetes_master
+    - type: cloudify.relationships.connected_to
+      target: app_svc
+
+  app_svc:
+    type: cloudify.kubernetes.resources.Service
+    properties:
+      definition:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: { concat: [{ get_property: [app, definition, metadata, name] }, '-svc'] }
+          labels:
+            app: { get_input: app_name }
+            manager: cloudify
+            tier: app
+        spec:
+          selector:
+            app: { get_input: app_name }
+            manager: cloudify
+            tier: app
+          ports:
+          - port: 80
+            targetPort: { get_input: container_port }
+      options:
+        namespace: { get_input: namespace }
+      validate_resource_status: false
+    relationships:
+    - type: cloudify.kubernetes.relationships.managed_by_master
+      target: kubernetes_master
+    - type: cloudify.relationships.contained_in
+      target: app
+
+  app:
+    type: cloudify.kubernetes.resources.Deployment
+    properties:
+      definition:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: { concat: [{ get_input: app_name }, '-app'] }
+          # # If you want to have OpenShift show the arrows connecting services/deployments, 
+          # # you should use the connects-to annotation - example below. 
+          # annotations:
+          #   app.openshift.io/connects-to: { get_property: [my_database, definition, metadata, name] }
+          labels:
+            app: { get_input: app_name }
+            manager: cloudify
+            tier: app
+        spec:
+          selector:
+            matchLabels:
+              app: { get_input: app_name }
+              manager: cloudify
+              tier: app
+          replicas: 1
+          template:
+            metadata:
+              labels:
+                app: { get_input: app_name }
+                manager: cloudify
+                tier: app
+            spec:
+              containers:
+              - name: { get_property: [SELF, definition, metadata, name] }
+                image: { get_input: container }
+                ports:
+                - containerPort: { get_input: container_port }
+                  name: http-server
+                resources:
+                  limits:
+                    cpu: 1
+                    memory: 128Mi
+                  requests:
+                    cpu: 1
+                    memory: 128Mi
+              #   # Example volume mount from PVC
+              #   volumeMounts:
+              #   - mountPath: "/var/www"
+              #     name: "pvol"
+              # volumes:
+              # - name: "pvol"
+              #   persistentVolumeClaim:
+              #     claimName: { get_property: [my_volume_claim, definition, metadata, name] }
+      options:
+        namespace: { get_input: namespace }
+    relationships:
+    - type: cloudify.kubernetes.relationships.managed_by_master
+      target: kubernetes_master
+  #   - type: cloudify.relationships.depends_on
+  #     target: my_volume_claim
+
+  # my_volume_claim:
+  #   type: cloudify.kubernetes.resources.BlueprintDefinedResource
+  #   properties:
+  #     definition:
+  #       apiVersion: v1
+  #       kind: PersistentVolumeClaim
+  #       metadata:
+  #         name: { concat: [{ get_input: app_name }, '-pvc0'] }
+  #         labels:
+  #           app: { get_input: app_name }
+  #           manager: cloudify
+  #           tier: app
+  #       spec:
+  #         storageClassName: gp2
+  #         accessModes:
+  #         - ReadWriteOnce
+  #         resources:
+  #           requests:
+  #             storage: 1Gi
+  #     options:
+  #       namespace: { get_input: namespace }
+  #   relationships:
+  #   - type: cloudify.kubernetes.relationships.managed_by_master
+  #     target: kubernetes_master
+
+outputs:
+
+  service:
+    description: Service endpoint
+    value:
+      endpoint: { concat: ['http://', { get_input: endpoint }] }
+
