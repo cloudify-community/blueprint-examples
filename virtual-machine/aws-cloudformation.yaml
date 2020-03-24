@@ -80,7 +80,7 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: two_tier_keypair
 
-outputs:
+capabilities:
 
   endpoint:
     description: The external endpoint of the application.
