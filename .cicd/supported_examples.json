@@ -44,6 +44,7 @@
   ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
   "kubernetes/azure-aks": ["blueprint.yaml"],
+  "kubernetes/gcp-gke": ["blueprint.yaml"],
   "kubernetes/openshift": ["blueprint.yaml"],
   "prometheus": [
     "aws.yaml",
