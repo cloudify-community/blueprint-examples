@@ -40,7 +40,7 @@ inputs:
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
-    default: 'centos'
+    default: 'ec2-user'
 
 dsl_definitions:
 
