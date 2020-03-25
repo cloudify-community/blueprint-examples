@@ -1,0 +1,95 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint create a managed cluster.
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.4/types.yaml
+  - plugin:cloudify-gcp-plugin?version= >=1.6.0
+  - plugin:cloudify-kubernetes-plugin?version= >=2.6.5
+
+inputs:
+  gcp_crdentials:
+    type: string
+    default: { get_secret: gcp_credentials }
+
+  zone:
+    default: { get_secret: gcp_zone }
+
+  resource_prefix:
+    type: string
+    default: ex2
+
+dsl_definitions:
+
+  gcp_config: &gcp_config
+    auth: { get_secret: gcp_credentials }
+    zone: { get_input: zone }
+
+node_templates:
+
+  kubernetes-cluster:
+    type: cloudify.gcp.nodes.KubernetesCluster
+    properties:
+      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
+      gcp_config: *gcp_config
+
+  kubernetes-cluster-attributes:
+    type: cloudify.gcp.nodes.KubernetesCluster
+    properties:
+      use_external_resource: true
+      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
+      gcp_config: *gcp_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster
+
+  kubernetes-cluster-node-pool:
+    type: cloudify.gcp.nodes.KubernetesNodePool
+    properties:
+      name: { concat: [ { get_input: resource_prefix }, '-node-pool-1']}
+      cluster_id: { get_property: [ kubernetes-cluster, name] }
+      additional_settings:
+        config:
+          machineType: n1-standard-2
+        initialNodeCount: 2
+        autoscaling:
+          enabled: true
+          minNodeCount: 2
+          maxNodeCount: 5
+      gcp_config: *gcp_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster
+
+  sanity_master:
+    type: cloudify.kubernetes.nodes.Master
+    properties:
+      authentication:
+        gcp_service_account: { get_secret: gcp_credentials }
+      configuration:
+        api_options:
+          host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+          verify_ssl: false
+          debug: false
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster-attributes
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster-node-pool
+
+  sanity_pod:
+    type: cloudify.kubernetes.resources.Pod
+    properties:
+      definition:
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: nginx
+        spec:
+          containers:
+          - name: nginx
+            image: nginx:stable
+    relationships:
+      - type: cloudify.kubernetes.relationships.managed_by_master
+        target: sanity_master
