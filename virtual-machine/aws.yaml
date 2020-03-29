@@ -25,6 +25,10 @@ inputs:
     description: The name of the AWS AMI in the AWS region.
     default: 'CentOS 7.7.1908 x86_64 with cloud-init (HVM)'
 
+  instance_type:
+    type: string
+    default: t2.micro
+
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
@@ -49,7 +53,7 @@ node_templates:
         key: { get_secret: agent_key_private }
       resource_config:
         ImageId: { get_attribute: [ ami, aws_resource_id ] }
-        InstanceType: t2.micro
+        InstanceType: { get_input: instance_type }
         kwargs:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
       use_public_ip: true
