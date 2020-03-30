@@ -13,7 +13,7 @@ inputs:
   availability_zone:
     type: string
     description: The availability zone in the AWS Region.
-    default: { concat: [ { get_secret: aws_region_name }, 'b' ] }
+    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   ami_owner_filter:
     type: string
@@ -34,12 +34,16 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
+  aws_region_name:
+    type: string
+    default: 'ca-central-1'
+
 dsl_definitions:
 
   client_config: &client_config
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
-    region_name: { get_secret: aws_region_name }
+    region_name: { get_input: aws_region_name }
 
 node_templates:
 

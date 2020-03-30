@@ -15,6 +15,7 @@ inputs:
   aws_region_name:
     type: string
     description: The AWS region name, such as us-east-1 or us-west-1.
+    default: 'us-east-1'
 
   availability_zone:
     type: string
@@ -35,6 +36,7 @@ inputs:
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
+
 
 dsl_definitions:
 

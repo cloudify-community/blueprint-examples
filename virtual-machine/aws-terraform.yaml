@@ -35,6 +35,7 @@ inputs:
   aws_region_name:
     type: string
     default: 'ca-central-1'
+
 node_templates:
   terraform:
     type: cloudify.nodes.terraform

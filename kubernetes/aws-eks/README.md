@@ -14,7 +14,6 @@ Replace <value> with actual values, without the <>
 ```shell
 cfy secrets create aws_access_key_id --secret-string <value>
 cfy secrets create aws_secret_access_key --secret-string <value>
-cfy secrets create ec2_region_name --secret-string <value>
 cfy secrets create aws_keypair --secret-string <value>
 ```
 

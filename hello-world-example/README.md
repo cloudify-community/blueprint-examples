@@ -76,7 +76,7 @@ cfy secrets create openstack_auth_url --secret-string <value>
 For **AWS**:
 
 ```shell
-cfy install aws.yaml -i aws_region_name=eu-central-1
+cfy install aws.yaml 
 ```
 
 For **Azure**:

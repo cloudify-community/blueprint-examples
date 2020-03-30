@@ -21,6 +21,7 @@ inputs:
 
   region_name:
     type: string
+    default: 'us-east-1'
 
   availability_zone:
     type: string
