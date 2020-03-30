@@ -37,7 +37,6 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
 
-
 dsl_definitions:
 
   client_config: &client_config
