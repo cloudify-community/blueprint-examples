@@ -1,6 +1,6 @@
 # blueprint-examples
 
-**Try out a [free lab](https://cloudify.co/HostedCloudify)!**
+**Download Cloudify to [get started](https://cloudify.co/download)!**
 
 
 ## User guide
