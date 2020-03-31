@@ -78,6 +78,11 @@ For **AWS**:
 ```shell
 cfy install aws.yaml 
 ```
+Or 
+```shell
+cfy install aws.yaml -i aws_region_name=<region_name>
+```
+If region not provided the default region will be used(see inputs section of aws blueprint). 
 
 For **Azure**:
 

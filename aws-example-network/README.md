@@ -33,6 +33,5 @@ You must have these secrets on your Cloudify Manager `tenant`:
 
   * `aws_access_key_id`: Your AWS credentials access key ID.
   * `aws_secret_access_key`: Your AWS credentials access key secret.
-  * `aws_availability_zone`: Your preferred availability zone in your EC2 region, such as `us-east-1c`.
 
 **You may override the secrets' values via deployment inputs when you create the deployment.**

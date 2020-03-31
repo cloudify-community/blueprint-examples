@@ -10,6 +10,10 @@ imports:
 
 inputs:
 
+  aws_region_name:
+      type: string
+      default: 'ca-central-1'
+
   availability_zone:
     type: string
     description: The availability zone in the AWS Region.
@@ -33,10 +37,6 @@ inputs:
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
-
-  aws_region_name:
-    type: string
-    default: 'ca-central-1'
 
 dsl_definitions:
 
