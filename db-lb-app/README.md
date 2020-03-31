@@ -35,8 +35,6 @@ The components are:
       - `azure_client_secret`: Azure subscription ID: `cfy secrets create -u azure_client_secret -s ...........`.
     - GCP:
       - `gcp_credentials`: A GCP service account key in JSON format. **Hint: Create this secret from a file:** `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
-      - `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`
-      - `gcp_zone`: A GCP Zone such as `us-east1-b`: `cfy secrets create gcp_zone -s zone`
     - Openstack:
       - `openstack_auth_url`: Openstack Auth URL: `cfy secrets create -u openstack_auth_url -s https://my.openstack.com:5000/v2.0`
       - `openstack_project_name`: Openstack Project Name: `cfy secrets create -u openstack_project_name -s project`
@@ -53,61 +51,61 @@ Get the [latest release](https://github.com/cloudify-community/blueprint-example
 
 For example, if you are an AWS user:
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/aws-example-network.zip -n blueprint.yaml -b aws`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/aws-example-network.zip -n blueprint.yaml -b aws`
 
 If you are an Azure user:
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/azure-example-network.zip -n blueprint.yaml -b azure`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/azure-example-network.zip -n blueprint.yaml -b azure`
 
 If you are an GCP user:
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/gcp-example-network.zip -n blueprint.yaml -b gcp`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/gcp-example-network.zip -n blueprint.yaml -b gcp`
 
 If you are an Openstack user:
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/openstack-example-network.zip -n blueprint.yaml -i external_network_id=0000-0000-0000-0000 -b openstack`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/openstack-example-network.zip -n blueprint.yaml -i external_network_id=0000-0000-0000-0000 -b openstack`
 
 
 ### Upload the infrastructure blueprint
 
 For example, if you are an AWS user:
 
-  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-infrastructure.zip -n aws.yaml -b infrastructure`
+  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-infrastructure.zip -n aws.yaml -b infrastructure`
 
 If you are an Azure user:
 
-  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-infrastructure.zip -n azure.yaml -b infrastructure`
+  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-infrastructure.zip -n azure.yaml -b infrastructure`
 
 If you are an GCP user:
 
-  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-infrastructure.zip -n gcp.yaml -b infrastructure`
+  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-infrastructure.zip -n gcp.yaml -b infrastructure`
 
 If you are an Openstack user:
 
-  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-infrastructure.zip -n openstack.yaml -b infrastructure`
+  `cfy blueprints upload https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-infrastructure.zip -n openstack.yaml -b infrastructure`
 
 ### Install the database
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-db.zip -n application.yaml -b db`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-db.zip -n application.yaml -b db`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
 
   Where `infrastructure--image_id` is ID of centos-7-with-docker image.
 ### Install the load balancer
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-lb.zip -n application.yaml -b lb`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-lb.zip -n application.yaml -b lb`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--resource_name_prefix='lb' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--resource_name_prefix='lb' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
 
 
 ### Install the application (Drupal)
 
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-app.zip -n application.yaml -b app`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-app.zip -n application.yaml -b app`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-4/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--resource_name_prefix='app' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--resource_name_prefix='app' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
 
   
 ## Complete Application Installation

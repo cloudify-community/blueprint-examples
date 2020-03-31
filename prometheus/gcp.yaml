@@ -10,13 +10,13 @@ inputs:
 
   region:
     type: string
-    description: The GCP region to deploy the application in, such as europe-west1.
-    default: { get_secret: gcp_region }
+    description: The GCP region to deploy the application in, such as 'us-west1'.
+    default: 'us-west1'
 
   zone:
     type: string
-    description: The GCP zone to deploy the application in, such as europe-west1-b.
-    default: { get_secret: gcp_zone }
+    description: The GCP zone to deploy the application in, such as 'us-west1-a'.
+    default: 'us-west1-a'
 
   network_name:
     type: string
