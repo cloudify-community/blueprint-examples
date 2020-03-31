@@ -88,8 +88,13 @@ cfy install azure.yaml -i location=eastus -i agent_password=OpenS3sVm3
 For **GCP**:
 
 ```shell
-cfy install gcp.yaml -i region=<region>
+cfy install gcp.yaml -i region=<region> -i zone=<zone>
 ```
+Or 
+```shell
+cfy install gcp.yaml 
+```
+If region and zone input not provided the default values will be used(see gcp.yaml inputs section).
 
 For **Openstack**:
 
@@ -148,14 +153,7 @@ cfy deployment outputs <deployment_id>
         * client_id
         * client_secret
     * For **GCP**
-        * gcp_client_x509_cert_url
-        * gcp_client_email
-        * gcp_client_id
-        * gcp_project_id
-        * gcp_private_key_id
-        * gcp_private_key
-        * gcp_project_id
-        * gcp_zone
+        * gcp_credentials(service account JSON file)
     * For **Openstack**
          * keystone_username
          * keystone_password
