@@ -7,15 +7,20 @@ imports:
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
 
 inputs:
-  gcp_crdentials:
+
+  gcp_credentials:
     type: string
     default: { get_secret: gcp_credentials }
 
   zone:
-    default: { get_secret: gcp_zone }
+    type: string
+    description: A GCP zone such as `us-west1-a`.
+    default: 'us-west1-a'
 
   region:
-    default: { get_secret: gcp_region }
+    type: string
+    description: A GCP region such as `us-west1`.
+    default: 'us-west1'
 
   subnet_cidr:
     default: 10.11.12.0/22
@@ -29,7 +34,7 @@ inputs:
 dsl_definitions:
 
   client_config: &client_config
-    auth: { get_secret: gcp_credentials }
+    auth: { get_input: gcp_credentials }
     zone: { get_input: zone }
 
 node_templates:
