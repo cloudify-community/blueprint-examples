@@ -1,0 +1,38 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
+  - http://www.getcloudify.org/spec/utilities-plugin/1.17.0/plugin.yaml
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+
+  rest_endpoint_cert:
+    description: >
+      REST API endpoint CA_BUNDLE
+
+  rest_client_cert:
+    description: >
+      REST API client certificate
+
+node_templates:
+
+  alice_check:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 9999
+      ssl: true
+      verify: { get_input: rest_endpoint_cert }
+      cert: { get_input: rest_client_cert }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            remove_calls: true
+            template_file: templates/alice.yaml
+            prerender: true
+            save_path: alice_response

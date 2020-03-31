@@ -1,0 +1,8 @@
+rest_calls:
+  - path: /authenticate
+    method: GET
+    response_format: xml
+    recoverable_codes: [400]
+    translation_format: v3
+    timeout: 100
+    response_translation: {"message": ["message"]}
