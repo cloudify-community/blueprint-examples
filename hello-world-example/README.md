@@ -84,6 +84,7 @@ For **Azure**:
 ```shell
 cfy install azure.yaml -i location=eastus -i agent_password=OpenS3sVm3
 ```
+If location input not provided the default location will be "eastus2"
 
 For **GCP**:
 
