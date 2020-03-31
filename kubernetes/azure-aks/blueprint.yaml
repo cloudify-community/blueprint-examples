@@ -33,7 +33,7 @@ inputs:
   location:
     type: string
     required: true
-    default: { get_secret: azure_location }
+    default: eastus2
 
   resource_suffix:
     type: string

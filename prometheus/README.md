@@ -83,6 +83,11 @@ For **Azure**:
 ```shell
 cfy install azure.yaml -i location=westeurope
 ```
+Or
+```shell
+cfy install azure.yaml
+```
+If location input not provided the default location will be "eastus2"
 
 For **GCP**:
 
