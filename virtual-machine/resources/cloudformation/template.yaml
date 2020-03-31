@@ -217,6 +217,8 @@ Resources:
       Tags:
         - Key: Application
           Value: !Ref 'AWS::StackId'
+        - Key: Name
+          Value: 'cf-virtual-machine-example'
 Outputs:
   URL:
     Value:
