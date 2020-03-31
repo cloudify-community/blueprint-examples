@@ -32,6 +32,9 @@ inputs:
       The username of the agent running on the instance created from the image.
     type: string
     default: 'centos'
+  aws_region_name:
+    type: string
+    default: 'ca-central-1'
 
 node_templates:
   terraform:
@@ -54,7 +57,7 @@ node_templates:
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
-          aws_region: { get_secret: aws_region_name }
+          aws_region: { get_input: aws_region_name }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_secret: agent_key_public }
         source: resources/terraform/template.zip

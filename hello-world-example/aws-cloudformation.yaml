@@ -16,7 +16,7 @@ inputs:
 
   aws_region_name:
     type: string
-    default: { get_secret: aws_region_name }
+    default: 'us-east-1'
 
   availability_zone:
     type: string
