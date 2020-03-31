@@ -33,7 +33,6 @@ The components are:
       - `azure_tenant_id`: Azure subscription ID: `cfy secrets create -u azure_tenant_id -s 00000000-0000-0000-0000-000000000000`.
       - `azure_client_id`: Azure subscription ID: `cfy secrets create -u azure_client_id -s 00000000-0000-0000-0000-000000000000`.
       - `azure_client_secret`: Azure subscription ID: `cfy secrets create -u azure_client_secret -s ...........`.
-      - `azure_location`: Azure subscription ID: `cfy secrets create -u azure_location -s westeurope`.
     - GCP:
       - `gcp_credentials`: A GCP service account key in JSON format. **Hint: Create this secret from a file:** `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
       - `gcp_region`: A GCP Region such as `us-east1`: `cfy secrets create gcp_region -s private_key_id`

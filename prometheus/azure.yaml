@@ -30,6 +30,7 @@ inputs:
   location:
     type: string
     description: Your Azure Region.
+    default: eastus2
 
   image:
     default:
