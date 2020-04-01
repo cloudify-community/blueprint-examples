@@ -9,12 +9,13 @@ imports:
   - plugin:cloudify-kubernetes-plugin?version= >=2.6.5
 
 inputs:
-  gcp_crdentials:
+  gcp_credentials:
     type: string
     default: { get_secret: gcp_credentials }
 
   zone:
-    default: { get_secret: gcp_zone }
+    type: string
+    default: 'us-west1-a'
 
   resource_prefix:
     type: string
@@ -23,7 +24,7 @@ inputs:
 dsl_definitions:
 
   gcp_config: &gcp_config
-    auth: { get_secret: gcp_credentials }
+    auth: { get_input: gcp_credentials }
     zone: { get_input: zone }
 
 node_templates:
@@ -66,7 +67,7 @@ node_templates:
     type: cloudify.kubernetes.nodes.Master
     properties:
       authentication:
-        gcp_service_account: { get_secret: gcp_credentials }
+        gcp_service_account: { get_input: gcp_credentials }
       configuration:
         api_options:
           host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}

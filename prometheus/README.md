@@ -42,12 +42,6 @@ gcp_credentials: A GCP service account key in JSON format. **Hint: Create this s
 `cfy secrets create gcp_credentials -f ./path/to/JSON key`.
 ```  
                                            
-gcp_zone: A GCP Zone such as `us-east1-b`:                                                              
-
-```shell
-cfy secrets create gcp_zone --secret-string <zone>                                                                                                                                              
-```
-
 gcp_project_id:
 ```shell
 cfy secrets create gcp_project_id --secret-string <project_id>                                                                                                                                              
@@ -83,12 +77,24 @@ For **Azure**:
 ```shell
 cfy install azure.yaml -i location=westeurope
 ```
+Or
+```shell
+cfy install azure.yaml
+```
+If location input not provided the default location will be "eastus2".
 
 For **GCP**:
 
 ```shell
-cfy install gcp.yaml -i region=<region>
+cfy install gcp.yaml -i region=<region> -i zone=<zone>
+
 ```
+Or 
+```shell
+cfy install gcp.yaml 
+```
+If region and zone input not provided the default values will be used(see gcp.yaml inputs section).
+
 
 For **Openstack**:
 

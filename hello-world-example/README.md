@@ -76,20 +76,31 @@ cfy secrets create openstack_auth_url --secret-string <value>
 For **AWS**:
 
 ```shell
-cfy install aws.yaml -i aws_region_name=eu-central-1
+cfy install aws.yaml 
 ```
+Or 
+```shell
+cfy install aws.yaml -i aws_region_name=<region_name>
+```
+If region not provided the default region will be used(see inputs section of aws blueprint). 
 
 For **Azure**:
 
 ```shell
 cfy install azure.yaml -i location=eastus -i agent_password=OpenS3sVm3
 ```
+If location input not provided the default location will be "eastus2".
 
 For **GCP**:
 
 ```shell
-cfy install gcp.yaml -i region=<region>
+cfy install gcp.yaml -i region=<region> -i zone=<zone>
 ```
+Or 
+```shell
+cfy install gcp.yaml 
+```
+If region and zone input not provided the default values will be used(see gcp.yaml inputs section).
 
 For **Openstack**:
 
@@ -148,14 +159,7 @@ cfy deployment outputs <deployment_id>
         * client_id
         * client_secret
     * For **GCP**
-        * gcp_client_x509_cert_url
-        * gcp_client_email
-        * gcp_client_id
-        * gcp_project_id
-        * gcp_private_key_id
-        * gcp_private_key
-        * gcp_project_id
-        * gcp_zone
+        * gcp_credentials(service account JSON file)
     * For **Openstack**
          * keystone_username
          * keystone_password

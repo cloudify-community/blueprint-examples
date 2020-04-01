@@ -25,6 +25,7 @@ inputs:
     description: >
       URL of infra zip file.
     type: string
+    # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.
     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-10/virtual-machine.zip'
 
   infra_exists:

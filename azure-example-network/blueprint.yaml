@@ -43,7 +43,9 @@ inputs:
     default: https://login.microsoftonline.com
 
   location:
-    default: { get_secret: azure_location }
+    type: string
+    description: Your Azure Region.
+    default: eastus2
 
   retry_after:
     default: 5
