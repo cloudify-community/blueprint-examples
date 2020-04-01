@@ -29,6 +29,9 @@
         "image": {
             "type": "object"
         },
+        "priority": {
+            "type": "string"
+        },
         "nic_name": {
             "type": "string"
         },
@@ -224,6 +227,7 @@
                         }
                     }
                 },
+                "priority": "[parameters('priority')]",
                 "networkProfile": {
                     "networkInterfaces": [
                         {
