@@ -75,7 +75,7 @@ if __name__ == '__main__':
     blueprints = {}
     for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
         blueprint_path = path.join(CWD, blueprint_id)
-        blueprints.update({blueprint_id, blueprint_path})
+        blueprints.update({blueprint_id: blueprint_path})
 
     blueprint_release_with_latest(
         'blueprint-examples',
