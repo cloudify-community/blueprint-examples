@@ -307,7 +307,7 @@ workflows:
           filters:
             branches:
               only: master
-      - release
+      - release:
           requires:
             - blueprint-validation
             - getting-started
