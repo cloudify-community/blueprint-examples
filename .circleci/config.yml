@@ -292,7 +292,7 @@ jobs:
           command: pip install --upgrade setuptools
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.7.zip
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.8.zip
       - run: python .cicd/package_examples.py
 
 
@@ -300,20 +300,20 @@ workflows:
   version: 2
   tests:
     jobs:
-#      - blueprint-validation
-#      - getting-started:
-#          requires:
-#            - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
+      - blueprint-validation
+      - getting-started:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
       - release
-#          requires:
-#            - blueprint-validation
-#            - getting-started
-#          filters:
-#            branches:
-#              only: master
+          requires:
+            - blueprint-validation
+            - getting-started
+          filters:
+            branches:
+              only: master
   nightly:
     triggers:
     - schedule:
