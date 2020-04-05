@@ -295,6 +295,7 @@ jobs:
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.3.zip
       - run: python .cicd/package_examples.py
 
+
 workflows:
   version: 2
   tests:
