@@ -261,7 +261,8 @@ jobs:
           name: execute test
           command: pytest -s .cicd/test_examples.py
 
-  blueprint-packaging:
+
+  release:
     docker:
       - image: circleci/python:2.7.15-stretch
     steps:
@@ -286,8 +287,13 @@ jobs:
       - run:
           name: install tox
           command: pip install --user pygithub pyyaml==3.10
+      - run:
+          name: upgrade setuptools
+          command: pip install --upgrade setuptools
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.1.zip
       - run: python .cicd/package_examples.py
-
 
 workflows:
   version: 2
