@@ -306,7 +306,7 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - blueprint-packaging
+      - release
 #          requires:
 #            - blueprint-validation
 #            - getting-started
