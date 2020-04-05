@@ -23,6 +23,7 @@ from ecosystem_cicd_tools.release import (
     blueprint_release_with_latest, get_most_recent_release)
 
 from __init__ import (SUPPORTED_EXAMPLES,
+                      CWD,
                       get_cloudify_version)
 
 BLUEPRINTS_RELEASE_NAME = 'Cloudify 5.0.5 Blueprint Examples Bundle v{0}'
@@ -67,10 +68,17 @@ if __name__ == '__main__':
     blueprint_examples_version = get_blueprints_version()
     blueprint_release_name = BLUEPRINTS_RELEASE_NAME.format(
         blueprint_examples_version)
+
     for gs in GETTING_STARTED:
         update_getting_started(gs, blueprint_examples_version)
+
+    blueprints = {}
+    for blueprint_id, _ in SUPPORTED_EXAMPLES.items():
+        blueprint_path = path.join(CWD, blueprint_id)
+        blueprints.update({blueprint_id, blueprint_path})
+
     blueprint_release_with_latest(
         'blueprint-examples',
         blueprint_examples_version,
         blueprint_release_name,
-        SUPPORTED_EXAMPLES)
+        blueprints)
