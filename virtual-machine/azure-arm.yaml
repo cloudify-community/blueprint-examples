@@ -31,6 +31,16 @@ inputs:
     description: Your Azure Region.
     default: eastus2
 
+  priority:
+    type: string
+    description: The VM's priority
+    constraints:
+      - valid_values:
+          - Regular
+          - Low
+          - Spot
+    default: 'Regular'
+
   image:
     description: >
       Image to use.
@@ -81,6 +91,7 @@ node_templates:
         vm_name: { concat: [ { get_input: resource_prefix }, vm, { get_input: resource_suffix } ] }
         nic_name: { concat: [ { get_input: resource_prefix }, nic, { get_input: resource_suffix } ] }
         ip_config_name: { concat: [ { get_input: resource_prefix }, ipcfg, { get_input: resource_suffix } ] }
+        priority: { get_input: priority }
         admin_user: { get_input: agent_user }
         public_key_data: { get_secret: agent_key_public }
       template_file: 'resources/arm/environment.json'
