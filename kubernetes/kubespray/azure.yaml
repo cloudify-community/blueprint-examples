@@ -34,6 +34,7 @@ inputs:
   location:
     type: string
     description: Your Azure Region.
+    default: westeurope
 
   image:
     default:
