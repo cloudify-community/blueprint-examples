@@ -292,7 +292,7 @@ jobs:
           command: pip install --upgrade setuptools
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.9.zip
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/2.2.10.zip
       - run: python .cicd/package_examples.py
 
 
