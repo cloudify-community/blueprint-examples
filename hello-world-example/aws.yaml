@@ -7,7 +7,7 @@ imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.20.0
   - includes/ansible.yaml
 
 inputs:
@@ -36,6 +36,9 @@ inputs:
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
+
+  agent_key_name:
+    default: agent_key
 
 dsl_definitions:
 
@@ -202,6 +205,15 @@ node_templates:
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
           - { get_secret: agent_key_public }
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
 
 outputs:
 
