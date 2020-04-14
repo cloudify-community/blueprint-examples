@@ -72,6 +72,8 @@ node_templates:
       target: ip
     - type: cloudify.relationships.depends_on
       target: cloud_init
+    - type: cloudify.relationships.depends_on
+      target: agent_key
 
   ami:
     type: cloudify.nodes.aws.ec2.Image
@@ -205,6 +207,9 @@ node_templates:
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
           - { get_secret: agent_key_public }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
 
   agent_key:
     type: cloudify.keys.nodes.RSAKey
