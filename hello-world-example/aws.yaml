@@ -56,7 +56,7 @@ node_templates:
       agent_config:
         install_method: none
         user: { get_input: agent_user }
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
       resource_config:
         ImageId: { get_attribute: [ ami, aws_resource_id ] }
         InstanceType: t2.micro
@@ -206,7 +206,7 @@ node_templates:
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
-          - { get_secret: agent_key_public }
+          - { get_attribute: [agent_key, public_key_export] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: agent_key
@@ -219,6 +219,15 @@ node_templates:
         openssh_format: true
       use_secret_store: true
       use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
+
+
 
 outputs:
 
