@@ -38,6 +38,7 @@ inputs:
     default: 'ubuntu'
 
   agent_key_name:
+    type: string
     default: agent_key
 
 dsl_definitions:
@@ -225,9 +226,6 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
-
-
-
 
 outputs:
 
