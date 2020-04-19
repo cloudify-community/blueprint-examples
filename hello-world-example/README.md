@@ -104,23 +104,13 @@ If region and zone input not provided the default values will be used(see gcp.ya
 
 For **Openstack**:
 
-```shell
+```shell 
 cfy install openstack.yaml \
-    -i region=RegionOne
-    -i external_network=external_network \
-    -i image=05bb3a46-ca32-4032-bedd-8d7ebd5c8100 \
-    -i flavor=4d798e17-3439-42e1-ad22-fb956ec22b54
+-i region=RegionOne \
+-i external_network_id=dda079ce-12cf-4309-879a-8e67aec94de4 \
+-i image=e41430f7-9131-495b-927f-e7dc4b8994c8 -i flavor=m1.small
 ```
 
-Another **Openstack** example:
-
-```shell
-cfy install openstack.yaml \
-     -i region=RegionOne \
-     -i external_network_name=GATEWAY_NET \
-     -i image=e41430f7-9131-495b-927f-e7dc4b8994c8 \
-     -i flavor=2
-```
 ###Get deployment id:       
 ```shell
 cfy deployments list         
@@ -190,9 +180,9 @@ cfy deployment outputs <deployment_id>
         * region, for example 'europe-west1'
     * For **Openstack**
          * region, for example 'RegionOne'
-         * external_network, for example 'GATEWAY_NET'
+         * external_network_id, for example the id of 'GATEWAY_NET'
          * image, for example '05bb3a46-ca32-4032-bedd-8d7ebd5c8100'
-         * flavor, for example '4d798e17-3439-42e1-ad22-fb956ec22b54'
+         * flavor, for example 'm1.small'
 9. Click 'Deploy'
 10. Scroll down to the deployments table, click the hanburger menu on the right and select 'Install'
 
