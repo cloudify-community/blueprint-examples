@@ -7,7 +7,7 @@ imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.20.0
   - includes/ansible.yaml
 
 inputs:
@@ -37,6 +37,10 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   client_config: &client_config
@@ -53,7 +57,7 @@ node_templates:
       agent_config:
         install_method: none
         user: { get_input: agent_user }
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
       resource_config:
         ImageId: { get_attribute: [ ami, aws_resource_id ] }
         InstanceType: t2.micro
@@ -69,6 +73,8 @@ node_templates:
       target: ip
     - type: cloudify.relationships.depends_on
       target: cloud_init
+    - type: cloudify.relationships.depends_on
+      target: agent_key
 
   ami:
     type: cloudify.nodes.aws.ec2.Image
@@ -201,7 +207,25 @@ node_templates:
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
-          - { get_secret: agent_key_public }
+          - { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 outputs:
 

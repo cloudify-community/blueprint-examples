@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-azure-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.20.0
 
 inputs:
 
@@ -56,6 +56,10 @@ inputs:
     description: The user name of the agent on the instance created from the image.
     default: centos
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   azure_config: &azure_config
@@ -84,12 +88,12 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-              - keydata: { get_secret: agent_key_public }
+              - keydata: { get_attribute: [agent_key, public_key_export] }
                 path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
       agent_config:
         install_method: none
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
     relationships:
@@ -101,6 +105,8 @@ node_templates:
       target: availability_set
     - type: cloudify.azure.relationships.connected_to_nic
       target: nic
+    - type: cloudify.relationships.depends_on
+      target: agent_key
 
   nic:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
@@ -253,6 +259,21 @@ node_templates:
       location: { get_input: location }
       azure_config: *azure_config
 
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
 capabilities:
 
   endpoint:
@@ -263,4 +284,4 @@ capabilities:
     value: { get_input: agent_user }
   key_content:
     description: Private agent key
-    value: { get_secret: agent_key_private }
+    value: { get_attribute: [agent_key, private_key_export] }
