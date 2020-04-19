@@ -59,6 +59,10 @@ inputs:
   prometheus_scrape_jobs:
     description: a list of jobs.
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   azure_config: &client_config
@@ -201,7 +205,7 @@ node_templates:
       azure_config: *client_config
       agent_config:
         install_method: none
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
       os_family: linux
@@ -220,7 +224,7 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-              - keydata: { get_secret: agent_key_public }
+              - keydata: { get_attribute: [agent_key, public_key_export] }
                 path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
     relationships:

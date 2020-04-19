@@ -25,6 +25,8 @@ inputs:
 
   availability_zone:
     type: string
+    description: The availability zone in the AWS Region.
+    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   ec2_region_endpoint:
     default: { concat: [ 'ec2.', { get_input: aws_region_name}, '.amazonaws.com' ] }
@@ -51,6 +53,10 @@ inputs:
 
   prometheus_scrape_jobs:
     description: a list of jobs.
+
+  agent_key_name:
+    type: string
+    default: agent_key
 
 dsl_definitions:
 
@@ -302,7 +308,7 @@ node_templates:
       client_config: *client_config
       agent_config:
         install_method: none
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
       resource_config:
@@ -319,3 +325,4 @@ node_templates:
         target: cloud_init
       - type: cloudify.relationships.depends_on
         target: centos_core_ami
+
