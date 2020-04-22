@@ -104,6 +104,7 @@ node_templates:
       target: nic
     - type: cloudify.relationships.depends_on
       target: agent_key
+
   nic:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
     properties:
