@@ -66,9 +66,9 @@ node_templates:
   sanity_master:
     type: cloudify.kubernetes.nodes.Master
     properties:
-      authentication:
+      authentication: &client_config_authentication
         gcp_service_account: { get_input: gcp_credentials }
-      configuration:
+      configuration: &client_config_configuration
         api_options:
           host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
           verify_ssl: false
@@ -82,6 +82,9 @@ node_templates:
   sanity_pod:
     type: cloudify.kubernetes.resources.Pod
     properties:
+      client_config:
+        authentication: *client_config_authentication
+        configuration: *client_config_configuration
       definition:
         apiVersion: v1
         kind: Pod
@@ -92,5 +95,5 @@ node_templates:
           - name: nginx
             image: nginx:stable
     relationships:
-      - type: cloudify.kubernetes.relationships.managed_by_master
+      - type: cloudify.relationships.depends_on
         target: sanity_master

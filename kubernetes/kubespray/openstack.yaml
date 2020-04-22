@@ -7,7 +7,7 @@ imports:
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.20.0
   - plugin:cloudify-kubernetes-plugin
   - includes/cloud-init.yaml
   - includes/application.yaml
@@ -58,6 +58,10 @@ inputs:
     type: string
     default: centos
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
   client_config_dict:
 #    type: dict
     description: A dictionary containing the client configuration for Openstack. Default is for keystone v2. Provide an alternate input for keystone v3.
@@ -80,7 +84,7 @@ node_types:
       agent_config:
         default:
           install_method: none
-          key: { get_secret: agent_key_private }
+          key: { get_attribute: [agent_key, private_key_export] }
           user: { get_input: agent_user }
       use_public_ip:
         default: true
@@ -203,7 +207,7 @@ node_templates:
                 task_name: remove_node
                 fabric_env:
                   host_string: { get_attribute: [ kube-master-ip-address, floating_ip_address ] }
-                  key: { get_secret: agent_key_private }
+                  key: { get_attribute: [agent_key, private_key_export] }
                   user: { get_input: agent_user }
 
   kube-master-port:
@@ -244,6 +248,23 @@ node_templates:
       # we need float ip for alive kube-master
       - type: cloudify.relationships.depends_on
         target: kube-master-ip-address
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true
 
 groups:
 

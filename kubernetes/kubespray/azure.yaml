@@ -7,7 +7,7 @@ imports:
   - plugin:cloudify-azure-plugin
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.20.0
   - plugin:cloudify-kubernetes-plugin
   - includes/cloud-init.yaml
   - includes/application.yaml
@@ -60,6 +60,10 @@ inputs:
     type: string
     default: 10.10.0.0/24
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   azure_config: &client_config
@@ -86,7 +90,7 @@ node_types:
       agent_config:
         default:
           install_method: none
-          key: { get_secret: agent_key_private }
+          key: { get_attribute: [agent_key, private_key_export] }
           user: { get_input: agent_user }
       use_public_ip:
         default: true
@@ -98,6 +102,7 @@ node_types:
         default: { get_input: location }
       storage_endpoint:
         default: core.windows.net
+
 
   kube-master: *k8s-cluster
 
@@ -238,7 +243,7 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-              - keydata: { get_secret: agent_key_public }
+              - keydata: { get_attribute: [agent_key, public_key_export] }
                 path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
     relationships:
@@ -252,6 +257,9 @@ node_templates:
         target: kube-node-nic
       - type: cloudify.relationships.depends_on
         target: cloudify-host-cloud-config
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
 
   kube-master-ip:
     type: cloudify.azure.nodes.network.PublicIPAddress
@@ -307,7 +315,7 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-              - keydata: { get_secret: agent_key_public }
+              - keydata: { get_attribute: [agent_key, public_key_export] }
                 path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
     relationships:
@@ -321,6 +329,23 @@ node_templates:
         target: kube-master-nic
       - type: cloudify.relationships.depends_on
         target: cloudify-host-cloud-config
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true
 
 groups:
 
