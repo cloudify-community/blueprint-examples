@@ -6,7 +6,7 @@ description: >
 imports:
   - http://www.getcloudify.org/spec/cloudify/3.4/types.yaml
   - plugin:cloudify-azure-plugin?version= >=2.1.10
-  - plugin:cloudify-kubernetes-plugin?version= >=2.6.3
+  - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
   - plugin:cloudify-utilities-plugin?version= >=1.20.1
 
 inputs:
@@ -208,7 +208,7 @@ node_templates:
           method: delete_namespaced_secret
           payload: V1DeleteOptions
     relationships:
-      - type: cloudify.kubernetes.relationships.depends_on
+      - type: cloudify.relationships.depends_on
         target: kubernetes_master
       - type: cloudify.relationships.depends_on
         target: new_role_binding
