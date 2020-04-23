@@ -4,6 +4,7 @@ imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-aws-plugin?version= >=2.3.1
   - plugin:cloudify-kubernetes-plugin?version= >=2.6.3
+  - plugin:cloudify-utilities-plugin?version= >=1.20.1
 
 inputs:
 
@@ -46,6 +47,10 @@ inputs:
     type: string
     default: { concat: [ 'eks_key', { get_input: resource_suffix } ] }
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   client_config: &client_config
@@ -55,13 +60,16 @@ dsl_definitions:
 
 node_templates:
 
-  eks_keypair:
+  keypair:
     type: cloudify.nodes.aws.ec2.Keypair
     properties:
       client_config: *client_config
       resource_config:
         KeyName: { get_input: ssh_keypair }
-        PublicKeyMaterial: { get_secret: agent_key_public }
+        PublicKeyMaterial: { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
 
   eks_service_iam_role:
     type: cloudify.nodes.aws.iam.Role
@@ -496,6 +504,8 @@ node_templates:
         target: eks_nodegroup_iam_role
       - type: cloudify.relationships.depends_on
         target: eks_cluster
+      - type: cloudify.relationships.depends_on
+        target: keypair
 
   kubernetes_master:
     type: cloudify.kubernetes.nodes.Master
@@ -617,3 +627,18 @@ node_templates:
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: sanity_master
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true

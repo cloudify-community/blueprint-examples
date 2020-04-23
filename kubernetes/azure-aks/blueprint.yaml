@@ -7,6 +7,7 @@ imports:
   - http://www.getcloudify.org/spec/cloudify/3.4/types.yaml
   - plugin:cloudify-azure-plugin?version= >=2.1.10
   - plugin:cloudify-kubernetes-plugin?version= >=2.6.3
+  - plugin:cloudify-utilities-plugin?version= >=1.20.1
 
 inputs:
   # Azure account information
@@ -48,10 +49,6 @@ inputs:
     type: string
     default: { concat: [ 'aks-test-mc', { get_input: resource_suffix } ] }
 
-  public_key:
-    type: string
-    default: { get_secret: agent_key_public }
-
   service_account_name:
     type: string
     default: examples-user
@@ -59,6 +56,10 @@ inputs:
   service_account_namespace:
     type: string
     default: default
+
+  agent_key_name:
+    type: string
+    default: agent_key
 
 dsl_definitions:
   azure_config: &azure_config
@@ -89,7 +90,7 @@ dsl_definitions:
       adminUsername: "azureuser"
       ssh:
         publicKeys:
-          - keyData : { get_input: public_key }
+          - keyData : { get_attribute: [agent_key, public_key_export] }
     network_profile:
       loadBalancerSku: "standard"
       outboundType: "loadBalancer"
@@ -126,6 +127,8 @@ node_templates:
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
+    - type: cloudify.relationships.depends_on
+      target: agent_key
 
   kubernetes_master:
     type: cloudify.kubernetes.nodes.Master
@@ -247,3 +250,18 @@ node_templates:
     relationships:
       - type: cloudify.kubernetes.relationships.managed_by_master
         target: sanity_master
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true
