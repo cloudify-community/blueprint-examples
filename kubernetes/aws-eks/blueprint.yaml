@@ -4,7 +4,7 @@ imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-aws-plugin?version= >=2.3.1
   - plugin:cloudify-kubernetes-plugin?version= >=2.6.3
-  - plugin:cloudify-utilities-plugin?version= >=1.20.0
+  - plugin:cloudify-utilities-plugin?version= >=1.20.1
 
 inputs:
 
@@ -18,7 +18,7 @@ inputs:
 
   aws_region_name:
     type: string
-    default: 'eu-west-1'
+    default: 'us-east-1'
 
   resource_suffix:
     default: '-1'
@@ -60,7 +60,7 @@ dsl_definitions:
 
 node_templates:
 
-  eks_keypair:
+  keypair:
     type: cloudify.nodes.aws.ec2.Keypair
     properties:
       client_config: *client_config
@@ -505,7 +505,7 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: eks_cluster
       - type: cloudify.relationships.depends_on
-        target: eks_keypair
+        target: keypair
 
   kubernetes_master:
     type: cloudify.kubernetes.nodes.Master

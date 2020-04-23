@@ -4,7 +4,7 @@ imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-azure-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin?version= >=1.20.0
+  - plugin:cloudify-utilities-plugin?version= >=1.20.1
   - includes/ansible.yaml
 
 inputs:
