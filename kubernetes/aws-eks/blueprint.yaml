@@ -267,7 +267,9 @@ node_templates:
         poststart:
           implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
           inputs:
-            MapPublicIpOnLaunch: true
+            resource_config:
+              MapPublicIpOnLaunch:
+                Value: true
 
   public_subnet_02:
     type: cloudify.nodes.aws.ec2.Subnet
@@ -296,7 +298,9 @@ node_templates:
         poststart:
           implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
           inputs:
-            MapPublicIpOnLaunch: true
+            resource_config:
+              MapPublicIpOnLaunch:
+                Value: true
 
   public_route_table_01:
     type: cloudify.nodes.aws.ec2.RouteTable
