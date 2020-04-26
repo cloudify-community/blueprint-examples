@@ -7,7 +7,7 @@ imports:
   - plugin:cloudify-azure-plugin
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin?version= >=1.20.1
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-kubernetes-plugin
   - includes/cloud-init.yaml
   - includes/application.yaml
