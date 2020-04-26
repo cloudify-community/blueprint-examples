@@ -194,12 +194,6 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        post_start:
-          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
-          inputs:
-            MapPublicIpOnLaunch: true
 
   private_route_table_01:
     type: cloudify.nodes.aws.ec2.RouteTable
@@ -233,12 +227,7 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        post_start:
-          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
-          inputs:
-            MapPublicIpOnLaunch: true
+
 
 
   private_route_table_02:
@@ -275,7 +264,7 @@ node_templates:
         target: internet_gateway
     interfaces:
       cloudify.interfaces.lifecycle:
-        post_start:
+        poststart:
           implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
           inputs:
             MapPublicIpOnLaunch: true
@@ -304,7 +293,7 @@ node_templates:
         target: internet_gateway
     interfaces:
       cloudify.interfaces.lifecycle:
-        post_start:
+        poststart:
           implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
           inputs:
             MapPublicIpOnLaunch: true
