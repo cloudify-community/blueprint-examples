@@ -3,8 +3,8 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://www.getcloudify.org/spec/cloudify/4.5/types.yaml
   - plugin:cloudify-aws-plugin?version= >=2.3.1
-  - plugin:cloudify-kubernetes-plugin?version= >=2.6.3
-  - plugin:cloudify-utilities-plugin?version= >=1.20.1
+  - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
 
@@ -194,6 +194,12 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        post_start:
+          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
+          inputs:
+            MapPublicIpOnLaunch: true
 
   private_route_table_01:
     type: cloudify.nodes.aws.ec2.RouteTable
@@ -227,6 +233,13 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        post_start:
+          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
+          inputs:
+            MapPublicIpOnLaunch: true
+
 
   private_route_table_02:
     type: cloudify.nodes.aws.ec2.RouteTable
@@ -260,6 +273,12 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        post_start:
+          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
+          inputs:
+            MapPublicIpOnLaunch: true
 
   public_subnet_02:
     type: cloudify.nodes.aws.ec2.Subnet
@@ -283,6 +302,12 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        post_start:
+          implementation: aws.cloudify_aws.ec2.resources.subnet.modify_subnet_attribute
+          inputs:
+            MapPublicIpOnLaunch: true
 
   public_route_table_01:
     type: cloudify.nodes.aws.ec2.RouteTable
@@ -510,7 +535,7 @@ node_templates:
   kubernetes_master:
     type: cloudify.kubernetes.nodes.Master
     properties:
-      configuration:
+      configuration: &kubernetes_master_configuration
         file_content: { get_attribute: [ eks_cluster, kubeconf ] }
     relationships:
       - type: cloudify.relationships.depends_on
@@ -519,6 +544,8 @@ node_templates:
   new_service_account:
     type: cloudify.kubernetes.resources.ServiceAccount
     properties:
+      client_config:
+        configuration: *kubernetes_master_configuration
       definition:
         apiVersion: v1
         kind: ServiceAccount
@@ -528,12 +555,14 @@ node_templates:
       options:
         namespace: { get_input: service_account_namespace }
     relationships:
-      - type: cloudify.kubernetes.relationships.managed_by_master
+      - type: cloudify.relationships.depends_on
         target: kubernetes_master
 
   new_role_binding:
     type: cloudify.kubernetes.resources.RoleBinding
     properties:
+      client_config:
+        configuration: *kubernetes_master_configuration
       definition:
         apiVersion: rbac.authorization.k8s.io/v1beta1
         kind: ClusterRoleBinding
@@ -550,12 +579,14 @@ node_templates:
       options:
         namespace: { get_input: service_account_namespace }
     relationships:
-      - type: cloudify.kubernetes.relationships.managed_by_master
+      - type: cloudify.relationships.depends_on
         target: kubernetes_master
 
   secret:
     type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
     properties:
+      client_config:
+        configuration: *kubernetes_master_configuration
       use_external_resource: true
       definition:
         apiVersion: v1
@@ -579,7 +610,7 @@ node_templates:
           method: delete_namespaced_secret
           payload: V1DeleteOptions
     relationships:
-      - type: cloudify.kubernetes.relationships.managed_by_master
+      - type: cloudify.relationships.depends_on
         target: kubernetes_master
       - type: cloudify.relationships.depends_on
         target: new_role_binding
@@ -602,7 +633,7 @@ node_templates:
   sanity_master:
     type: cloudify.kubernetes.nodes.Master
     properties:
-      configuration:
+      configuration: &sanity_master_configuration
         api_options:
           host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
           api_key: { get_secret: kubernetes_token }
@@ -615,6 +646,8 @@ node_templates:
   sanity_pod:
     type: cloudify.kubernetes.resources.Pod
     properties:
+      client_config:
+        configuration: *sanity_master_configuration
       definition:
         apiVersion: v1
         kind: Pod
@@ -625,7 +658,7 @@ node_templates:
           - name: nginx
             image: nginx:stable
     relationships:
-      - type: cloudify.kubernetes.relationships.managed_by_master
+      - type: cloudify.relationships.depends_on
         target: sanity_master
 
   agent_key:
