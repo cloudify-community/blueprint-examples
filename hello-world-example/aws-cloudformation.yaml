@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-aws-plugin
-
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
 inputs:
 
   aws_access_key_id:
@@ -37,6 +37,9 @@ inputs:
     type: string
     default: { concat: [ 'hello_world_key', { get_input: resource_suffix } ] }
 
+  agent_key_name:
+    type: string
+    default: agent_key
 
 dsl_definitions:
 
@@ -53,7 +56,10 @@ node_templates:
       client_config: *client_config
       resource_config:
         KeyName: { get_input: key_pair_name }
-        PublicKeyMaterial: { get_secret: agent_key_public }
+        PublicKeyMaterial: { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
 
   hello_world_stack:
     type: cloudify.nodes.aws.CloudFormation.Stack
@@ -75,6 +81,21 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: hello_world_keypair
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true
 
 outputs:
 

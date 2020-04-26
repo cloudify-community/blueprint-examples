@@ -54,14 +54,6 @@ cfy secrets create openstack_password --secret-string <value>
 cfy secrets create openstack_tenant_name --secret-string <value>
 cfy secrets create openstack_auth_url --secret-string <value>
 ```
-      
-For **Key pair**
-```shell
-ssh-keygen -t rsa -C "your_email@example.com"
-# [ENTER] [ENTER] [ENTER] [ENTER] [ENTER]
-cfy secrets create agent_key_private -f ~/.ssh/id_rsa -u
-cfy secrets create agent_key_public -f ~/.ssh/id_rsa.pub -u
-```
          
 ### Running the example
 
@@ -69,7 +61,7 @@ cfy secrets create agent_key_public -f ~/.ssh/id_rsa.pub -u
 For **AWS**:
 
 ```shell
-cfy install aws.yaml -i region_name=eu-central-1 -i availability_zone=eu-central-1b -i image_id=ami-04f992cf4dcaed3c4 -i instance_type=t2.large -i agent_user=ec2-user
+cfy install aws.yaml -i region_name=eu-central-1 -i image_id=ami-04f992cf4dcaed3c4 -i instance_type=t2.large -i agent_user=ec2-user
 ```
 
 For **Azure**:

@@ -2,7 +2,6 @@
 
 **Download Cloudify to [get started](https://cloudify.co/download)!**
 
-
 ## User guide
 
 Each of these blueprints is tested on the version of Cloudify and with the latest version of our official Cloudify plugins. If you have not installed the required plugins, you can do so now from the CLI, by running `cfy plugins bundle-upload`.

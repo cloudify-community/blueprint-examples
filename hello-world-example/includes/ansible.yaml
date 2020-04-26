@@ -22,6 +22,6 @@ node_templates:
                       vm:
                         ansible_host: { get_attribute: [ vm, ip ] }
                         ansible_user: { get_input: agent_user }
-                        ansible_ssh_private_key_file: { get_secret: agent_key_private }
+                        ansible_ssh_private_key_file: { get_attribute: [agent_key, private_key_export] }
                         ansible_become: True
                         ansible_ssh_common_args: -o StrictHostKeyChecking=no

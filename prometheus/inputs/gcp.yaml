@@ -7,7 +7,7 @@ prometheus_scrape_jobs:
   - job_name: 'gcp'
     gce_sd_configs:
       - project: { get_secret: gcp_project_id }
-        zone: { get_secret: gcp_zone }
+        zone: { get_input: zone }
     relabel_configs:
       - regex: ([^:]+)(?::\d+)?
         replacement: $1:9100

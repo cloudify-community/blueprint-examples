@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
 
@@ -37,6 +37,10 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: centos
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -54,7 +58,7 @@ node_templates:
       client_config: *openstack_config
       agent_config:
         install_method: none
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       resource_config:
         name: vm
@@ -172,7 +176,25 @@ node_templates:
           shell: /bin/bash
           sudo: ['ALL=(ALL) NOPASSWD:ALL']
           ssh-authorized-keys:
-          - { get_secret: agent_key_public }
+          - { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 capabilities:
 
@@ -186,4 +208,4 @@ capabilities:
 
   key_content:
     description: Private agent key
-    value: { get_secret: agent_key_private }
+    value: { get_attribute: [agent_key, private_key_export] }

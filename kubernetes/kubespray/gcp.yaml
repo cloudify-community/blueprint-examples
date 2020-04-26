@@ -4,7 +4,7 @@ imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-ansible-plugin
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - includes/application.yaml
   - includes/kube-config.yaml
 
@@ -44,6 +44,10 @@ inputs:
     description: The username of the agent running on the instance created from the image.
     default: centos
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   client_config: &gcp_config
@@ -60,7 +64,7 @@ node_types:
       agent_config:
         default:
           install_method: none
-          key: { get_secret: agent_key_private }
+          key: { get_attribute: [agent_key, private_key_export] }
           user: { get_input: agent_user }
       use_public_ip:
         default: true
@@ -87,7 +91,7 @@ node_types:
               default: { get_input: agent_user }
             ssh_keys:
               default:
-                - { get_secret: agent_key_public }
+                - { get_attribute: [agent_key, public_key_export] }
 
   kube-master: *k8s-cluster
 
@@ -133,12 +137,31 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: subnet
+      - type: cloudify.relationships.depends_on
+        target: agent_key
 
   kube-node:
     type: kube-node
     relationships:
       - type: cloudify.relationships.depends_on
         target: subnet
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+      type: cloudify.keys.nodes.RSAKey
+      properties:
+        resource_config:
+          key_name: { get_input: agent_key_name }
+          openssh_format: true
+        use_secret_store: true
+        use_secrets_if_exist: true
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: keys.cloudify_ssh_key.operations.create
+            inputs:
+              store_private_key_material: true
 
 groups:
 

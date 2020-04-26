@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 
 inputs:
@@ -43,6 +43,10 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
+  agent_key_name:
+    type: string
+    default: agent_key
+
 dsl_definitions:
 
   client_config: &gcp_config
@@ -57,7 +61,7 @@ node_templates:
       gcp_config: *gcp_config
       agent_config:
         install_method: none
-        key: { get_secret: agent_key_private }
+        key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
       image_id: { get_input: image }
@@ -67,6 +71,8 @@ node_templates:
     relationships:
     - type: cloudify.relationships.depends_on
       target: subnet
+    - type: cloudify.relationships.depends_on
+      target: agent_key
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -75,7 +81,7 @@ node_templates:
           inputs:
             user: { get_input: agent_user }
             ssh_keys:
-              - { get_secret: agent_key_public }
+              - { get_attribute: [agent_key, public_key_export] }
 
 
   firewall:
@@ -113,6 +119,21 @@ node_templates:
       gcp_config: *gcp_config
       auto_subnets: false
 
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
 capabilities:
 
   endpoint:
@@ -125,4 +146,4 @@ capabilities:
 
   key_content:
     description: Private agent key
-    value: { get_secret: agent_key_private }
+    value: { get_attribute: [agent_key, private_key_export] }

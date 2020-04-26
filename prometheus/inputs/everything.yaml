@@ -41,7 +41,7 @@ prometheus_scrape_jobs:
   - job_name: 'gcp'
     gce_sd_configs:
       - project: { get_secret: gcp_project_id }
-        zone: { get_secret: gcp_zone }
+        zone: { get_input: zone }
         port: 9100
     relabel_configs:
       - regex: ([^:]+)(?::\d+)?

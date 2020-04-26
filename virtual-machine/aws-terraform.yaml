@@ -6,6 +6,7 @@ description: >
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-terraform-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
   terraform_installation_source:
@@ -35,6 +36,9 @@ inputs:
   aws_region_name:
     type: string
     default: 'ca-central-1'
+  agent_key_name:
+    type: string
+    default: agent_key
 
 node_templates:
   terraform:
@@ -59,11 +63,29 @@ node_templates:
           secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }
           admin_user: { get_input: agent_user }
-          admin_key_public: { get_secret: agent_key_public }
+          admin_key_public: { get_attribute: [agent_key, public_key_export] }
         source: resources/terraform/template.zip
     relationships:
       - target: terraform
         type: cloudify.relationships.depends_on
+      - target: agent_key
+        type: cloudify.relationships.depends_on
+
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 capabilities:
   name:
@@ -79,4 +101,4 @@ capabilities:
 
   key_content:
     description: Private agent key
-    value: { get_secret: agent_key_private }
+    value: { get_attribute: [agent_key, private_key_export] }
