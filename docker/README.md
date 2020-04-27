@@ -63,7 +63,7 @@ cfy install ansible-container-using-docker-ansible-playbook.yaml -i docker_host=
  * ansible_host: ip of vm with Ubuntu image installed on it.
  * ansible_user: ubuntu
 
-In order to sse that the example works:
+In order to see that the example works:
  1. Go to  https://<ansible_host> and see the "hello world" site.
  2. look in docker_ansible_container node instance and see the "run_result" runtime property.
    
@@ -79,7 +79,7 @@ cfy install any-container.yaml -i docker_host=<ip> -i docker_user=<username>
  * docker_host: ip of vm with docker installed
  * docker_user: username for ssh to the vm(centos)
 
-In order to sse that the example works look in docker_centos_container node instance and see the "run_result" runtime property.
+In order to see that the example works look in docker_centos_container node instance and see the "run_result" runtime property.
    
 ## installation examples
 
@@ -114,6 +114,6 @@ cfy install terraform-container-using-docker-terraform-module.yaml   -i docker_h
  * docker_host: ip of vm with docker installed.
  * docker_user: username for ssh to the vm(centos/ubuntu)
  
- In order to sse that the example works:
+ In order to see that the example works:
   1. You can enter your aws console and see that a VM was created.
-  2. Look in docker_terraform_container node instance and see the "run_result" runtime property(check that terraform was installed).
+  2. Look in docker_terraform_container node instance and see the "run_result" runtime property(check terraform execution result).
