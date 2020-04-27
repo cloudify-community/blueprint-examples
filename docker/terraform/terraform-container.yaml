@@ -47,9 +47,9 @@ inputs:
     type: string
     default: { get_secret: aws_secret_access_key }
 
-  aws_default_region:
+  aws_region_name:
     type: string
-    default: { get_secret: ec2_region_name }
+    default: us-east-1
 
   public_key:
     default: { get_secret: agent_key_public }
@@ -104,7 +104,7 @@ node_templates:
               - 'storage'
           plugins: { get_input: terraform_plugins }
           variables:
-            aws_region: { get_input: aws_default_region }
+            aws_region: { get_input: aws_region_name }
             key_name: terraform
             public_key: { get_input: public_key }
           backend: {}
@@ -125,7 +125,7 @@ node_templates:
           environment:
             AWS_ACCESS_KEY_ID: { get_input: aws_access_key_id }
             AWS_SECRET_ACCESS_KEY: { get_input: aws_secret_access_key }
-            AWS_DEFAULT_REGION: { get_input: aws_default_region }
+            AWS_DEFAULT_REGION: { get_input: aws_region_name }
           volumes:
             - { get_input: container_volume }
           volumes_mapping:
