@@ -153,8 +153,8 @@ node_templates:
     properties:
       client_config: *client_config
       resource_config:
-        GroupName: CloudifyHelloWorldGroup
-        Description: Created by cloudify-hello-world-example.
+        GroupName: CloudifyGettingStartedExample
+        Description: Created by cloudify-getting-started-example.
         VpcId: { get_attribute: [ vpc, aws_resource_id ] }
     relationships:
     - type: cloudify.relationships.depends_on

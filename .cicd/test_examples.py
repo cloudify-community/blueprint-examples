@@ -13,38 +13,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from os import path, system
+
+import os
 import pytest
-from __init__ import blueprint_list, get_cloudify_version, VersionsException
+
+from ecosystem_tests.dorkl import (
+    blueprints_upload,
+    basic_blueprint_test,
+    cleanup_on_failure, prepare_test
+)
+
+from __init__ import (
+    blueprint_id_filter,
+    get_dirname_and_infra_name,
+    blueprint_list,
+    get_cloudify_version,
+    VersionsException,
+    PLUGINS_TO_UPLOAD,
+    SECRETS_TO_CREATE)
 
 
-UPLOAD_BLUEPRINT = 'cfy blueprints upload {0} -b {1}'
+prepare_test(plugins=PLUGINS_TO_UPLOAD, secrets=SECRETS_TO_CREATE)
+
+virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
+                        in b and os.environ.get('IAAS', '') in b]
+getting_started_list = [b for b in blueprint_list if 'getting-started' in b]
 
 
 @pytest.fixture(scope='function', params=blueprint_list)
-def validate_blueprint(request):
-    # For the db-lb-app, we need a blueprint named 'infrastructure'.
-    # So this makes sure that the first one that gets uploaded (aws)
-    # will be the reference.
-    # TODO: Add to supported examples.json desired blueprint name.
-    dirname_param = path.dirname(request.param).split('/')[-1:][0]
-    infra_name = path.basename(request.param).split('.yaml')[0]
-    if dirname_param == 'infrastructure' and infra_name == 'azure':
-        blueprint_id = '{0}'.format(dirname_param)
-    elif dirname_param == 'infrastructure' and infra_name == 'aws':
-        blueprint_id = 'public-cloud-vm'
-    elif dirname_param == 'infrastructure' and infra_name == 'openstack':
-        blueprint_id = 'private-cloud-vm'
-    else:
+def upload_blueprints_for_validation(request):
+    blueprints_upload(request.param, blueprint_id_filter(request.param))
+
+
+@pytest.fixture(scope='function', params=virtual_machine_list)
+def basic_blueprint_test_with_getting_started_filter(request):
+    _, infra_name = get_dirname_and_infra_name(request.param)
+    blueprints_upload(request.param, 'infra-{0}'.format(infra_name))
+    for blueprint_path in getting_started_list:
         blueprint_id = '{0}-{1}'.format(
-            dirname_param,
-            infra_name)
-    return system(UPLOAD_BLUEPRINT.format(request.param, blueprint_id))
+            blueprint_id_filter(blueprint_path), infra_name)
+        try:
+            basic_blueprint_test(
+                blueprint_path,
+                blueprint_id,
+                inputs='infra_name={0} -i infra_exists=true'.format(
+                    infra_name),
+                timeout=3000)
+        except:
+            cleanup_on_failure(blueprint_id)
+            raise
 
 
-def test_blueprints(validate_blueprint):
+def test_blueprint_validation(upload_blueprints_for_validation):
     """All blueprints must pass DSL validation."""
-    assert validate_blueprint == 0
+    assert upload_blueprints_for_validation is None
 
 
 def test_versions():
@@ -56,3 +78,7 @@ def test_versions():
         pytest.fail(
             "Failed to verify that branch "
             "versions are the same: {0}.".format(str(e)))
+
+
+def test_getting_started(basic_blueprint_test_with_getting_started_filter):
+    assert basic_blueprint_test_with_getting_started_filter is None

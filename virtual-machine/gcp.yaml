@@ -21,12 +21,12 @@ inputs:
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: demoappvnet
+    default: cfynet
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: demoappsubnet
+    default: cfysubnet
 
   image:
     type: string
