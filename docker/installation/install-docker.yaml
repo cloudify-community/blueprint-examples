@@ -1,0 +1,46 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-docker-plugin
+
+inputs:
+
+  docker_host:
+    type: string
+    required: true
+
+  docker_user:
+    type: string
+    required: true
+
+dsl_definitions:
+
+  docker_machine_config: &docker_machine_config
+    docker_ip: { get_input: docker_host }
+    docker_user: { get_input: docker_user }
+    docker_key: { get_secret: agent_key_private }
+
+node_templates:
+
+  docker_installation:
+    type: cloudify.nodes.docker.host
+    properties:
+      docker_machine: *docker_machine_config
+      resource_config:
+        install_url: https://get.docker.com
+        install_script: |
+          usermod -aG docker $USER
+
+          if [ -f /etc/redhat-release ]; then
+            sed -i '/ExecStart/s/usr\/bin\/dockerd/usr\/bin\/dockerd --mtu=1450/' /lib/systemd/system/docker.service
+            sed -i '/ExecStart/ s/$/ -H=tcp:\/\/0.0.0.0:2375 --dns 8.8.8.8 --bip 172.99.0.1\/16/' /lib/systemd/system/docker.service
+            systemctl daemon-reload
+            systemctl restart docker.service
+          fi
+
+          if [ -f /etc/lsb-release ]; then
+            echo "DOCKER_OPTS=\"--mtu=1450 --dns 8.8.8.8 --dns 8.8.4.4 -H=tcp://0.0.0.0:2375 --bip 172.99.0.1/16\"" >> /etc/default/docker
+            service docker restart
+
+          fi
