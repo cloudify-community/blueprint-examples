@@ -103,6 +103,9 @@
   "docker/installation": [
     "install-docker.yaml"
   ],
+  "docker/docker-machine": [
+    "mc-docker.yaml"
+  ],
   "docker/terraform": [
     "terraform-container-using-docker-terraform-module.yaml",
     "terraform-container.yaml"
