@@ -38,6 +38,8 @@ Mappings:
   RegionMap:
     us-east-1:
       AMI: ami-03248a0341eadb1f1
+    ca-central-1:
+      AMI: ami-033e6106180a626d0
     us-west-1:
       AMI: ami-01dd5a8ef26e6341d
     us-west-2:
