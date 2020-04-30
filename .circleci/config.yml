@@ -221,6 +221,13 @@ jobs:
           name: show images
           command: docker images
       - run:
+          name: install docker
+          description: The user needs the docker plugin, which is not included in this package.
+          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-docker-plugin/2.0.1/cloudify_docker_plugin-2.0.1-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/docker-plugin/2.0.1/plugin.yaml || true
+      - run:
+          name: execute test
+          command: pytest -s .cicd/test_examples.py
+      - run:   
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
       - run:
