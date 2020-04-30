@@ -11,186 +11,6 @@ checkout:
 
 jobs:
 
-  getting-started:
-    # This job tests first time user's getting started experience.
-    machine:
-      enabled: true
-      python:
-        version: pypy-2.2.1
-    environment:
-      CLOUDIFY_SSL_TRUST_ALL: true
-    steps:
-      - checkout
-      - attach_workspace:
-          at: workspace
-      - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule init
-            git submodule update --remote
-      - run:
-          name: update pip
-          command: pip install -U pip
-      - run:
-          name: Install JQ
-          command: sudo apt-get install -y jq
-      - run:
-          name: install cloudify
-          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
-      - run:
-          name: download manager docker image
-          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
-      - run:
-          name: load docker image
-          command: docker load -i cloudify-docker-manager-5.0.0.tar
-      - run:
-          name: retain space by dumping the tar
-          command: rm cloudify-docker-manager-5.0.0.tar
-      - run:
-          name: start docker container
-          description: This is the first user step, creating the manager.
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
-      - run:
-          name: init CLI profile
-          description: The user now needs to initialize their CLI profile.
-          command: |
-            counter=0
-            until [ $counter -ge 15 ]
-            do
-                cfy profiles use localhost -u admin -p admin -t default_tenant && break
-                counter=$[$counter+1]
-                sleep 2
-            done
-      - run:
-          name: upload license
-          description: The user will not need to upload a license, they are most likely using cloudify community.
-          command: |
-            set +x
-            echo ${TEST_LICENSE} | base64 --decode > license.yaml
-            set -x
-            cfy license upload license.yaml
-      - run:
-          name: install plugins bundle
-          description: The user will need to upload all plugins.
-          command: |
-            cfy plugins bundle-upload
-            for plugin in `cfy executions list --include-system-workflows | grep install_plugin | awk '{print $2}'`; do cfy events list -vv $plugin; sleep 5; done
-      - run:
-          name: create iaas secrets
-          description: The user needs to create the secrets.
-          command: |
-
-            cfy secrets create aws_access_key_id -s `echo "${aws_access_key_id}" | base64 --decode`
-            cfy secrets create aws_secret_access_key -s `echo "${aws_secret_access_key}" | base64 --decode`
-            cfy secrets create aws_region_name -s `echo "${aws_region_name}" | base64 --decode`
-            cfy secrets create ec2_region_endpoint -s `echo "${ec2_region_endpoint}" | base64 --decode`
-
-            cfy secrets create azure_subscription_id -s `echo "${azure_subscription_id}" | base64 --decode`
-            cfy secrets create azure_tenant_id -s `echo "${azure_tenant_id}" | base64 --decode`
-            cfy secrets create azure_client_id -s `echo "${azure_client_id}" | base64 --decode`
-            cfy secrets create azure_client_secret -s `echo "${azure_client_secret}" | base64 --decode`
-            cfy secrets create azure_location -s `echo "${azure_location}" | base64 --decode`
-
-            echo "${gcp_credentials}" | base64 --decode > gcp_credentials.json
-
-            cfy secrets create gcp_credentials -f gcp_credentials.json
-
-            cfy secrets create -u openstack_username -s `echo "${openstack_username}" | base64 --decode`
-            cfy secrets create -u openstack_password -s `echo "${openstack_password}" | base64 --decode`
-            cfy secrets create -u openstack_tenant_name -s `echo "${openstack_tenant_name}" | base64 --decode`
-            cfy secrets create -u openstack_auth_url -s `echo "${openstack_auth_url}" | base64 --decode`
-            cfy secrets create -u openstack_region -s `echo "${openstack_region}" | base64 --decode`
-
-      - run:
-          name: create agent secrets
-          description: >
-            These examples use Ansible to setup all applications. Since Ansible is primarily a SSH-centered tool, we need an SSH authentication method. We use key-based authentication, because it is easy to automate. In this step, we create the keys and then upload them as secrets.
-          command: |
-            ssh-keygen -t rsa -N '' -f foo.rsa
-            cfy secrets create agent_key_private -f foo.rsa
-            cfy secrets create agent_key_public -f foo.rsa.pub
-      - run:
-          name: Install AWS
-          description: the user executes aws install.
-          command: |
-            DEP_ID=getting-started.aws
-            set +x
-            function cleanup()
-            {
-                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
-                cfy executions cancel $EX_ID
-                sleep 5
-                cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
-            }
-            trap cleanup EXIT
-            cfy install getting-started/mc-jboss.yaml -i infra_name=aws -b $DEP_ID -vv
-            sleep 5
-            cfy uninstall $DEP_ID
-            trap EXIT
-            set -x
-      - run:
-          name: Install Azure
-          description: the user executes azure install.
-          command: |
-            DEP_ID=getting-started.azure
-            set +x
-            function cleanup()
-            {
-                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
-                cfy executions cancel $EX_ID
-                sleep 5
-                cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
-            }
-            trap cleanup EXIT
-            cfy install getting-started/mc-jboss.yaml -i infra_name=azure -b $DEP_ID -vv
-            sleep 5
-            cfy uninstall $DEP_ID
-            trap EXIT
-            set -x
-      - run:
-          name: Install GCP
-          description: the user executes gcp install.
-          command: |
-            DEP_ID=getting-started.gcp
-            set +x
-            function cleanup()
-            {
-                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
-                cfy executions cancel $EX_ID
-                sleep 5
-                cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
-            }
-            trap cleanup EXIT
-            cfy install getting-started/mc-jboss.yaml -i infra_name=gcp -b $DEP_ID -vv
-            sleep 5
-            cfy uninstall $DEP_ID
-            trap EXIT
-            set -x
-      - run:
-          name: install openstack
-          description: The user needs the 3.x OS plugin, which is not included in this package.
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.9/cloudify_openstack_plugin-3.2.9-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.9/plugin.yaml || true
-#      - run:
-#          name: Install OS
-#          description: the user executes openstack install.
-#          command: |
-#            DEP_ID=getting-started.os
-#            set +x
-#            function cleanup()
-#            {
-#                EX_ID=`cfy executions list --include-system-workflows | grep install | grep $DEP_ID | awk '{print $2}'`
-#                cfy executions cancel $EX_ID
-#                sleep 5
-#                cfy uninstall $DEP_ID -p ignore_failure=true --force -vv
-#            }
-#            trap cleanup EXIT
-#            cfy install getting-started/mc-jboss.yaml -i infra_name=openstack -b $DEP_ID -vv
-#            sleep 5
-#            cfy uninstall $DEP_ID
-#            trap EXIT
-#            set -x
-
-
   blueprint-validation:
     machine:
       enabled: true
@@ -229,38 +49,184 @@ jobs:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
       - run:
-          name: init CLI profile
-          command: |
-            counter=0
-            until [ $counter -ge 15 ]
-            do
-                cfy profiles use localhost -u admin -p admin -t default_tenant && break
-                counter=$[$counter+1]
-                sleep 2
-            done
-      - run:
-          name: upload license
-          command: |
-            set +x
-            echo ${TEST_LICENSE} | base64 --decode > license.yaml
-            set -x
-            cfy license upload license.yaml
-      - run:
-          name: install plugins bundle
-          command: cfy plugins bundle-upload
-      - run:
-          name: install openstack
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/3.2.9/cloudify_openstack_plugin-3.2.9-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/openstack-plugin/3.2.9/plugin.yaml || true
-      - run:
-          name: install updated utilities
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-utilities-plugin/1.22.1/cloudify_utilities_plugin-1.22.1-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/utilities-plugin/1.22.1/plugin.yaml || true
-      - run:
-          name: install updated terraform
-          command: cfy plugins upload http://repository.cloudifysource.org/cloudify/wagons/cloudify-terraform-plugin/0.7/cloudify_terraform_plugin-0.7-py27-none-linux_x86_64-centos-Core.wgn -y http://www.getcloudify.org/spec/terraform-plugin/0.7/plugin.yaml || true
-      - run:
-          name: execute test
-          command: pytest -s .cicd/test_examples.py
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
+      - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
 
+
+  getting-started-aws:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      IAAS: aws
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
+      - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
+
+
+  getting-started-openstack:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      IAAS: openstack
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
+      - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
+
+  getting-started-azure:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      IAAS: azure
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
+      - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
+
+
+  getting-started-gcp:
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      IAAS: gcp
+    steps:
+      - checkout
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
+      - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
 
   release:
     docker:
@@ -300,17 +266,32 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprint-validation
-      - getting-started:
+      - getting-started-aws:
           requires:
-            - blueprint-validation
+          - blueprint-validation
           filters:
             branches:
               only: master
+      - getting-started-azure:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-gcp:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      # - getting-started-openstack  # TODO: Get correct parameters for public OS.
+      - blueprint-validation
       - release:
           requires:
-            - blueprint-validation
-            - getting-started
+            - getting-started-aws
+            - getting-started-azure
+            - getting-started-gcp
+            # - getting-started-openstack  # TODO: Get correct parameters for public OS.
           filters:
             branches:
               only: master
@@ -324,9 +305,27 @@ workflows:
               - master
     jobs:
       - blueprint-validation
-      - getting-started:
+      - getting-started-aws:
           requires:
-            - blueprint-validation
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-azure:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-gcp:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-openstack:
+          requires:
+          - blueprint-validation
           filters:
             branches:
               only: master
