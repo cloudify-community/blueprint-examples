@@ -47,3 +47,4 @@ nosetests.xml
 .vagrant/
 .coverage*
 .idea
+.cache*
