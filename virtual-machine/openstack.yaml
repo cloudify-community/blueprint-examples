@@ -143,6 +143,10 @@ node_templates:
           protocol: tcp
           port_range_min: 9990
           port_range_max: 9990
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 2375
+          port_range_max: 2375
 
   ip:
     type: cloudify.nodes.openstack.FloatingIP
@@ -205,4 +209,3 @@ capabilities:
   key_content:
     description: Private agent key
     value: { get_attribute: [agent_key, private_key_export] }
-

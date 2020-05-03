@@ -92,5 +92,22 @@
   ],
   "getting-started": [
     "mc-jboss.yaml"
+  ],
+  "docker/ansible": [
+    "ansible-container-using-docker-ansible-playbook.yaml",
+    "ansible-container.yaml"
+  ],
+  "docker/general": [
+    "any-container.yaml"
+  ],
+  "docker/installation": [
+    "install-docker.yaml"
+  ],
+  "docker/docker-machine": [
+    "mc-docker.yaml"
+  ],
+  "docker/terraform": [
+    "terraform-container-using-docker-terraform-module.yaml",
+    "terraform-container.yaml"
   ]
 }

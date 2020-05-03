@@ -94,6 +94,7 @@ node_templates:
           - 80
           - 9990
           - 8080
+          - 2375
       sources:
         - 0.0.0.0/0
     relationships:
