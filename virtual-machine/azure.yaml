@@ -189,6 +189,17 @@ node_templates:
             priority: 103
             access: 'Allow'
             direction: Inbound
+        - name: docker_api_port
+          properties:
+            description: HTTP access
+            protocol: Tcp
+            sourcePortRange: '*'
+            destinationPortRange: 2375
+            sourceAddressPrefix: '*'
+            destinationAddressPrefix: '*'
+            priority: 104
+            access: 'Allow'
+            direction: Inbound
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
