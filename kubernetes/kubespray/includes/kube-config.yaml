@@ -143,10 +143,13 @@ outputs:
     description: Kubernetes Access Url
     value: { concat: [ "https://", { get_attribute: [ kube-master, ip ] }, ":", { get_attribute: [ dashboard-token-and-port, dashboard_port ] } ] }
 
+  endpoint:
+    value: { concat: [ "https://", { get_attribute: [ kube-master, ip ] }, ":6443" ] }
+
 capabilities:
 
   endpoint:
-    value: { get_attribute: [ kube-master, ip ] }
+    value: { concat: [ "https://", { get_attribute: [ kube-master, ip ] }, ":6443" ] }
 
   node-endpoint:
     value: { get_attribute: [ kube-node, ip ] }

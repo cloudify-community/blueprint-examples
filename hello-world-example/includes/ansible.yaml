@@ -1,6 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
-description: Install Drupal8 on infrastructure.
+description: Installs HTTPD with Ansible.
 
 node_templates:
 

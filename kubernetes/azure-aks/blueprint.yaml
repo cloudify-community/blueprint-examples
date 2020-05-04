@@ -273,3 +273,13 @@ node_templates:
             implementation: keys.cloudify_ssh_key.operations.create
             inputs:
               store_private_key_material: true
+
+capabilities:
+
+  endpoint:
+    value: { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
+
+outputs:
+
+  endpoint:
+    value: { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }

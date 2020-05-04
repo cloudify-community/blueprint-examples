@@ -97,3 +97,14 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: sanity_master
+
+
+capabilities:
+
+  endpoint:
+    value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+
+outputs:
+
+  endpoint:
+    value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
