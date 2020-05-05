@@ -27,6 +27,7 @@ SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 OS_VERSION = '3.2.12'
 UT_VERSION = '1.21.0'
 TF_VERSION = '0.13.1'
+DK_VERSION = '2.0.1'
 
 TF_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            'cloudify-terraform-plugin/{v}/cloudify_terraform_plugin' \
@@ -43,6 +44,11 @@ UT_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=UT_VERSION)
 UT_PLUGIN = 'http://www.getcloudify.org/spec/utilities-plugin/' \
             '{v}/plugin.yaml'.format(v=UT_VERSION)
+DK_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
+           'cloudify-docker-plugin/{v}/cloudify_docker_plugin' \
+           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=DK_VERSION)
+DK_PLUGIN = 'http://www.getcloudify.org/spec/docker-plugin/' \
+            '{v}/plugin.yaml'.format(v=DK_VERSION)
 
 PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN), (TF_WAGON, TF_PLUGIN),
                      (UT_WAGON, UT_PLUGIN)]
