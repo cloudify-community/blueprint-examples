@@ -11,12 +11,6 @@ checkout:
 
 executors:
 
-  py221:
-    machine:
-      enabled: true
-      python:
-        version: pypy-2.2.1
-
   py27:
     docker:
     - image: circleci/python:2.7.15-stretch
@@ -113,13 +107,13 @@ commands:
           command: sudo python get-pip.py
       - run:
           name: Install virtualenv
-          command: pip install --user virtualenv
+          command: pip install virtualenv
       - run:
           name: Init virtualenv
           command: virtualenv env
       - run:
           name: install tox
-          command: pip install --user pygithub pyyaml==3.10
+          command: pip install pygithub pyyaml==3.10
       - run:
           name: upgrade setuptools
           command: pip install --upgrade setuptools
@@ -131,14 +125,14 @@ commands:
 jobs:
 
   blueprint-validation:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
       - validate_examples
 
   getting-started-aws:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -146,7 +140,7 @@ jobs:
       - test_examples
 
   getting-started-aws-terraform:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -154,7 +148,7 @@ jobs:
       - test_examples
 
   getting-started-aws-cloudformation:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -162,7 +156,7 @@ jobs:
       - test_examples
 
   getting-started-openstack:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: openstack
@@ -170,7 +164,7 @@ jobs:
       - test_examples
 
   getting-started-azure:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
@@ -178,7 +172,7 @@ jobs:
       - test_examples
 
   getting-started-azure-arm:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
@@ -186,7 +180,7 @@ jobs:
       - test_examples
 
   getting-started-gcp:
-    executor: py221
+    executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: gcp
