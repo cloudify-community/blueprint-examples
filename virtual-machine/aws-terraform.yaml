@@ -60,7 +60,6 @@ node_templates:
   cloud_resources:
     type: cloudify.nodes.terraform.Module
     properties:
-      terraform_config: *terraform_config
       resource_config:
         source: resources/terraform/template.zip
         variables:
