@@ -13,7 +13,11 @@ executors:
 
   py27:
     docker:
-    - image: circleci/python:2.7.15-stretch
+      - image: circleci/python:2.7
+
+  cloudify-machine:
+    machine:
+      image: ubuntu-1604:201903-01
 
 
 commands:
@@ -125,14 +129,14 @@ commands:
 jobs:
 
   blueprint-validation:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
       - validate_examples
 
   getting-started-aws:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -140,7 +144,7 @@ jobs:
       - test_examples
 
   getting-started-aws-terraform:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -148,7 +152,7 @@ jobs:
       - test_examples
 
   getting-started-aws-cloudformation:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
@@ -156,7 +160,7 @@ jobs:
       - test_examples
 
   getting-started-openstack:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: openstack
@@ -164,7 +168,7 @@ jobs:
       - test_examples
 
   getting-started-azure:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
@@ -172,7 +176,7 @@ jobs:
       - test_examples
 
   getting-started-azure-arm:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
@@ -180,7 +184,7 @@ jobs:
       - test_examples
 
   getting-started-gcp:
-    executor: py27
+    executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: gcp
