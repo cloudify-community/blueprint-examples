@@ -8,6 +8,13 @@ imports:
   - plugin:cloudify-terraform-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
+dsl_definitions:
+
+  terraform_config: &terraform_config
+    executable_path: {get_input: terraform_executable}
+    storage_path: {get_input: terraform_storage_path}
+    plugins_dir: {get_input: terraform_plugins_dir}
+
 inputs:
   terraform_installation_source:
     description: >
@@ -44,30 +51,26 @@ node_templates:
   terraform:
     type: cloudify.nodes.terraform
     properties:
-      use_existing_resource: false
-      installation_source: { get_input: terraform_installation_source }
-      plugins: { get_input: terraform_plugins }
-      executable_path: { get_input: terraform_executable }
-      plugins_dir: { get_input: terraform_plugins_dir }
-      storage_path: { get_input: terraform_storage_path }
+      terraform_config: *terraform_config
+      resource_config:
+        use_existing_resource: false
+        installation_source: { get_input: terraform_installation_source }
+        plugins: { get_input: terraform_plugins }
 
   cloud_resources:
     type: cloudify.nodes.terraform.Module
     properties:
-      executable_path: { get_property: [ terraform, executable_path ] }
-      plugins_dir: { get_property: [ terraform, plugins_dir ] }
-      storage_path: { get_property: [ terraform, storage_path ] }
       resource_config:
+        source: resources/terraform/template.zip
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
-        source: resources/terraform/template.zip
     relationships:
       - target: terraform
-        type: cloudify.relationships.depends_on
+        type: cloudify.terraform.relationships.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
 

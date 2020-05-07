@@ -26,7 +26,7 @@ SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 
 OS_VERSION = '3.2.12'
 UT_VERSION = '1.21.0'
-TF_VERSION = '0.13.1'
+TF_VERSION = '0.13.2'
 DK_VERSION = '2.0.1'
 
 TF_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
