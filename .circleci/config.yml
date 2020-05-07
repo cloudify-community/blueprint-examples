@@ -22,23 +22,20 @@ executors:
 
 commands:
 
-
   validate_examples:
     steps:
-      - checkout
-      - attach_workspace:
-          at: workspace
       - run:
           name: "Pull Submodules"
           command: |
-            git submodule init
-            git submodule update --remote
+            git submodule update --init --recursive
+      - attach_workspace:
+          at: workspace
       - run:
           name: update pip
-          command: pip install -U pip --user
+          command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10 --user
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
       - run:
           name: download manager docker image
           command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
@@ -61,20 +58,18 @@ commands:
 
   test_examples:
     steps:
-      - checkout
-      - attach_workspace:
-          at: workspace
       - run:
           name: "Pull Submodules"
           command: |
-            git submodule init
-            git submodule update --remote
+            git submodule update --init --recursive
+      - attach_workspace:
+          at: workspace
       - run:
           name: update pip
-          command: pip install -U pip --user
+          command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10 --user
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
       - run:
           name: download manager docker image
           command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
@@ -97,30 +92,18 @@ commands:
 
   release_examples:
     steps:
-      - checkout
       - run:
           name: "Pull Submodules"
           command: |
-            git submodule init
-            git submodule update --remote
+            git submodule update --init --recursive
+      - attach_workspace:
+          at: workspace
       - run:
-          name: Download pip
-          command: curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+          name: update pip
+          command: pip install -U pip
       - run:
-          name: Install pip
-          command: sudo python get-pip.py
-      - run:
-          name: Install virtualenv
-          command: pip install --user virtualenv --user
-      - run:
-          name: Init virtualenv
-          command: virtualenv env
-      - run:
-          name: install tox
-          command: pip install --user pygithub pyyaml==3.10 --user
-      - run:
-          name: upgrade setuptools
-          command: pip install --upgrade setuptools --user
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -133,6 +116,7 @@ jobs:
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
+      - checkout
       - validate_examples
 
   getting-started-aws:
@@ -141,6 +125,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
+      - checkout
       - test_examples
 
   getting-started-aws-terraform:
@@ -149,6 +134,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
+      - checkout
       - test_examples
 
   getting-started-aws-cloudformation:
@@ -157,6 +143,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
+      - checkout
       - test_examples
 
   getting-started-openstack:
@@ -165,6 +152,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: openstack
     steps:
+      - checkout
       - test_examples
 
   getting-started-azure:
@@ -173,6 +161,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
     steps:
+      - checkout
       - test_examples
 
   getting-started-azure-arm:
@@ -181,6 +170,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
     steps:
+      - checkout
       - test_examples
 
   getting-started-gcp:
@@ -189,6 +179,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: gcp
     steps:
+      - checkout
       - test_examples
 
   release:
@@ -197,6 +188,7 @@ jobs:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: gcp
     steps:
+      - checkout
       - release_examples
 
 workflows:
