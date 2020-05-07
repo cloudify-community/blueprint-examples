@@ -36,7 +36,8 @@ from __init__ import (
 prepare_test(plugins=PLUGINS_TO_UPLOAD, secrets=SECRETS_TO_CREATE)
 
 virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
-                        in b and os.environ.get('IAAS', '') in b]
+                        in b and os.environ.get('IAAS', '') ==
+                        os.path.basename(b).split('.yaml')[0]]
 getting_started_list = [b for b in blueprint_list if 'getting-started' in b]
 
 
