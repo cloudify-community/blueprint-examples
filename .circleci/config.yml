@@ -12,9 +12,10 @@ checkout:
 executors:
 
   py221:
-    enabled: true
-    python:
-      version: pypy-2.2.1
+    machine:
+      enabled: true
+      python:
+        version: pypy-2.2.1
 
   py27:
     docker:
