@@ -9,6 +9,15 @@ inputs:
   kubernetes_master_endpoint:
     type: string
 
+  kubernetes_client_config:
+    default:
+      configuration:
+        api_options:
+          host: { get_input: kubernetes_master_endpoint }
+          api_key: { get_secret: kubernetes_token }
+          debug: false
+          verify_ssl: false
+
   resource_path:
     type: string
     default: resources/deployment.yaml
@@ -26,13 +35,7 @@ node_templates:
   resource:
     type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
-      client_config:
-        configuration:
-          api_options:
-            host: { get_input: kubernetes_master_endpoint }
-            api_key: { get_secret: kubernetes_token }
-            debug: false
-            verify_ssl: false
+      client_config: { get_input: kubernetes_client_config }
       validate_resource_status: { get_input: validate_status }
       file:
         resource_path: { get_input: resource_path }
