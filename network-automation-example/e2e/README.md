@@ -49,8 +49,8 @@ Create the below secrets in the secret store management:
     * *fortigate_username* - Username for Fortigate VM. It is set during provisioning and used during configuration, "admin" is not allowed. You can set this up via the CLI: `cfy secrets create fortigate_username -s [secret value]`. For OpenStack, it has to be set on default username: `admin`.
     * *fortigate_password* - Password for Fortigate VM. It is set during provisioning and used during configuration. The supplied password must be between 6-72 characters long and must satisfy at least 3 of password complexity requirements from the following: Contains an uppercase character, Contains a lowercase character, Contains a numeric digit, Contains a special character. Control characters are not allowed. . You can set this up via the CLI: `cfy secrets create fortigate_password -s [secret value]`. For OpenStack, it has to be set on empty password: ` `.
     * *fortigate_license* - Content of license file, its used during provisioning to license Fortigate
-    * *httpd_username* - Username for HTTPD VM. It is set during provisioning and used during configuration, "admin" is not allowed. `ubuntu` is recommended. You can set this up via the CLI: `cfy secrets create httpd_username -s [secret value]`.
-    * *httpd_website* - Content of website file for HTTPD VM, it is set during provisioning and served after configuration
+    * *webserver_username* - Username for webserver VM. It is set during provisioning and used during configuration, "admin" is not allowed. `ubuntu` is recommended. You can set this up via the CLI: `cfy secrets create webserver_username -s [secret value]`.
+    * *webserver_website* - Content of website file for webserver VM, it is set during provisioning and served after configuration
 
 You can create those with the following cfy commands:\
 ``cfy secrets create azure_client_id -s <azure_client_id>``\
@@ -69,8 +69,8 @@ You can create those with the following cfy commands:\
 ``cfy secrets create fortigate_username -s <fortigate_username>``\
 ``cfy secrets create fortigate_password -s <fortigate_password>``\
 ``cfy secrets create fortigate_license -f <path to a fortigate license>``\
-``cfy secrets create httpd_username -s <httpd_username>``\
-``cfy secrets create httpd_website -s <httpd_website>``
+``cfy secrets create webserver_username -s <webserver_username>``\
+``cfy secrets create webserver_website -s <webserver_website>``
 
 ### Inputs
 
@@ -80,9 +80,9 @@ You can create those with the following cfy commands:\
 * *f5_conf_name* - The name of the BIG IP Configuration deployment - default: VNFM-F5-Conf
 * *fg_prov_name* - The name of the Fortigate Provisioning deployment - default: VNFM-Fortigate-Prov-Azure-vm
 * *fg_conf_name* - The name of the Fortigate Configuration deployment - default: VNFM-Fortigate-Conf
-* *httpd_prov_name* - The name of the HTTPD Provisioning deployment - default: VNFM-HTTPD-Prov-Azure-vm
-* *httpd_conf_name* - The name of the HTTPD Configuration deployment - default: VNFM-HTTPD-Conf
-* *service_prov_name* - The name of the service provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-HTTPD
+* *webserver_prov_name* - The name of the webserver Provisioning deployment - default: VNFM-webserver-Prov-Azure-vm
+* *webserver_conf_name* - The name of the webserver Configuration deployment - default: VNFM-webserver-Conf
+* *service_prov_name* - The name of the service provisioning deployment - default: NS-LB-Firewall-F5-Fortigate-webserver
 
 
 ### Install
@@ -90,10 +90,10 @@ You can create those with the following cfy commands:\
 To apply the service configuration execute:
 
 AZURE:
-``cfy install azuree2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy install azuree2e.yaml -b VNFM-E2E-F5-Fortigate-webserver``
 
 OPENSTACK:
-``cfy install openstacke2e.yaml -b VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy install openstacke2e.yaml -b VNFM-E2E-F5-Fortigate-webserver``
 
 ### Service validation
 
@@ -103,4 +103,4 @@ Once all steps had been performed, you should be able to access the web page dis
 
 To tear down the service configuration execute:
 
-``cfy uninstall VNFM-E2E-F5-Fortigate-HTTPD``
+``cfy uninstall VNFM-E2E-F5-Fortigate-webserver``

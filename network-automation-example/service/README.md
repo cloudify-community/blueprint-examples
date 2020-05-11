@@ -8,7 +8,7 @@ First make sure that you have satisfied the global requirements in the [main REA
 
   * *BIG IP Provisioning & Configuration*: See [instructions](../bigip/README.md).
   * *Fortigate Provisioning & Configuration*: See [instructions](../fortigate/README.md).
-  * *HTTPD Provisioning & Configuration*: See [instructions](../httpd/README.md).
+  * *webserver Provisioning & Configuration*: See [instructions](../webserver/README.md).
 
 ## Service creation
 
@@ -21,7 +21,7 @@ IP addresses are fetched using `get_capability` function.
 * Inputs:
   * `f5_prov_deployment_name`: The name of the BIG IP Provisioning deployment, used to get management and Public IPs from BIG IP VE. Default: `VNFM-F5-Prov-Azure-vm`.
   * `fg_prov_deployment_name`: The name of the Fortigate Provisioning deployment, used to get management and WAN IPs from Fortigate VM. Default: `VNFM-Fortigate-Prov-Azure-vm`.
-  * `httpd_prov_deployment_name`: The name of the HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP. Default: `VNFM-HTTPD-Prov-Azure-vm`.
+  * `webserver_prov_deployment_name`: The name of the webserver Provisioning deployment, used to fetch webserver LAN interface IP. Default: `VNFM-webserver-Prov-Azure-vm`.
   * `lb_public_port`: Load balancer public network port on which the service is exposed. Default: `8080`.
   * `wan_port`: Fortigate WAN port on which the service is going to be exposed. Default: `8080'`.
 
@@ -30,10 +30,10 @@ IP addresses are fetched using `get_capability` function.
 To apply service configuration execute:
 
 AZURE:
-``cfy install azure_service.yaml -b NS-LB-Firewall-F5-Fortigate-HTTPD``
+``cfy install azure_service.yaml -b NS-LB-Firewall-F5-Fortigate-webserver``
 
 OPENSTACK:
-``cfy install openstack_service.yaml -b NS-LB-Firewall-F5-Fortigate-HTTPD``
+``cfy install openstack_service.yaml -b NS-LB-Firewall-F5-Fortigate-webserver``
 
 ### Service validation
 

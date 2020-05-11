@@ -12,7 +12,7 @@ This series of blueprints demonstrates how to install a simple network service c
 The infrastructures used in this example are Microsoft Azure or OpenStack, and the demonstrated VNFs are:
   * F5 BIG-IP VE (Load balancer)
   * Fortigate (Firewall)
-  * Httpd (Web Server)
+  * webserver (Web Server)
 
 ## Common Prerequisites:
 
@@ -51,9 +51,9 @@ The installation is broken into a few basic steps. Go to the relevant README and
 1. Provisioning of the VNFs:
   1. [Provision the load balancer](bigip/README.md##Provisioning) and setup basic settings.
   1. [Provision the firewall](fortigate/README.md##Provisioning) and configure its network interfaces and the network settings.
-  1. [Provision the web server](httpd/README.md##Provisioning) instance, configure it, and setup basic web content.
+  1. [Provision the web server](webserver/README.md##Provisioning) instance, configure it, and setup basic web content.
 1. Compose the service flow by:
   1. [Configuration the load balancer](bigip/README.md##Configuration) and setup basic settings.
   1. [Configuration the firewall](fortigate/README.md##Configuration) and configure its network interfaces and the network settings.
-  1. [Configuration the web server](httpd/README.md##Configuration) instance, configure it, and setup basic web content.
+  1. [Configuration the web server](webserver/README.md##Configuration) instance, configure it, and setup basic web content.
 1. [Create service](service/README.md) The last step creates a service chain of connected network services (Load Balancer, Firewall and Web Server). In this case service chaining consists of port forwarding rule on Fortigate and load balancing rule on BIG IP in order to pass traffic through.

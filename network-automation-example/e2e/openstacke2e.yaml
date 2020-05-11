@@ -6,10 +6,10 @@ description: >
     * prepares the environment, including networks, subnets, security groups etc.
     * provisions F5 BIG-IP VM
     * provisions Fortigate VM
-    * provisions HTTPD VM
+    * provisions webserver VM
     * configures F5 BIG-IP
     * configures Fortigate
-    * configures HTTPD
+    * configures webserver
     * creates a service chain to allow traffic forwarding
 
 # In this section, we import the basic node types, which will be later used in the
@@ -46,17 +46,17 @@ inputs:
     description: Name of Fortigate Configuration blueprint/deployment
     default: VNFM-Fortigate-Conf
 
-  httpd_prov_name:
-    description: Name of HTTPD Provisioning blueprint/deployment
-    default: VNFM-HTTPD-Prov-Openstack-vm
+  webserver_prov_name:
+    description: Name of webserver Provisioning blueprint/deployment
+    default: VNFM-webserver-Prov-Openstack-vm
 
-  httpd_conf_name:
-    description: Name of HTTPD Configuration blueprint/deployment
-    default: VNFM-HTTPD-Conf
+  webserver_conf_name:
+    description: Name of webserver Configuration blueprint/deployment
+    default: VNFM-webserver-Conf
 
   service_prov_name:
     description: Name of service chain Provisioning blueprint/deployment
-    default: NS-LB-Firewall-F5-Fortigate-HTTPD
+    default: NS-LB-Firewall-F5-Fortigate-webserver
 
 # In the node_templates section, we define the nodes that will be instanciated.
 # We use Component nodes to deploy other blueprints representing the example
@@ -133,25 +133,25 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: network_prov
 
-  # HTTPD Provisioning:
-  #   This blueprint is responsible for provisioning the HTTPD VM in OpenStack
+  # webserver Provisioning:
+  #   This blueprint is responsible for provisioning the webserver VM in OpenStack
   #   infrastructure, including the necessary network interfaces.
   #   Component is used for the blueprint uploading and the
   #   deployment creation.
   #   A "depends_on" relationship which targets the "network_prov" node is defined.
-  #   It means, that during the install workflow, "httpd_prov" node will be instantiated
-  #   after "network_prov" node will. That will alllow the "httpd_prov" node to create network
+  #   It means, that during the install workflow, "webserver_prov" node will be instantiated
+  #   after "network_prov" node will. That will alllow the "webserver_prov" node to create network
   #   interfaces in the networks created by "network_prov" blueprint.
-  httpd_prov:
+  webserver_prov:
     type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
-          id: { get_input: httpd_prov_name }
-          blueprint_archive: Resources/httpd.zip
+          id: { get_input: webserver_prov_name }
+          blueprint_archive: Resources/webserver.zip
           main_file_name: openstack.yaml
         deployment:
-          id: { get_input: httpd_prov_name }
+          id: { get_input: webserver_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
         target: network_prov
@@ -210,37 +210,37 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: fg_prov
 
-  # HTTPD Configuration:
-  #   This blueprint is responsible for configuration of the HTTPD VM
-  #   created by the "httpd_prov" node.
+  # webserver Configuration:
+  #   This blueprint is responsible for configuration of the webserver VM
+  #   created by the "webserver_prov" node.
   #   Component is being used for the blueprint uploading and the
   #   deployment creation.
   #   In relationships section, there's a "depends_on" relationship defined,
-  #   which targets the "httpd_prov" node. It means, that during install
-  #   workflow, "httpd_conf" node will be instantiated after "httpd_prov".
+  #   which targets the "webserver_prov" node. It means, that during install
+  #   workflow, "webserver_conf" node will be instantiated after "webserver_prov".
   #   It prevents the situation, when Cloudify Manager starts to configure
-  #   HTTPD VM before it gets instantiated by "httpd_prov" node.
-  httpd_conf:
+  #   webserver VM before it gets instantiated by "webserver_prov" node.
+  webserver_conf:
     type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
-          id: { get_input: httpd_conf_name }
-          blueprint_archive: Resources/httpd.zip
+          id: { get_input: webserver_conf_name }
+          blueprint_archive: Resources/webserver.zip
           main_file_name: openstackapp.yaml
         deployment:
-          id: { get_input: httpd_conf_name }
+          id: { get_input: webserver_conf_name }
           inputs:
-            httpd_vm_deployment_name: { get_input: httpd_prov_name }
+            webserver_vm_deployment_name: { get_input: webserver_prov_name }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: httpd_prov
+        target: webserver_prov
 
   # Service Chain:
   #   This blueprint is responsible for creating a service chain between the
   #   nodes created in previous steps. It applies the load balancing rules to
   #   the F5 BIG-IP VM and sets a port-forwarding policy on FortiGate VM to
-  #   expose a website served by HTTPD VM on the public interface of the F5
+  #   expose a website served by webserver VM on the public interface of the F5
   #   BIG-IP VM.
   #   Component is being used for the blueprint uploading and the
   #   deployment creation.
@@ -273,7 +273,7 @@ node_templates:
     #   - type: cloudify.relationships.depends_on
     #     target: fg_conf
     #   - type: cloudify.relationships.depends_on
-    #     target: httpd_conf
+    #     target: webserver_conf
 
 # In the outputs section we can expose values, which will appear in GUI after
 # the successful deployment installation. Here, a webserver endpoint is being

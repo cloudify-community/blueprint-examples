@@ -16,9 +16,9 @@ inputs:
     description:
     default: VNFM-Fortigate-Prov-Openstack-vm
 
-  httpd_prov_deployment_name:
-    description: Name of HTTPD Provisioning deployment, used to fetch HTTPD LAN interface IP
-    default: VNFM-HTTPD-Prov-Openstack-vm
+  webserver_prov_deployment_name:
+    description: Name of webserver Provisioning deployment, used to fetch webserver LAN interface IP
+    default: VNFM-webserver-Prov-Openstack-vm
 
   lb_public_port:
     description: >
@@ -46,7 +46,7 @@ dsl_definitions:
 
 node_templates:
 
-  # Fortigate port forwarding from HTTPD LAN IP to Fortigate WAN IP
+  # Fortigate port forwarding from webserver LAN IP to Fortigate WAN IP
   fg_port_forwarding:
     type: cloudify.terminal.raw
     interfaces:
@@ -70,7 +70,7 @@ node_templates:
             calls:
               - template: Resources/templates/fortigate-portforward-start.txt
                 params:
-                  PORTFORWARD_IP: { get_capability: [ { get_input: httpd_prov_deployment_name }, lan_ip] }
+                  PORTFORWARD_IP: { get_capability: [ { get_input: webserver_prov_deployment_name }, lan_ip] }
                   PORTFORWARD_PORT: { get_input: wan_port }
                   EXTERNAL_IP: { get_capability: [ { get_input: fg_prov_deployment_name }, wan_ip] }
         stop:
