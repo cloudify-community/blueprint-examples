@@ -1,6 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_3
 description: >
-    Starts HTTPD process on VM.
+    Starts webserver process on VM.
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
@@ -8,18 +8,18 @@ imports:
 
 inputs:
 
-  httpd_vm_deployment_name:
-    description: Name of HTTPD Provisioning deployment
-    default: VNFM-HTTPD-Prov-Openstack-vm
+  webserver_vm_deployment_name:
+    description: Name of webserver Provisioning deployment
+    default: VNFM-webserver-Prov-Openstack-vm
 
 node_templates:
 
-  httpd_vm_deployment:
+  webserver_vm_deployment:
     type: cloudify.nodes.SharedResource
     properties:
       resource_config:
         deployment:
-          id: { get_input: httpd_vm_deployment_name }
+          id: { get_input: webserver_vm_deployment_name }
 
   web_server:
     type: cloudify.terminal.raw
@@ -28,12 +28,12 @@ node_templates:
         create:
           inputs:
             terminal_auth:
-              user: { get_secret: httpd_username }
-              ip: { get_capability: [{ get_input: httpd_vm_deployment_name }, vm_public_ip] }
-              key_content: { get_capability: [{ get_input: httpd_vm_deployment_name }, private_key_content] }
+              user: { get_secret: webserver_username }
+              ip: { get_capability: [{ get_input: webserver_vm_deployment_name }, vm_public_ip] }
+              key_content: { get_capability: [{ get_input: webserver_vm_deployment_name }, private_key_content] }
               errors: []
             calls:
               - action: 'screen -dmS -X python3 -m http.server 8080'
     relationships:
       - type: cloudify.relationships.depends_on
-        target: httpd_vm_deployment
+        target: webserver_vm_deployment

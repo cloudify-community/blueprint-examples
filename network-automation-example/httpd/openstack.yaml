@@ -28,7 +28,7 @@ inputs:
 
   vnf_vm_name:
     type: string
-    default: httpd
+    default: webserver
 
 dsl_definitions:
 
@@ -110,7 +110,7 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_httpd_mgmt_port"
+            - "_webserver_mgmt_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
@@ -126,7 +126,7 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_httpd_lan_port"
+            - "_webserver_lan_port"
             - { get_input: resource_suffix }
     relationships:
     - type: cloudify.relationships.contained_in
@@ -152,14 +152,14 @@ node_templates:
           concat:
             - "/etc/cloudify/.ssh/"
             - { get_input: resource_prefix }
-            - "_httpd_keypair"
+            - "_webserver_keypair"
             - { get_input: resource_suffix }
             - ".pub"
         private_key_path:
           concat:
             - "/etc/cloudify/.ssh/"
             - { get_input: resource_prefix }
-            - "_httpd_keypair"
+            - "_webserver_keypair"
             - { get_input: resource_suffix }
             - ".pem"
         openssh_format: true
@@ -167,7 +167,7 @@ node_templates:
       key_name:
         concat:
           - { get_input: resource_prefix }
-          - "_httpd_keypair"
+          - "_webserver_keypair"
           - { get_input: resource_suffix }
     interfaces:
       cloudify.interfaces.lifecycle:
@@ -176,7 +176,7 @@ node_templates:
           inputs:
             store_private_key_material: true
 
-  # Cloud config for httpd, responsible for website uploading
+  # Cloud config for webserver, responsible for website uploading
   cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -191,7 +191,7 @@ node_templates:
           - path: "/home/ubuntu/index.html"
             permissions: 0644
             owner: ubuntu:ubuntu
-            content: { get_secret: httpd_website }
+            content: { get_secret: webserver_website }
         runcmd:
           - ifconfig ens4 up
           - dhclient ens4
@@ -209,7 +209,7 @@ node_templates:
         name:
           concat:
             - { get_input: resource_prefix }
-            - "_httpd_vm"
+            - "_webserver_vm"
             - { get_input: resource_suffix }
         image_id: { get_attribute: [ image, id ] }
         flavor_id: { get_input: flavor_id }

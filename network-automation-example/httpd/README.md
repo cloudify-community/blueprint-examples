@@ -1,14 +1,14 @@
-# HTTPD Webserver
+# webserver Webserver
 
-This blueprint installs HTTPD webserver on an Azure or Openstack VM.
+This blueprint installs webserver webserver on an Azure or Openstack VM.
 
 ### Prerequisites
 
 First make sure that you have satisfied the global requirements in the [main README](../README.md).
 
 * These additional secrets should exist on your manager:
-  * `httpd_username`: Username for HTTPD VM. It is set during provisioning and used during configuration, "admin" is not allowed. `ubuntu` is recommended. You can set this up via the CLI: `cfy secrets create httpd_username -s [secret value]`.
-  * `httpd_website`: Content of website file for HTTPD VM, it is set during provisioning and served after configuration. Exemplary website can be found under `Resources/website/index.html`.
+  * `webserver_username`: Username for webserver VM. It is set during provisioning and used during configuration, "admin" is not allowed. `ubuntu` is recommended. You can set this up via the CLI: `cfy secrets create webserver_username -s [secret value]`.
+  * `webserver_website`: Content of website file for webserver VM, it is set during provisioning and served after configuration. Exemplary website can be found under `Resources/website/index.html`.
 
 ## Provisioning
 
@@ -22,7 +22,7 @@ The networks' NICs are connected to the security group created in the network de
   * `image`: Image information. Default: `{'publisher': 'Canonical', 'offer': 'UbuntuServer', 'sku': '18.04-LTS', 'version': 'latest}'`.
   * `network_deployment_name`: Name of deployment responsible for creation resource group, security group and networks. Default: `VNFM-Networking-Prov-Azure-networks`.
 * Openstack inputs:
-  * `vnf_vm_name` - Name of the VM - default: `httpd`
+  * `vnf_vm_name` - Name of the VM - default: `webserver`
   * `flavor_id` - ID of the flavor in OpenStack - default: `6e2d4276-0390-4a24-b6ab-40f388edcc87`
   * `image_id` - ID of the image in OpenStack - default: `ee6a6582-1351-4f8b-b132-a90b7db88171`
   * `openstack_network_deployment_name` - Name of deployment responsible for router, security group and networks creation -
@@ -35,13 +35,13 @@ Upload the blueprint, create the deployment and execute install workflow in one 
 AZURE:
 ```bash
 cfy install  azure.yaml -b  \
-    VNFM-HTTPD-Prov-Azure-vm
+    VNFM-webserver-Prov-Azure-vm
 ```
 
 OPENSTACK:
 ```bash
 cfy install  openstack.yaml -b  \
-    VNFM-HTTPD-Prov-Openstack-vm
+    VNFM-webserver-Prov-Openstack-vm
 ```
 
 ### Uninstall
@@ -50,29 +50,29 @@ Uninstall the deployment:
 
 AZURE:
 ```
-cfy uninstall VNFM-HTTPD-Prov-Azure-vm
+cfy uninstall VNFM-webserver-Prov-Azure-vm
 ```
 
 OPENSTACK:
 ```
-cfy uninstall VNFM-HTTPD-Prov-Openstack-vm
+cfy uninstall VNFM-webserver-Prov-Openstack-vm
 ```
 
 ## Configuration
 
-* Blueprint: The `<infrastructure>app.yaml` blueprint is responsible for starting HTTPD process on the target VM, `web_server` node is responsible for creating such server using the following command: `screen -dmS -X python3 -m http.server 8080`. The IP address of the target VM is fetched from VNFM-HTTPD-Prov-Azure-vm/VNFM-HTTPD-Prov-Openstack-vm deployment using capabilities.
+* Blueprint: The `<infrastructure>app.yaml` blueprint is responsible for starting webserver process on the target VM, `web_server` node is responsible for creating such server using the following command: `screen -dmS -X python3 -m http.server 8080`. The IP address of the target VM is fetched from VNFM-webserver-Prov-Azure-vm/VNFM-webserver-Prov-Openstack-vm deployment using capabilities.
 
 * Inputs:
-  * `httpd_vm_deployment_name`: Name of HTTPD Provisioning deployment. Default: `VNFM-HTTPD-Prov-Azure-vm` or `VNFM-HTTPD-Prov-Openstack-vm`.
+  * `webserver_vm_deployment_name`: Name of webserver Provisioning deployment. Default: `VNFM-webserver-Prov-Azure-vm` or `VNFM-webserver-Prov-Openstack-vm`.
 
 ### Install
 
 AZURE:
-`cfy install azureapp.yaml -b VNFM-HTTPD-Conf`
+`cfy install azureapp.yaml -b VNFM-webserver-Conf`
 
 OPENSTACK:
-`cfy install openstackapp.yaml -b VNFM-HTTPD-Conf`
+`cfy install openstackapp.yaml -b VNFM-webserver-Conf`
 
 ### Uninstall
 
-`cfy uninstall VNFM-HTTPD-Conf`
+`cfy uninstall VNFM-webserver-Conf`

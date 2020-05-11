@@ -91,7 +91,7 @@ node_templates:
     properties:
       azure_config: *azure_config
       use_external_resource: false
-      name: { concat: [ { get_input: resource_prefix }, 'httpdsa', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserversa', { get_input: resource_suffix } ] }
       location: { get_secret: azure_location }
       resource_config:
         accountType: Standard_LRS
@@ -99,7 +99,7 @@ node_templates:
       - type: cloudify.azure.relationships.contained_in_resource_group
         target: resource_group
 
-  # Cloud config for httpd, responsible for website uploading
+  # Cloud config for webserver, responsible for website uploading
   cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -108,15 +108,15 @@ node_templates:
           - path:
               concat:
                 - "/home/"
-                - { get_secret: httpd_username }
+                - { get_secret: webserver_username }
                 - "/index.html"
             permissions: 0644
             owner:
               concat:
-                - { get_secret: httpd_username }
+                - { get_secret: webserver_username }
                 - ":"
-                - { get_secret: httpd_username }
-            content: { get_secret: httpd_website }
+                - { get_secret: webserver_username }
+            content: { get_secret: webserver_website }
 
   keypair:
     type: cloudify.keys.nodes.RSAKey
@@ -126,14 +126,14 @@ node_templates:
           concat:
             - "/etc/cloudify/.ssh/"
             - { get_input: resource_prefix }
-            - "_httpd_keypair"
+            - "_webserver_keypair"
             - { get_input: resource_suffix }
             - ".pub"
         private_key_path:
           concat:
             - "/etc/cloudify/.ssh/"
             - { get_input: resource_prefix }
-            - "_httpd_keypair"
+            - "_webserver_keypair"
             - { get_input: resource_suffix }
             - ".pem"
         openssh_format: true
@@ -141,7 +141,7 @@ node_templates:
       key_name:
         concat:
           - { get_input: resource_prefix }
-          - "_httpd_keypair"
+          - "_webserver_keypair"
           - { get_input: resource_suffix }
     interfaces:
       cloudify.interfaces.lifecycle:
@@ -156,7 +156,7 @@ node_templates:
       location: { get_property: [ resource_group, location ] }
       retry_after: { get_input: retry_after }
       os_family: linux
-      name: { concat: [ { get_input: resource_prefix }, 'httpd', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver', { get_input: resource_suffix } ] }
       resource_config:
         hardwareProfile:
           vmSize: { get_input: size }
@@ -165,14 +165,14 @@ node_templates:
         osProfile:
           customData: { get_attribute: [ cloud_config, cloud_config ] }
           computerName: { get_property: [SELF, name] }
-          adminUsername: { get_secret: httpd_username }
+          adminUsername: { get_secret: webserver_username }
           linuxConfiguration:
             ssh:
               publicKeys:
                 - path:
                     concat:
                       - "/home/"
-                      - { get_secret: httpd_username }
+                      - { get_secret: webserver_username }
                       - "/.ssh/authorized_keys"
                   keyData: { get_attribute: [ keypair, public_key_export ] }
             disablePasswordAuthentication: True
@@ -199,7 +199,7 @@ node_templates:
     properties:
       name: mgmt_security_group
       location: { get_property: [ resource_group, location ] }
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_mgmt_sg', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_mgmt_sg', { get_input: resource_suffix } ] }
       azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
@@ -223,7 +223,7 @@ node_templates:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
     properties:
       location: { get_property: [ resource_group, location ] }
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_mgmt_n', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_mgmt_n', { get_input: resource_suffix } ] }
       azure_config: *azure_config
       retry_after: { get_input: retry_after }
       primary: true
@@ -239,7 +239,7 @@ node_templates:
     type: cloudify.azure.nodes.network.IPConfiguration
     properties:
       location: { get_property: [ resource_group, location ] }
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_mgmt_ic', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_mgmt_ic', { get_input: resource_suffix } ] }
       azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
@@ -256,7 +256,7 @@ node_templates:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
       azure_config:  *azure_config
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_mgmt_ia', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_mgmt_ia', { get_input: resource_suffix } ] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
       resource_config:
@@ -306,7 +306,7 @@ node_templates:
     properties:
       location: { get_property: [ resource_group, location ] }
       azure_config: *azure_config
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_lan_n', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_lan_n', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       primary: false
     relationships:
@@ -322,7 +322,7 @@ node_templates:
     properties:
       location: { get_property: [ resource_group, location ] }
       azure_config: *azure_config
-      name: { concat: [ { get_input: resource_prefix }, 'httpd_lan_ic', { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, 'webserver_lan_ic', { get_input: resource_suffix } ] }
       retry_after: { get_input: retry_after }
       resource_config:
         privateIPAllocationMethod: Dynamic
