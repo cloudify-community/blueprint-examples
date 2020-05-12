@@ -1,7 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - https://getcloudify.org/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
 
 inputs:
@@ -18,25 +18,34 @@ inputs:
           debug: false
           verify_ssl: false
 
-  resource_path:
+  app_name:
+    description: Prefix to use for application service / deployment names
+    default: cloudify-hello-world
+
+  container:
+    description: Standard container reference
     type: string
-    default: resources/deployment.yaml
+    default: gcr.io/google-samples/node-hello:1.0
+
+  container_port:
+    description: Exposed container port to reference
+    type: integer
+    default: 80
 
   validate_status:
-    type: boolean
     default: false
-
-  resource_template_variables:
-    default:
-      PORT: 80
 
 node_templates:
 
-  resource:
+  hello-world:
     type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
       client_config: { get_input: kubernetes_client_config }
       validate_resource_status: { get_input: validate_status }
       file:
-        resource_path: { get_input: resource_path }
-        template_variables: { get_input: resource_template_variables }
+        resource_path: resources.yaml
+        template_variables:
+          APP_NAME: { get_input: app_name }
+          PORT: { get_input: container_port }
+          CONTAINER_NAME: { get_input: app_name }
+          CONTAINER_IMAGE: { get_input: container }
