@@ -19,6 +19,7 @@ import sys
 import subprocess
 
 from cloudify import ctx
+from cloudify.manager import get_rest_client
 from cloudify.exceptions import NonRecoverableError
 from cloudify.utils import exception_to_error_cause
 from fabric import api as fabric_api
@@ -97,7 +98,10 @@ def generate_token_and_port():
         )
 
     # Set the generated token and set it as run time properties for  instance
-    ctx.instance.runtime_properties['bearer_token'] = bearer_token.strip()
+    token = bearer_token.strip()
+    client = get_rest_client()
+    client.secrets.create('kubernetes_token', token, update_if_exists=True)
+    ctx.instance.runtime_properties['bearer_token'] = token
     # Set the exposed port and set it as run time properties for instance
     ctx.instance.runtime_properties['dashboard_port'] = port.strip()
 

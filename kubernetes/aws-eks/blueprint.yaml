@@ -629,7 +629,7 @@ node_templates:
       configuration: &sanity_master_configuration
         api_options:
           host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
-          api_key: { get_secret: kubernetes_token }
+          api_key: { get_attribute: [ store_token, token ] }
           debug: false
           verify_ssl: false
     relationships:
