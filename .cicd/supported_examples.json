@@ -46,7 +46,7 @@
   "kubernetes/azure-aks": ["blueprint.yaml"],
   "kubernetes/gcp-gke": ["blueprint.yaml"],
   "kubernetes/plugin-examples/openshift": ["blueprint.yaml"],
-  "kubernetes/plugin-examples/file-resource": ["blueprint.yaml"],
+  "kubernetes/plugin-examples/hello-world": ["blueprint.yaml"],
   "prometheus": [
     "aws.yaml",
     "azure.yaml",
