@@ -1,0 +1,8 @@
+kubernetes_client_config:
+  authentication:
+    gcp_service_account: { get_secret: gcp_credentials }
+  configuration:
+    api_options:
+      host: { get_input: kubernetes_master_endpoint }
+      verify_ssl: false
+      debug: false
