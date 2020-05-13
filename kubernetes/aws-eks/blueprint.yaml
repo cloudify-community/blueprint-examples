@@ -20,6 +20,14 @@ inputs:
     type: string
     default: 'us-east-1'
 
+  availability_zone_1:
+    type: string
+    default: { concat: [ { get_input: aws_region_name}, 'd' ] }
+
+  availability_zone_2:
+    type: string
+    default: { concat: [ { get_input: aws_region_name}, 'e' ] }
+
   resource_suffix:
     default: '-1'
 
@@ -177,7 +185,7 @@ node_templates:
     properties:
       resource_config:
         CidrBlock: '10.0.0.0/24'
-        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'a' ] }
+        AvailabilityZone: { get_input: availability_zone_1 }
       client_config: *client_config
       Tags:
         - Key: Name
@@ -210,7 +218,7 @@ node_templates:
     properties:
       resource_config:
         CidrBlock: '10.0.1.0/24'
-        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'b' ] }
+        AvailabilityZone: { get_input: availability_zone_2 }
       client_config: *client_config
       Tags:
         - Key: Name
@@ -245,7 +253,7 @@ node_templates:
     properties:
       resource_config:
         CidrBlock: '10.0.2.0/24'
-        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'a' ] }
+        AvailabilityZone: { get_input: availability_zone_1 }
       client_config: *client_config
       Tags:
         - Key: Name
@@ -276,7 +284,7 @@ node_templates:
     properties:
       resource_config:
         CidrBlock: '10.0.3.0/24'
-        AvailabilityZone: { concat: [ { get_input: aws_region_name}, 'b' ] }
+        AvailabilityZone: { get_input: availability_zone_2 }
       client_config: *client_config
       Tags:
         - Key: Name
@@ -618,7 +626,7 @@ node_templates:
           implementation: scripts/store_kube_token.py
           executor: central_deployment_agent
           inputs:
-            kube_token: {get_attribute: [secret, kubernetes, data, token ]}
+            kube_token: { get_attribute: [ secret, kubernetes, data, token ] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: secret
