@@ -21,7 +21,7 @@ inputs:
 
   availability_zone:
     type: string
-    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
+    default: { concat: [ { get_input: aws_region_name }, 'd' ] }
 
   vpc_cidr:
     type: string

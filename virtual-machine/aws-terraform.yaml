@@ -16,33 +16,45 @@ dsl_definitions:
     plugins_dir: {get_input: terraform_plugins_dir}
 
 inputs:
+
   terraform_installation_source:
     description: >
       Where to get Terraform from.
     type: string
     default: 'https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip'
+
   terraform_plugins:
     type: list
     default:
       - 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
       - 'https://releases.hashicorp.com/terraform-provider-aws/2.49.0/terraform-provider-aws_2.49.0_linux_amd64.zip'
+
   terraform_executable:
     type: string
     default: '/tmp/terraform/bin/terraform'
+
   terraform_plugins_dir:
     type: string
     default: '/tmp/terraform/plugins'
+
   terraform_storage_path:
     type: string
     default: '/tmp/terraform/storage'
+
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'centos'
+
   aws_region_name:
     type: string
-    default: 'ca-central-1'
+    default: 'us-east-1'
+
+  aws_zone_name:
+    type: string
+    default: { concat: [ { get_input: aws_region_name }, 'd' ] }
+
   agent_key_name:
     type: string
     default: agent_key
@@ -66,6 +78,7 @@ node_templates:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }
+          aws_zone: { get_input: aws_zone_name }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
     relationships:
