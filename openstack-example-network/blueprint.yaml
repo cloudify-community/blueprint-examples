@@ -49,12 +49,12 @@ inputs:
     default: "1"
 
   private_subnet_cidr:
-    default: { concat: [ "10.10.", { get_input: public_cidr }, ".0/24" ] }
+    default: { concat: [ "10.10.", { get_input: private_cidr }, ".0/24" ] }
 
   private_subnet_allocation_pools:
     default:
-    - start: { concat: [ "10.10.", { get_input: public_cidr }, ".2" ] }
-      end: { concat: [ "10.10.", { get_input: public_cidr }, ".254" ] }
+    - start: { concat: [ "10.10.", { get_input: private_cidr }, ".2" ] }
+      end: { concat: [ "10.10.", { get_input: private_cidr }, ".254" ] }
 
   resource_suffix:
     default: '-1'
