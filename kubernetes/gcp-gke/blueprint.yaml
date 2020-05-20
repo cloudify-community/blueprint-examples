@@ -63,40 +63,32 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster
 
-  sanity_master:
-    type: cloudify.kubernetes.nodes.Master
+  sanity_pod:
+    type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
-      authentication: &client_config_authentication
-        gcp_service_account: { get_input: gcp_credentials }
-      configuration: &client_config_configuration
-        api_options:
-          host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
-          verify_ssl: false
-          debug: false
+      client_config:
+        configuration:
+          api_options:
+            host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
+            api_key: { get_attribute: [ store_token, token ] }
+            debug: false
+            verify_ssl: false
+      validate_resource_status: true
+      file:
+        resource_path: resources/template.yaml
     relationships:
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster-attributes
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster-node-pool
-
-  sanity_pod:
-    type: cloudify.kubernetes.resources.Pod
-    properties:
-      client_config:
-        authentication: *client_config_authentication
-        configuration: *client_config_configuration
-      definition:
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          name: nginx
-        spec:
-          containers:
-          - name: nginx
-            image: nginx:stable
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: sanity_master
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
+        start:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
+        delete:
+          implementation: {}
 
 
 capabilities:
