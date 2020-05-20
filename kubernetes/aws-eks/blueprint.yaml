@@ -653,8 +653,7 @@ node_templates:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
         start:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
-        delete:
-          implementation: {}
+        delete: {}
 
   agent_key:
       type: cloudify.keys.nodes.RSAKey
