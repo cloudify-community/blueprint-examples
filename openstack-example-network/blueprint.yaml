@@ -34,21 +34,30 @@ inputs:
   nameservers:
     default: [8.8.4.4, 8.8.8.8]
 
+  public_cidr:
+    default: "0"
+
   public_subnet_cidr:
-    default: 10.10.0.0/24
+    default: { concat: [ "10.10.", { get_input: public_cidr }, ".0/24" ] }
 
   public_subnet_allocation_pools:
     default:
-    - start: 10.10.0.2
-      end: 10.10.0.254
+    - start: { concat: [ "10.10.", { get_input: public_cidr }, ".2" ] }
+      end: { concat: [ "10.10.", { get_input: public_cidr }, ".254" ] }
+
+  private_cidr:
+    default: "1"
 
   private_subnet_cidr:
-    default: 10.10.1.0/24
+    default: { concat: [ "10.10.", { get_input: public_cidr }, ".0/24" ] }
 
   private_subnet_allocation_pools:
     default:
-    - start: 10.10.1.2
-      end: 10.10.1.254
+    - start: { concat: [ "10.10.", { get_input: public_cidr }, ".2" ] }
+      end: { concat: [ "10.10.", { get_input: public_cidr }, ".254" ] }
+
+  resource_suffix:
+    default: '-1'
 
   user_domain_name:
     description: Openstack user domain name.
@@ -73,9 +82,6 @@ inputs:
       user_domain_name: { get_input: user_domain_name }
       project_domain_name: { get_input: project_domain_name }
 
-dsl_definitions:
-
-
 node_templates:
 
   external-network:
@@ -94,14 +100,14 @@ node_templates:
     properties:
       client_config: { get_input: client_config_dict }
       resource_config:
-        name: public-network
+        name: { concat: [ public-network, { get_input: resource_suffix } ] }
 
   private-network:
     type: cloudify.nodes.openstack.Network
     properties:
       client_config: { get_input: client_config_dict }
       resource_config:
-        name: private-network
+        name: { concat: [ private-network, { get_input: resource_suffix } ] }
 
   public-network-router:
     type: cloudify.nodes.openstack.Router
@@ -116,7 +122,7 @@ node_templates:
     properties:
       client_config: { get_input: client_config_dict }
       resource_config:
-        name: public-subnet
+        name: { concat: [ public-subnet, { get_input: resource_suffix } ] }
         ip_version: 4
         dns_nameservers: { get_input: nameservers }
         cidr: { get_input: public_subnet_cidr }
@@ -133,7 +139,7 @@ node_templates:
       client_config: { get_input: client_config_dict }
       resource_config:
         ip_version: 4
-        name: private-subnet
+        name: { concat: [ private-subnet, { get_input: resource_suffix } ] }
         dns_nameservers: { get_input: nameservers }
         cidr: { get_input: private_subnet_cidr }
         allocation_pools: { get_input: private_subnet_allocation_pools }

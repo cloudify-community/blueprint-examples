@@ -228,36 +228,30 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: secret
 
-  sanity_master:
-    type: cloudify.kubernetes.nodes.Master
+  sanity_pod:
+    type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
-      configuration: &sanity_master_configuration
-        api_options:
-          host:  { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
-          api_key: { get_attribute: [ store_token, token ] }
-          debug: false
-          verify_ssl: false
+      client_config:
+        configuration:
+          api_options:
+            host:  { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
+            api_key: { get_attribute: [ store_token, token ] }
+            debug: false
+            verify_ssl: false
+      validate_resource_status: true
+      file:
+        resource_path: resources/template.yaml
     relationships:
       - type: cloudify.relationships.depends_on
         target: store_token
-
-  sanity_pod:
-    type: cloudify.kubernetes.resources.Pod
-    properties:
-      client_config:
-        configuration: *sanity_master_configuration
-      definition:
-        apiVersion: v1
-        kind: Pod
-        metadata:
-          name: nginx
-        spec:
-          containers:
-          - name: nginx
-            image: nginx:stable
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: sanity_master
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
+        start:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
+        delete:
+          implementation: {}
 
   agent_key:
       type: cloudify.keys.nodes.RSAKey
