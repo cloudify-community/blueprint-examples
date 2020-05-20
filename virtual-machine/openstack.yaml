@@ -41,6 +41,10 @@ inputs:
     type: string
     default: agent_key
 
+  cidr:
+    type: string
+    default: "4"
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -93,11 +97,11 @@ node_templates:
       resource_config:
         name: { get_input: subnet_id }
         ip_version: 4
-        cidr: 10.10.4.0/24
+        cidr: { concat: [ "10.10.", { get_input: cidr }, ".0/24" ] }
         dns_nameservers: [8.8.4.4, 8.8.8.8]
         allocation_pools:
-        - start: 10.10.4.2
-          end: 10.10.4.254
+        - start:  { concat: [ "10.10.", { get_input: cidr }, ".2" ] }
+          end:  { concat: [ "10.10.", { get_input: cidr }, ".254" ] }
     relationships:
       - type: cloudify.relationships.contained_in
         target: network
