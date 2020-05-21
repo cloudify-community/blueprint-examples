@@ -16,7 +16,7 @@ If you have already ensured these requirements are met, skip to [installation st
     - [ ] `cloudify-azure-plugin`, version 2.1.7 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-azure-plugin/releases).
     - [ ] `cloudify-gcp-plugin`, version 1.4.4 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-gcp-plugin/releases).
     - [ ] `cloudify-openstack-plugin`, version 3.2.2 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-openstack-plugin/releases).
-    - [ ] `cloudify-utilites-plugin`, version 1.14.0 or higher, see [releases](https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases).
+    - [ ] `cloudify-utilites-plugin`, version 1.22.1 or higher, see [releases](https://github.com/cloudify-incubator/cloudify-utilities-plugin/releases).
     - [ ] `cloudify-fabric-plugin`, version 1.5.3 or higher, see [releases](https://github.com/cloudify-cosmo/cloudify-fabric-plugin/releases).
 
 To learn how to upload plugins, see [uploading plugins](#how-to-upload-plugins).
@@ -184,16 +184,24 @@ If you need help locating your credentials, read about [GCP Plugin Configuration
 
 If you are an Openstack user, you must create the following secrets:
 
-  - [ ] `openstack_auth_url`: Openstack Auth URL: `cfy secrets create -u openstack_auth_url -s https://my.openstack.com:5000/v2.0`
-  - [ ] `openstack_project_name`: Openstack Project Name: `cfy secrets create -u openstack_project_name -s project`
+  - [ ] `openstack_auth_url`: Openstack Auth URL: `cfy secrets create -u openstack_auth_url -s https://my.openstack.com:5000/v3`
   - [ ] `openstack_tenant_name`: Openstack Tenant Name: `cfy secrets create -u openstack_tenant_name -s tenant`
   - [ ] `openstack_username`: Openstack Username: `cfy secrets create -u openstack_username -s janedoe`
   - [ ] `openstack_password`: Openstack Password: `cfy secrets create -u openstack_password -s peacelove`
   - [ ] `openstack_region`: Openstack Region Name: `cfy secrets create -u openstack_region -s RegionOne`
   - [ ] `openstack_external_network`: The ID of the floating IP network that you will use to connect to the internet.
   - [ ] `base_image_id`: The image ID of a Centos 7 that supports Cloud Init.
-  - [ ] `base_flavor_id`: The flavor ID of an Openstack flavor that is appropriate for your Centos 7 "base_image_id".
+  - [ ] `openstack_user_domain_name`: OS_USER_DOMAIN_NAME as specified in Openstack RC file, most of the time this value is "default".
+  - [ ] `openstack_project_domain_name`: openstack project domain name, most of the time this value is "default".
+
 
 If you need help locating your credentials, read about [Openstack RC File](https://docs.openstack.org/zh_CN/user-guide/common/cli-set-environment-variables-using-openstack-rc.html), although sourcing is not enough, these values must be created as secrets:
 
 [Return to requirements](#requirements).
+
+**Notes:** 
+
+1. Use v3 authentication url.
+
+2. If v2 authentication url used, remove user_domain_name and project_domain_name
+from client_config. 

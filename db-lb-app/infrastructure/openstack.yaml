@@ -52,6 +52,17 @@ inputs:
     type: string
     default: { get_secret: base_flavor_id }
 
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  default
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  defaul
+
+
 dsl_definitions:
 
   client_config: &client_config
@@ -60,6 +71,8 @@ dsl_definitions:
     password: { get_secret: openstack_password }
     project_name: { get_secret: openstack_project_name }
     region_name: { get_input: openstack_region }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 

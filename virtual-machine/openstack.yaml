@@ -45,6 +45,16 @@ inputs:
     type: string
     default: "4"
 
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  { get_secret: openstack_user_domain_name }
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  { get_secret: openstack_project_domain_name }
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -53,6 +63,8 @@ dsl_definitions:
     project_name: { get_secret: openstack_tenant_name }
     username: { get_secret: openstack_username }
     password: { get_secret: openstack_password }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 

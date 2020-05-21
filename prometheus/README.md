@@ -55,13 +55,13 @@ cfy secrets create openstack_tenant_name --secret-string <value>
 cfy secrets create openstack_auth_url --secret-string <value> 
 ```
 
-In case that project_domain_name, project_domain_name is not "default" please provide them as an inputs.
+In case that project_domain_name, project_domain_name is not "default" please provide them as inputs.
 
 **Notes:** 
 
 1. Use v3 authentication url.
 
-2. if you are using v2 authentication url you should remove user_domain_name and project_domain_name
+2. If v2 authentication url used, remove user_domain_name and project_domain_name
 from client_config. 
          
 ### Running the example

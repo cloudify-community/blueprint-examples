@@ -43,6 +43,16 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: ubuntu
 
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  default
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  default
+
   agent_key_name:
     type: string
     default: agent_key
@@ -55,6 +65,8 @@ dsl_definitions:
     project_name: { get_secret: openstack_tenant_name }
     username: { get_secret: openstack_username }
     password: { get_secret: openstack_password }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 

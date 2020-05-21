@@ -36,9 +36,9 @@ If you do not provide your own `deployment inputs` below, you must add these sec
 
 Find the name of your Openstack Floating IP Network. You will need this value for the `external_network_name` input when you create your deployment.
 
-In case that project_domain_name, project_domain_name is not "default" please provide them as an inputs.
+In case that project_domain_name, project_domain_name is not "default" please provide them as inputs.
 
-**Note:** if you are using v2 authentication url you should remove user_domain_name and project_domain_name
+**Note:** if you are using v2 authentication url remove user_domain_name and project_domain_name
 from client_config_dict. 
 
 **Example**:

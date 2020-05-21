@@ -8,6 +8,7 @@ node_templates:
     type: cloudify.nodes.ansible.Playbook
     properties:
       playbook_path: apache2/playbook.yaml
+      start_at_task: "install apache2"
       # save_playbook: true
     relationships:
       - type: cloudify.ansible.relationships.run_on_host
