@@ -60,7 +60,7 @@ inputs:
   project_domain_name:
     description: The name of your OpenStack project.
     type: string
-    default:  defaul
+    default:  default
 
 
 dsl_definitions:
