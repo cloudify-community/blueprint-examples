@@ -49,26 +49,38 @@ inputs:
     default: "1"
 
   private_subnet_cidr:
-    default: { concat: [ "10.10.", { get_input: public_cidr }, ".0/24" ] }
+    default: { concat: [ "10.10.", { get_input: private_cidr }, ".0/24" ] }
 
   private_subnet_allocation_pools:
     default:
-    - start: { concat: [ "10.10.", { get_input: public_cidr }, ".2" ] }
-      end: { concat: [ "10.10.", { get_input: public_cidr }, ".254" ] }
+    - start: { concat: [ "10.10.", { get_input: private_cidr }, ".2" ] }
+      end: { concat: [ "10.10.", { get_input: private_cidr }, ".254" ] }
 
   resource_suffix:
     default: '-1'
 
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  default
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  default
+
+
   client_config_dict:
 #    type: dict
-    description: A dictionary containing the client configuration for Openstack. Default is for keystone v2. Provide an alternate input for keystone v3.
+    description: A dictionary containing the client configuration for Openstack. Default is for keystone v3. Provide an alternate input for keystone v2.
     default:
       username: { get_input: username }
       password: { get_input: password }
       project_name: { get_input: project_name }
       auth_url: { get_input: auth_url }
       region_name: { get_input: region }
-
+      user_domain_name: { get_input: user_domain_name }
+      project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 

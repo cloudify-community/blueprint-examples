@@ -68,7 +68,14 @@ cfy secrets create openstack_password --secret-string <value>
 cfy secrets create openstack_tenant_name --secret-string <value>
 cfy secrets create openstack_auth_url --secret-string <value>
 ```
-         
+
+**Notes:** 
+
+1. Use v3 authentication url.
+
+2. If v2 authentication url used, remove user_domain_name and project_domain_name
+from client_config. 
+                  
          
 ### Running the example
 
@@ -110,6 +117,7 @@ cfy install openstack.yaml \
 -i external_network_id=dda079ce-12cf-4309-879a-8e67aec94de4 \
 -i image=e41430f7-9131-495b-927f-e7dc4b8994c8 -i flavor=m1.small
 ```
+In case that project_domain_name, project_domain_name is not "default" please provide them as inputs.
 
 ###Get deployment id:       
 ```shell
@@ -151,10 +159,10 @@ cfy deployment outputs <deployment_id>
     * For **GCP**
         * gcp_credentials(service account JSON file)
     * For **Openstack**
-         * keystone_username
-         * keystone_password
-         * keystone_tenant_name
-         * keystone_url
+         * openstack_username
+         * openstack_password
+         * openstack_tenant_name
+         * openstack_auth_url
  
 
 ### Running the example

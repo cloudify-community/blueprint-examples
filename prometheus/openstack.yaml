@@ -25,7 +25,7 @@ inputs:
 
   project_name:
     type: string
-    default: { get_secret: openstack_project_name }
+    default: { get_secret: openstack_tenant_name }
 
   region_name:
     type: string
@@ -47,6 +47,16 @@ inputs:
     type: string
     default: centos
 
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  default
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  default
+
   prometheus_scrape_jobs:
     description: a list of jobs.
 
@@ -62,6 +72,8 @@ dsl_definitions:
     password: { get_input: password }
     project_name: { get_input: project_name }
     region_name: { get_input: region_name }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
 
 node_templates:
 

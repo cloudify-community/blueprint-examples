@@ -14,7 +14,7 @@
 ## Compatibility
 
 Tested with:
-  * Cloudify 4.5.5
+  * Cloudify 5.0.5
 
 
 ## Pre-installation steps
@@ -31,7 +31,15 @@ If you do not provide your own `deployment inputs` below, you must add these sec
   * `openstack_username`
   * `openstack_password`
   * `openstack_tenant_name`
-  * `openstack_auth_url`
+  * `openstack_auth_url` - v3 authentication url. 
   * `openstack_region`, such as `RegionOne`.
 
 Find the name of your Openstack Floating IP Network. You will need this value for the `external_network_name` input when you create your deployment.
+
+In case that project_domain_name, project_domain_name is not "default" please provide them as inputs.
+
+**Note:** if you are using v2 authentication url remove user_domain_name and project_domain_name
+from client_config_dict. 
+
+**Example**:
+`cfy install blueprint.yaml -i external_network_id=ext-net -i user_domain_name=<value> -i project_domain_name=<value>`
