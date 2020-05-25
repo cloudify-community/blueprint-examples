@@ -12,8 +12,8 @@ inputs:
 
   kubernetes_master_configuration:
     default:
-      host: { get_secret: kubernetes_endpoint }
-      api_key: { get_secret: kubernetes_token }
+      host: { get_secret: openshift_master_endpoint }
+      api_key: { get_secret: openshift_secret_token }
       debug: false
       verify_ssl: false
 
@@ -28,12 +28,12 @@ inputs:
 
   namespace:
     description: OpenShift namespace to use
-    default: eaas-demo
+    default: { get_secret: openshift_namespace }
 
   fqdn_suffix:
     description: Domain name to append to form the final service endpoint URL. 
     type: string
-    default: apps.us-west-1.starter.openshift-online.com
+    default: apps.us-east-1.starter.openshift-online.com
 
   endpoint: 
     description: Final service endpoint
@@ -52,15 +52,12 @@ inputs:
 
 node_templates:
 
-  kubernetes_master:
-    type: cloudify.kubernetes.nodes.Master
-    properties:
-      configuration:
-        api_options: { get_input: kubernetes_api_options }
-
   app_ingress:
     type: cloudify.kubernetes.resources.BlueprintDefinedResource
     properties:
+      client_config: &client_config
+        configuration:
+          api_options: { get_input: kubernetes_api_options }
       definition:
         apiVersion: networking.k8s.io/v1beta1
         kind: Ingress
@@ -81,14 +78,13 @@ node_templates:
       options:
         namespace: { get_input: namespace }
     relationships:
-    - type: cloudify.kubernetes.relationships.managed_by_master
-      target: kubernetes_master
     - type: cloudify.relationships.connected_to
       target: app_svc
 
   app_svc:
     type: cloudify.kubernetes.resources.Service
     properties:
+      client_config: *client_config
       definition:
         apiVersion: v1
         kind: Service
@@ -110,14 +106,13 @@ node_templates:
         namespace: { get_input: namespace }
       validate_resource_status: false
     relationships:
-    - type: cloudify.kubernetes.relationships.managed_by_master
-      target: kubernetes_master
     - type: cloudify.relationships.contained_in
       target: app
 
   app:
     type: cloudify.kubernetes.resources.Deployment
     properties:
+      client_config: *client_config
       definition:
         apiVersion: apps/v1
         kind: Deployment
@@ -169,8 +164,6 @@ node_templates:
       options:
         namespace: { get_input: namespace }
     relationships:
-    - type: cloudify.kubernetes.relationships.managed_by_master
-      target: kubernetes_master
   #   - type: cloudify.relationships.depends_on
   #     target: my_volume_claim
 

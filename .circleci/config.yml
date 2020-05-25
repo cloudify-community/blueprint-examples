@@ -56,6 +56,40 @@ commands:
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
 
+  test_openshift:
+    steps:
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule update --init --recursive
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: update pip
+          command: pip install -U pip
+      - run:
+          name: install cloudify
+          command: pip install -U cloudify==5.0.0 pytest==4.6.3 pyyaml==3.10
+      - run:
+          name: download manager docker image
+          command: wget http://repository.cloudifysource.org/cloudify/5.0.0/ga-release/cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: load docker image
+          command: docker load -i cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: retain space by dumping the tar
+          command: rm cloudify-docker-manager-5.0.0.tar
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+      - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
+
   test_examples:
     steps:
       - run:
@@ -182,11 +216,18 @@ jobs:
       - checkout
       - test_examples
 
+  openshift:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+    steps:
+      - checkout
+      - test_openshift
+
   release:
     executor: py27
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
-      IAAS: gcp
     steps:
       - checkout
       - release_examples
@@ -231,6 +272,7 @@ workflows:
           filters:
             branches:
               only: master
+      - openshift
       # - getting-started-openstack  # TODO: Get correct parameters for public OS.
       - blueprint-validation
       - release:
@@ -241,6 +283,7 @@ workflows:
             - getting-started-azure
             - getting-started-azure-arm
             - getting-started-gcp
+            - openshift
             # - getting-started-openstack  # TODO: Get correct parameters for public OS.
           filters:
             branches:
@@ -255,6 +298,7 @@ workflows:
               - master
     jobs:
       - blueprint-validation
+      - openshift
       - getting-started-aws:
           requires:
           - blueprint-validation
@@ -268,6 +312,30 @@ workflows:
             branches:
               only: master
       - getting-started-gcp:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-azure-arm:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-aws-cloudformation:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-aws-terraform:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - openshift:
           requires:
           - blueprint-validation
           filters:

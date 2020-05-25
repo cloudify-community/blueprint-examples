@@ -71,7 +71,10 @@ SECRETS_TO_CREATE = {
     'openstack_external_network': False,
     'base_image_id': False,
     'base_flavor_id': False,
-    'gcp_credentials': True
+    'gcp_credentials': True,
+    'openshift_secret_token': False,
+    'openshift_master_endpoint': False,
+    'openshift_namespace': False
 }
 
 
