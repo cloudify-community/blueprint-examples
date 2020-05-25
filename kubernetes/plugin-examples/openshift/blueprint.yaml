@@ -31,11 +31,11 @@ inputs:
     default: { get_secret: openshift_namespace }
 
   fqdn_suffix:
-    description: Domain name to append to form the final service endpoint URL. 
+    description: Domain name to append to form the final service endpoint URL.
     type: string
-    default: apps.us-east-1.starter.openshift-online.com
+    default: apps.us-west-1.starter.openshift-online.com
 
-  endpoint: 
+  endpoint:
     description: Final service endpoint
     type: string
     default: { concat: [{ get_input: app_name }, '-', { get_input: namespace }, '.', { get_input: fqdn_suffix }] }
@@ -44,7 +44,7 @@ inputs:
     description: Standard container reference
     type: string
     default: jcornutt/cloudify:latest
-  
+
   container_port:
     description: Exposed container port to reference
     type: integer
@@ -55,7 +55,7 @@ node_templates:
   app_ingress:
     type: cloudify.kubernetes.resources.BlueprintDefinedResource
     properties:
-      client_config: &client_config
+      client_config:
         configuration:
           api_options: { get_input: kubernetes_api_options }
       definition:
@@ -84,7 +84,9 @@ node_templates:
   app_svc:
     type: cloudify.kubernetes.resources.Service
     properties:
-      client_config: *client_config
+      client_config:
+        configuration:
+          api_options: { get_input: kubernetes_api_options }
       definition:
         apiVersion: v1
         kind: Service
@@ -112,14 +114,16 @@ node_templates:
   app:
     type: cloudify.kubernetes.resources.Deployment
     properties:
-      client_config: *client_config
+      client_config:
+        configuration:
+          api_options: { get_input: kubernetes_api_options }
       definition:
         apiVersion: apps/v1
         kind: Deployment
         metadata:
           name: { concat: [{ get_input: app_name }, '-app'] }
-          # # If you want to have OpenShift show the arrows connecting services/deployments, 
-          # # you should use the connects-to annotation - example below. 
+          # If you want to have OpenShift show the arrows connecting services/deployments,
+          # you should use the connects-to annotation - example below.
           # annotations:
           #   app.openshift.io/connects-to: { get_property: [my_database, definition, metadata, name] }
           labels:
@@ -153,44 +157,44 @@ node_templates:
                   requests:
                     cpu: 1
                     memory: 128Mi
-              #   # Example volume mount from PVC
-              #   volumeMounts:
-              #   - mountPath: "/var/www"
-              #     name: "pvol"
-              # volumes:
-              # - name: "pvol"
-              #   persistentVolumeClaim:
-              #     claimName: { get_property: [my_volume_claim, definition, metadata, name] }
+                # Example volume mount from PVC
+                volumeMounts:
+                - mountPath: "/var/www"
+                  name: "pvol"
+              volumes:
+              - name: "pvol"
+                persistentVolumeClaim:
+                  claimName: { get_property: [my_volume_claim, definition, metadata, name] }
       options:
         namespace: { get_input: namespace }
     relationships:
-  #   - type: cloudify.relationships.depends_on
-  #     target: my_volume_claim
+    - type: cloudify.relationships.depends_on
+      target: my_volume_claim
 
-  # my_volume_claim:
-  #   type: cloudify.kubernetes.resources.BlueprintDefinedResource
-  #   properties:
-  #     definition:
-  #       apiVersion: v1
-  #       kind: PersistentVolumeClaim
-  #       metadata:
-  #         name: { concat: [{ get_input: app_name }, '-pvc0'] }
-  #         labels:
-  #           app: { get_input: app_name }
-  #           manager: cloudify
-  #           tier: app
-  #       spec:
-  #         storageClassName: gp2
-  #         accessModes:
-  #         - ReadWriteOnce
-  #         resources:
-  #           requests:
-  #             storage: 1Gi
-  #     options:
-  #       namespace: { get_input: namespace }
-  #   relationships:
-  #   - type: cloudify.kubernetes.relationships.managed_by_master
-  #     target: kubernetes_master
+  my_volume_claim:
+    type: cloudify.kubernetes.resources.BlueprintDefinedResource
+    properties:
+      client_config:
+        configuration:
+          api_options: { get_input: kubernetes_api_options }
+      definition:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: { concat: [{ get_input: app_name }, '-pvc0'] }
+          labels:
+            app: { get_input: app_name }
+            manager: cloudify
+            tier: app
+        spec:
+          storageClassName: gp2
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+      options:
+        namespace: { get_input: namespace }
 
 outputs:
 
@@ -198,4 +202,3 @@ outputs:
     description: Service endpoint
     value:
       endpoint: { concat: ['http://', { get_input: endpoint }] }
-

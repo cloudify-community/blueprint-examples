@@ -68,13 +68,18 @@ SECRETS_TO_CREATE = {
     'openstack_tenant_name': False,
     'openstack_auth_url': False,
     'openstack_region': False,
+    'openstack_region_name': False,
     'openstack_external_network': False,
+    'openstack_project_id': False,
+    'openstack_project_name': False,
+    'openstack_project_domain_id': False,
+    'openstack_user_domain_name': False,
+    'openstack_project_domain_name': False,
     'base_image_id': False,
     'base_flavor_id': False,
     'gcp_credentials': True,
-    'openshift_secret_token': False,
+    'openshift_secret_token': True,
     'openshift_master_endpoint': False,
-    'openshift_namespace': False
 }
 
 

@@ -244,6 +244,7 @@ workflows:
               only: master
       - getting-started-aws-terraform:
           requires:
+          - getting-started-aws
           - blueprint-validation
           filters:
             branches:
@@ -251,6 +252,7 @@ workflows:
       - getting-started-aws-cloudformation:
           requires:
           - blueprint-validation
+          - getting-started-aws-terraform
           filters:
             branches:
               only: master
@@ -273,7 +275,7 @@ workflows:
             branches:
               only: master
       - openshift
-      # - getting-started-openstack  # TODO: Get correct parameters for public OS.
+      - getting-started-openstack
       - blueprint-validation
       - release:
           requires:
@@ -284,7 +286,7 @@ workflows:
             - getting-started-azure-arm
             - getting-started-gcp
             - openshift
-            # - getting-started-openstack  # TODO: Get correct parameters for public OS.
+            - getting-started-openstack
           filters:
             branches:
               only: master
@@ -326,12 +328,14 @@ workflows:
       - getting-started-aws-cloudformation:
           requires:
           - blueprint-validation
+          - getting-started-aws
           filters:
             branches:
               only: master
       - getting-started-aws-terraform:
           requires:
           - blueprint-validation
+          - getting-started-aws-cloudformation
           filters:
             branches:
               only: master
@@ -341,9 +345,9 @@ workflows:
           filters:
             branches:
               only: master
-#      - getting-started-openstack:
-#          requires:
-#          - blueprint-validation
-#          filters:
-#            branches:
-#              only: master
+      - getting-started-openstack:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
