@@ -274,8 +274,18 @@ workflows:
           filters:
             branches:
               only: master
-      - openshift
-      - getting-started-openstack
+      - openshift:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-openstack:
+          requires:
+          - blueprint-validation
+          filters:
+            branches:
+              only: master
       - blueprint-validation
       - release:
           requires:
