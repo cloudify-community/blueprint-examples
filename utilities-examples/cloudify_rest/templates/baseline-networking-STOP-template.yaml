@@ -1,0 +1,51 @@
+rest_calls:
+
+  # DELETE self IP 192.168.20.53 on VLAN 1.1 - subscribers
+  - path: /mgmt/tm/net/self/subscriberVlanIP
+    method: DELETE
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    response_format: raw
+    recoverable_codes: [400]
+
+  # DELETE VLAN 1.1 - subscribers
+  - path: /mgmt/tm/net/vlan/subscribers
+    method: DELETE
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    response_format: raw
+    recoverable_codes: [400]
+
+  # DELETE self IP 192.168.10.64 on VLAN 1.2 - internet
+  - path: /mgmt/tm/net/self/internetVlanIP
+    method: DELETE
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    response_format: raw
+    recoverable_codes: [400]
+
+  # DELETE VLAN 1.2 - internet
+  - path: /mgmt/tm/net/vlan/internet
+    method: DELETE
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    response_format: raw
+    recoverable_codes: [400]
+
+  # save configuration
+  - path: /mgmt/tm/sys/config
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+        command: "save"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [savestate]
+    response_expectation:
+        - ['kind', "tm:sys:config:savestate"]

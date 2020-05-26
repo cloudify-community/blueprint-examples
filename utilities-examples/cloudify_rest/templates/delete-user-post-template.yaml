@@ -1,0 +1,9 @@
+rest_calls:
+  # delete user post
+  - path: /posts/{{POST_ID}}
+    method: DELETE
+    headers:
+      Content-type: application/json
+    payload:
+    response_format: json
+    recoverable_codes: [400]

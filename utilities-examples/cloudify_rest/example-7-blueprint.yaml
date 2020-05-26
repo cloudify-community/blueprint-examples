@@ -1,0 +1,56 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+    default: "jsonplaceholder.typicode.com"
+
+node_templates:
+
+  user10-some-properties:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        # use {% for encoded
+        create:
+          inputs:
+            template_file: templates/create-user-precoded-1.yaml
+            params:
+              USER:
+                userId: "10"
+                name: "Clementina DuBuque"
+                email: "Rey.Padberg@karina.biz"
+              POST_ID: "1"
+        # use {{ and prerender
+        configure:
+          inputs:
+            prerender: true
+            template_file: templates/create-user-precoded-2.yaml
+            params:
+              USER:
+                userId: "10"
+                name: "Clementina DuBuque"
+                email: "Rey.Padberg@karina.biz"
+              POST_ID: "1"
+        # use raw file and prerender
+        start:
+          inputs:
+            prerender: true
+            template_file: templates/create-user-precoded-3.yaml
+            params:
+              USER:
+                userId: "10"
+                name: "Clementina DuBuque"
+                email: "Rey.Padberg@karina.biz"
+              POST_ID: "1"

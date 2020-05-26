@@ -1,0 +1,30 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+    default: "kctbh9vrtdwd.statuspage.io"
+
+node_templates:
+
+  github-state:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            template_file: templates/get-github-status-template.yaml
+            save_path: status
+            prerender: true
+            remove_calls: true

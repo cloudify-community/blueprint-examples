@@ -1,0 +1,38 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+    default: "jsonplaceholder.typicode.com"
+
+node_templates:
+
+  update_user:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            template_file: templates/get-and-update-properties-template_part0.yaml
+            prerender: true
+            save_path: get_user
+            remove_calls: true
+        configure:
+          inputs:
+            template_file: templates/get-and-update-properties-template_part1.yaml
+            prerender: true
+            save_path: post_user
+            remove_calls: true
+            params:
+              saved_user: { get_attribute: [SELF, get_user, saved_user]}

@@ -1,0 +1,11 @@
+rest_calls:
+- path: /api/v2/status.json
+  method: GET
+  headers:
+   Content-type: application/json
+  payload:
+  response_format: json
+  recoverable_codes: [400]
+  response_translation: [github]
+  response_expectation:
+  - ['page', 'name', '\AGitHub\Z|\AGitLab\Z']

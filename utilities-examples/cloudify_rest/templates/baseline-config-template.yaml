@@ -1,0 +1,62 @@
+rest_calls:
+  # diasble initial wizard
+  - path: /mgmt/tm/sys/global-settings
+    method: PATCH
+    headers:
+      X-F5-Auth-Token: '{{TOKEN}}'
+      Content-type: application/json
+    payload:
+        guiSetup: "disabled"
+        hostname: "sg-test-bigip.com.pl"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [global-settings]
+    response_expectation:
+        - ['kind', "tm:sys:global-settings:global-settingsstate"]
+
+  # configure DNS
+  - path: /mgmt/tm/sys/dns
+    method: PATCH
+    headers:
+      X-F5-Auth-Token: '{{TOKEN}}'
+      Content-type: application/json
+    payload:
+        nameServers:
+          - "10.10.10.10"
+          - "11.11.11.11"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [dnsstate]
+    response_expectation:
+        - ['kind', "tm:sys:dns:dnsstate"]
+
+  # configure NTP
+  - path: /mgmt/tm/sys/ntp
+    method: PUT
+    headers:
+      X-F5-Auth-Token: '{{TOKEN}}'
+      Content-type: application/json
+    payload:
+        servers:
+          - "sg1.ntp.org"
+          - "sg2.ntp.org"
+        timezone: "Europe/Brussels"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [ntpstate]
+    response_expectation:
+        - ['kind', "tm:sys:ntp:ntpstate"]
+
+  # save configuration
+  - path: /mgmt/tm/sys/config
+    method: POST
+    headers:
+      X-F5-Auth-Token: '{{TOKEN}}'
+      Content-type: application/json
+    payload:
+        command: "save"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [savestate]
+    response_expectation:
+        - ['kind', "tm:sys:config:savestate"]

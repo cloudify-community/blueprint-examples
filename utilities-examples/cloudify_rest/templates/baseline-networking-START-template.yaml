@@ -1,0 +1,98 @@
+rest_calls:
+  # create VLAN 1.1 - subscribers
+  - path: /mgmt/tm/net/vlan/
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+      name: "subscribers"
+      partition: "Common"
+      autolasthop: "default"
+      cmpHash: "src-ip"
+      mtu: "1500"
+      interfaces:
+        -
+          name: "1.1"
+          tagged: false
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [vlanstate-1]
+    response_expectation:
+        - ['kind', "tm:net:vlan:vlanstate"]
+
+  # create self IP 192.168.20.53 on VLAN 1.1 - subscribers
+  - path: /mgmt/tm/net/self/
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+      name: "subscriberVlanIP"
+      partition: "Common"
+      address: "192.168.20.53/24"
+      floating: "disabled"
+      trafficGroup: "/Common/traffic-group-local-only"
+      vlan: "/Common/subscribers"
+      allowService: "none"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [selfstate-1]
+    response_expectation:
+        - ['kind', "tm:net:self:selfstate"]
+
+  # create VLAN 1.2 - internet
+  - path: /mgmt/tm/net/vlan/
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+      name: "internet"
+      partition: "Common"
+      autolasthop: "default"
+      cmpHash: "src-ip"
+      mtu: "1500"
+      interfaces:
+        -
+          name: "1.2"
+          tagged: false
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [vlanstate-2]
+    response_expectation:
+        - ['kind', "tm:net:vlan:vlanstate"]
+
+    # create self IP 192.168.10.64 on VLAN 1.2 - internet
+  - path: /mgmt/tm/net/self/
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+      name: "internetVlanIP"
+      partition: "Common"
+      address: "192.168.10.64/24"
+      floating: "disabled"
+      trafficGroup: "/Common/traffic-group-local-only"
+      vlan: "/Common/internet"
+      allowService: "none"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [selfstate-1]
+    response_expectation:
+       - ['kind', "tm:net:self:selfstate"]
+
+  # save configuration
+  - path: /mgmt/tm/sys/config
+    method: POST
+    headers:
+      X-F5-Auth-Token: "{{TOKEN}}"
+      Content-type: application/json
+    payload:
+        command: "save"
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [savestate]
+    response_expectation:
+        - ['kind', "tm:sys:config:savestate"]
