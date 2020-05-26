@@ -78,7 +78,7 @@ SECRETS_TO_CREATE = {
     'base_image_id': False,
     'base_flavor_id': False,
     'gcp_credentials': True,
-    'openshift_secret_token': True,
+    'openshift_secret_token': False,
     'openshift_master_endpoint': False,
 }
 
