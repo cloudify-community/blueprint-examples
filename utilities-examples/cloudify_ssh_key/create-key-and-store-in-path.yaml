@@ -1,0 +1,33 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin?version= >=1.18.0
+
+inputs:
+
+  private_key_path:
+    default: ~/.ssh/example-key.pem
+
+  public_key_path:
+    default: ~/.ssh/example-key.pem.pub
+
+  use_secret_store:
+    default: false
+
+  openssh_format:
+    default: True
+
+dsl_definitions:
+  resource_config: &RESOURCE_CONFIG
+    private_key_path: { get_input: private_key_path }
+    public_key_path: { get_input: public_key_path }
+    openssh_format: { get_input: openssh_format }
+
+node_templates:
+
+  manager_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config: *RESOURCE_CONFIG
+      use_secret_store: { get_input: use_secret_store }
