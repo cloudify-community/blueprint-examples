@@ -49,9 +49,14 @@ DK_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=DK_VERSION)
 DK_PLUGIN = 'http://www.getcloudify.org/spec/docker-plugin/' \
             '{v}/plugin.yaml'.format(v=DK_VERSION)
+AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
+           'releases/download/2.9.0/cloudify_ansible_plugin' \
+           '-2.9.0-py27-none-linux_x86_64-centos-Core.wgn'
+AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
+            'releases/download/2.9.0/plugin.yaml'
 
 PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN), (TF_WAGON, TF_PLUGIN),
-                     (UT_WAGON, UT_PLUGIN)]
+                     (UT_WAGON, UT_PLUGIN), (AN_WAGON, AN_PLUGIN)]
 
 SECRETS_TO_CREATE = {
     'aws_access_key_id': False,

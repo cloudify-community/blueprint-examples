@@ -69,7 +69,7 @@ node_templates:
       client_config:
         configuration:
           api_options:
-            host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
+            host:  { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
             api_key: { get_attribute: [ store_token, token ] }
             debug: false
             verify_ssl: false
