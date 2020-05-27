@@ -129,4 +129,4 @@ Check the key files exist in the paths.
 
 **Note**:
 
-For more use cases, see [virtual-machine examples](https://github.com/cloudify-community/blueprint-examples/tree/master/virtual-machine)
+For more use cases, see [virtual-machine examples](https://github.com/cloudify-community/blueprint-examples/tree/master/virtual-machine).
