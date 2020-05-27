@@ -186,6 +186,7 @@ node_templates:
   cloud_init:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
+      encode_base64: true
       resource_config:
         users:
         - name: { get_input: agent_user }

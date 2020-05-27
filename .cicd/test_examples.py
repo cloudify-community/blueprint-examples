@@ -33,12 +33,15 @@ from __init__ import (
     SECRETS_TO_CREATE)
 
 
-prepare_test(plugins=PLUGINS_TO_UPLOAD, secrets=SECRETS_TO_CREATE)
+prepare_test(plugins=PLUGINS_TO_UPLOAD,
+             secrets=SECRETS_TO_CREATE,
+             plugin_test=False)
 
 virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
                         in b and os.environ.get('IAAS', '') ==
                         os.path.basename(b).split('.yaml')[0]]
 getting_started_list = [b for b in blueprint_list if 'getting-started' in b]
+openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 
 
 @pytest.fixture(scope='function', params=blueprint_list)
@@ -65,6 +68,18 @@ def basic_blueprint_test_with_getting_started_filter(request):
             raise
 
 
+@pytest.fixture(scope='function', params=openshift_list)
+def openshift_test(request):
+    try:
+        basic_blueprint_test(
+            request.param, blueprint_id_filter(request.param),
+            inputs='namespace=blueprint-tests',
+            timeout=3000)
+    except:
+        cleanup_on_failure(blueprint_id_filter(request.param))
+        raise
+
+
 def test_blueprint_validation(upload_blueprints_for_validation):
     """All blueprints must pass DSL validation."""
     assert upload_blueprints_for_validation is None
@@ -83,3 +98,8 @@ def test_versions():
 
 def test_getting_started(basic_blueprint_test_with_getting_started_filter):
     assert basic_blueprint_test_with_getting_started_filter is None
+
+
+def test_openshift(openshift_test):
+    assert openshift_test is None
+
