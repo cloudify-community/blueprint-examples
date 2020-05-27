@@ -28,6 +28,7 @@ OS_VERSION = '3.2.12'
 UT_VERSION = '1.21.0'
 TF_VERSION = '0.13.2'
 DK_VERSION = '2.0.1'
+AN_VERSION = '2.9.1'
 
 TF_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            'cloudify-terraform-plugin/{v}/cloudify_terraform_plugin' \
@@ -50,10 +51,10 @@ DK_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
 DK_PLUGIN = 'http://www.getcloudify.org/spec/docker-plugin/' \
             '{v}/plugin.yaml'.format(v=DK_VERSION)
 AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
-           'releases/download/2.9.0/cloudify_ansible_plugin' \
-           '-2.9.0-py27-none-linux_x86_64-centos-Core.wgn'
+           'releases/download/{v}/cloudify_ansible_plugin' \
+           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=AN_VERSION)
 AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
-            'releases/download/2.9.0/plugin.yaml'
+            'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 
 PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN), (TF_WAGON, TF_PLUGIN),
                      (UT_WAGON, UT_PLUGIN), (AN_WAGON, AN_PLUGIN)]
