@@ -67,12 +67,13 @@ node_templates:
     type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
-        configuration:
+        authentication: &client_config_authentication
+          gcp_service_account: { get_input: gcp_credentials }
+        configuration: &client_config_configuration
           api_options:
-            host:  { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
-            api_key: { get_attribute: [ store_token, token ] }
-            debug: false
+            host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
             verify_ssl: false
+            debug: false
       validate_resource_status: true
       file:
         resource_path: resources/template.yaml
