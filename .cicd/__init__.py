@@ -24,7 +24,7 @@ CWD = '/{0}'.format(
 SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 
 
-OS_VERSION = '3.2.12'
+OS_VERSION = '3.2.15'
 UT_VERSION = '1.21.0'
 TF_VERSION = '0.13.2'
 DK_VERSION = '2.0.1'
@@ -56,7 +56,8 @@ AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
 AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
             'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 
-PLUGINS_TO_UPLOAD = [(TF_WAGON, TF_PLUGIN),
+PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN),
+                     (TF_WAGON, TF_PLUGIN),
                      (UT_WAGON, UT_PLUGIN),
                      (AN_WAGON, AN_PLUGIN),
                      (DK_WAGON, DK_PLUGIN)]
