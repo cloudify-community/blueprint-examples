@@ -55,6 +55,9 @@ inputs:
     type: string
     default:  { get_secret: openstack_project_domain_name }
 
+  encode_cloud_init:
+    default: false
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -186,6 +189,7 @@ node_templates:
   cloud_init:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
+      encode_base64: { get_input: encode_cloud_init }
       resource_config:
         users:
         - name: { get_input: agent_user }

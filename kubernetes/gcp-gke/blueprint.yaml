@@ -67,12 +67,13 @@ node_templates:
     type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
+        authentication:
+          gcp_service_account: { get_input: gcp_credentials }
         configuration:
           api_options:
-            host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
-            api_key: { get_attribute: [ store_token, token ] }
-            debug: false
+            host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
             verify_ssl: false
+            debug: false
       validate_resource_status: true
       file:
         resource_path: resources/template.yaml
@@ -87,8 +88,7 @@ node_templates:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
         start:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
-        delete:
-          implementation: {}
+        delete: {}
 
 
 capabilities:

@@ -24,34 +24,44 @@ CWD = '/{0}'.format(
 SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 
 
-OS_VERSION = '3.2.12'
+OS_VERSION = '3.2.15'
 UT_VERSION = '1.21.0'
 TF_VERSION = '0.13.2'
 DK_VERSION = '2.0.1'
+AN_VERSION = '2.9.1'
 
-TF_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
-           'cloudify-terraform-plugin/{v}/cloudify_terraform_plugin' \
-           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=TF_VERSION)
-TF_PLUGIN = 'http://www.getcloudify.org/spec/terraform-plugin/' \
-            '{v}/plugin.yaml'.format(v=TF_VERSION)
-OS_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
-           'cloudify-openstack-plugin/{v}/cloudify_openstack_plugin' \
-           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=OS_VERSION)
-OS_PLUGIN = 'http://www.getcloudify.org/spec/openstack-plugin/' \
+TF_WAGON = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
+           'releases/download/{v}/cloudify_terraform_plugin-{v}-py27-none-' \
+           'linux_x86_64-centos-Core.wgn'.format(v=TF_VERSION)
+TF_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
+            'releases/download/{v}/plugin.yaml'.format(v=TF_VERSION)
+OS_WAGON = 'https://github.com/cloudify-cosmo/cloudify-openstack-plugin/' \
+           'releases/download/{v}/cloudify_openstack_plugin-{v}-py27-none-' \
+           'linux_x86_64-centos-Core.wgn'.format(v=OS_VERSION)
+OS_PLUGIN = 'https://github.com/cloudify-cosmo/' \
+            'cloudify-openstack-plugin/releases/download/' \
             '{v}/plugin.yaml'.format(v=OS_VERSION)
 UT_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            'cloudify-utilities-plugin/{v}/cloudify_utilities_plugin' \
            '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=UT_VERSION)
 UT_PLUGIN = 'http://www.getcloudify.org/spec/utilities-plugin/' \
             '{v}/plugin.yaml'.format(v=UT_VERSION)
-DK_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
-           'cloudify-docker-plugin/{v}/cloudify_docker_plugin' \
-           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=DK_VERSION)
-DK_PLUGIN = 'http://www.getcloudify.org/spec/docker-plugin/' \
-            '{v}/plugin.yaml'.format(v=DK_VERSION)
+DK_WAGON = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
+           'releases/download/{v}/cloudify_docker_plugin-{v}-py27-none-' \
+           'linux_x86_64-centos-Core.wgn'.format(v=DK_VERSION)
+DK_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
+            'releases/download/{v}/plugin.yaml'.format(v=DK_VERSION)
+AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
+           'releases/download/{v}/cloudify_ansible_plugin' \
+           '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=AN_VERSION)
+AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
+            'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 
-PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN), (TF_WAGON, TF_PLUGIN),
-                     (UT_WAGON, UT_PLUGIN)]
+PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN),
+                     (TF_WAGON, TF_PLUGIN),
+                     (UT_WAGON, UT_PLUGIN),
+                     (AN_WAGON, AN_PLUGIN),
+                     (DK_WAGON, DK_PLUGIN)]
 
 SECRETS_TO_CREATE = {
     'aws_access_key_id': False,
@@ -68,10 +78,18 @@ SECRETS_TO_CREATE = {
     'openstack_tenant_name': False,
     'openstack_auth_url': False,
     'openstack_region': False,
+    'openstack_region_name': False,
     'openstack_external_network': False,
+    'openstack_project_id': False,
+    'openstack_project_name': False,
+    'openstack_project_domain_id': False,
+    'openstack_user_domain_name': False,
+    'openstack_project_domain_name': False,
     'base_image_id': False,
     'base_flavor_id': False,
-    'gcp_credentials': True
+    'gcp_credentials': True,
+    'openshift_secret_token': False,
+    'openshift_master_endpoint': False,
 }
 
 
