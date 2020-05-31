@@ -1,0 +1,4 @@
+config system global
+end
+{{ system }}
+end
