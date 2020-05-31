@@ -1,0 +1,4 @@
+node_sequence:
+- leaf
+- branch
+scale_node_field_value: branch1

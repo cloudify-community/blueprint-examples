@@ -1,0 +1,20 @@
+node_sequence:
+- leaf
+- branch
+scalable_entity_properties:
+  branch:
+  - config:
+      branch_name: branch1
+  leaf:
+  - config:
+      tree_name: tree0
+      branch_name: branch1
+      leaf_name: leaf1-1
+  - config:
+      tree_name: tree0
+      branch_name: branch1
+      leaf_name: leaf1-2
+  - config:
+      tree_name: tree0
+      branch_name: branch1
+      leaf_name: leaf1-3

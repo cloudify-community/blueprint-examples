@@ -1,0 +1,23 @@
+scale_transaction_field: ""
+scalable_entity_properties:
+  branch:
+  - config:
+      tree_name: tree0
+      branch_name: branch2
+  - config:
+      tree_name: tree0
+      branch_name: branch3
+
+  leaf:
+  - config:
+      tree_name: tree0
+      branch_name: branch2
+      leaf_name: leaf2-1
+  - config:
+      tree_name: tree0
+      branch_name: branch2
+      leaf_name: leaf2-2
+  - config:
+      tree_name: tree0
+      branch_name: branch3
+      leaf_name: leaf3

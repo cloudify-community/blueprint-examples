@@ -1,0 +1,5 @@
+scale_transaction_field: ""
+scale_node_name: ""
+scale_node_field: ["config", "branch_name"]
+scale_node_field_value: branch2
+force_db_cleanup: true

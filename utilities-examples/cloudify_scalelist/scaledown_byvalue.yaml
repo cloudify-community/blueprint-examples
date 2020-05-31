@@ -1,0 +1,6 @@
+# search in any nodes
+scale_node_name: ""
+scale_node_field: ["deep", "search"]
+scale_node_field_value: check
+# skip transations
+scale_transaction_field: ""

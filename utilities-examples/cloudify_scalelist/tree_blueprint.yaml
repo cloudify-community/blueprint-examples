@@ -1,0 +1,584 @@
+# create branch0
+# cfy install cloudify-utilities-plugin/cloudify_scalelist/examples/tree_blueprint.yaml -b examples
+# add branch1
+# cfy executions start tree_add_branch -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_add_branch_params.yaml -d examples
+# check rollback
+# cfy executions start tree_add_branch -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_rollback_branch_params.yaml -d examples
+# update width for branch1
+# cfy executions start tree_update_branch -d examples -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_update_branch_params.yaml
+# remove branch1
+# cfy executions start tree_remove_branch -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_remove_branch_params.yaml -d examples
+# remove branch0 (created by install)
+# cfy executions start tree_remove_branch -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_remove_branch_precreated.yaml -d examples
+# add branch2 and branch3
+# cfy executions start scaleuplist -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_scaleup_params.yaml -d examples
+# remove branch2 (branch3 will be alive)
+# cfy executions start scaledownlist -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_scaledown_params.yaml -d examples
+# add tree1
+# cfy executions start tree_add_tree -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_add_tree_params.yaml -d examples
+# update tree1 (update workflow)
+# cfy executions start tree_update_tree -d examples -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_update_params.yaml
+# remove tree1, after delete should be alive only tree0->branch3->leaf3
+# cfy executions start tree_remove_tree -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_remove_tree_params.yaml -d examples
+# remove tree0 (created by install), after delete should be alive only root
+# cfy executions start tree_remove_tree -p cloudify-utilities-plugin/cloudify_scalelist/examples/tree_remove_tree_precreated.yaml -d examples
+# remove everything
+# cfy uninstall examples
+
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Scale Blueprint Check
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.0/types.yaml
+  - http://www.getcloudify.org/spec/utilities-plugin/1.18.0/plugin.yaml
+
+inputs:
+
+  tree_name:
+    type: string
+    description: >
+       Tree name
+    default: tree0
+
+  branch_name:
+    type: string
+    description: >
+       Branch name
+    default: branch0
+
+  leaf_name:
+    type: string
+    description: >
+       Leaf name
+    default: leaf0
+
+workflows:
+  tree_add_branch:
+    mapping: scalelist.cloudify_scalelist.workflows.scaleuplist
+    parameters:
+      scalable_entity_properties:
+        description: >
+          List properties for nodes
+        default: {}
+      scale_compute:
+        description: >
+            If a node name is passed as the `scalable_entity_name` parameter
+            and that node is contained (transitively) within a compute node
+            and this property is 'true', operate on the compute node instead
+            of the specified node.
+        default: false
+      ignore_failure:
+        default: false
+        type: boolean
+      scale_transaction_field:
+        type: string
+        default: ""
+        description: >
+           Place to save instances id's created in same transaction.
+      scale_transaction_value:
+        type: string
+        default: ""
+        description: >
+           Optional, transaction value.
+      ignore_rollback_failure:
+        default: true
+        type: boolean
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_remove_branch:
+    mapping: scalelist.cloudify_scalelist.workflows.scaledownlist
+    parameters:
+      scale_compute:
+        description: >
+            If a node name is passed as the `scalable_entity_name` parameter
+            and that node is contained (transitively) within a compute node
+            and this property is 'true', operate on the compute node instead
+            of the specified node.
+        default: false
+      ignore_failure:
+        default: false
+        type: boolean
+      scale_transaction_field:
+        type: string
+        default: ""
+        description: >
+           Place to save instances id's created in same transaction.
+      scale_node_name:
+        type: string
+        default: ""
+        description: >
+           Node name where we need to search value
+      scale_node_field:
+        default: ['config', 'branch_name']
+        description: >
+          Node runtime properties field name for search value, supported search
+          by ['a', 'b'] on {'a': {'b': 'c'}} return 'c'
+      scale_node_field_value:
+        default: ""
+        description: >
+          Node runtime properties field value for search. Can be provided
+          as list of possible values.
+      force_db_cleanup:
+        default: true
+        description: >
+            Run DB cleanup directly if instances can't be deleted in one
+            transaction.
+      all_results:
+        default: false
+        description: >
+          Get all instances for filter. Required 4.3+ manager.
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_add_tree:
+    mapping: scalelist.cloudify_scalelist.workflows.scaleuplist
+    parameters:
+      scalable_entity_properties:
+        description: >
+          List properties for nodes
+        default: {}
+      scale_compute:
+        description: >
+            If a node name is passed as the `scalable_entity_name` parameter
+            and that node is contained (transitively) within a compute node
+            and this property is 'true', operate on the compute node instead
+            of the specified node.
+        default: false
+      ignore_failure:
+        default: false
+        type: boolean
+      scale_transaction_field:
+        type: string
+        default: ""
+        description: >
+           Place to save instances id's created in same transaction.
+      scale_transaction_value:
+        type: string
+        default: ""
+        description: >
+           Optional, transaction value.
+      ignore_rollback_failure:
+        default: true
+        type: boolean
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_remove_tree:
+    mapping: scalelist.cloudify_scalelist.workflows.scaledownlist
+    parameters:
+      scale_compute:
+        description: >
+            If a node name is passed as the `scalable_entity_name` parameter
+            and that node is contained (transitively) within a compute node
+            and this property is 'true', operate on the compute node instead
+            of the specified node.
+        default: false
+      ignore_failure:
+        default: false
+        type: boolean
+      scale_transaction_field:
+        type: string
+        default: ""
+        description: >
+           Place to save instances id's created in same transaction.
+      scale_node_name:
+        type: string
+        default: ""
+        description: >
+           Node name where we need to search value
+      scale_node_field:
+        default: ['config', 'name']
+        description: >
+          Node runtime properties field name for search value, supported search
+          by ['a', 'b'] on {'a': {'b': 'c'}} return 'c'
+      scale_node_field_value:
+        default: ""
+        description: >
+          Node runtime properties field value for search. Can be provided
+          as list of possible values.
+      force_db_cleanup:
+        default: true
+        description: >
+            Run DB cleanup directly if instances can't be deleted in one
+            transaction.
+      all_results:
+        default: false
+        description: >
+          Get all instances for filter. Required 4.3+ manager.
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_update_tree:
+    mapping: scalelist.cloudify_scalelist.workflows.execute_operation
+    parameters:
+      operation:
+        type: string
+        default: cloudify.interfaces.lifecycle.update
+        description: >
+          The name of the operation to execute
+          (Default: cloudify.interfaces.lifecycle.update).
+      operation_kwargs:
+        default: {}
+        description: >
+          A dictionary of keyword arguments that will be passed to the
+          operation invocation (Default: {}).
+      allow_kwargs_override:
+        default: null
+        description: >
+          A boolean describing whether overriding operations inputs defined in
+          the blueprint by using inputs of the same name in the
+          operation_kwargs parameter is allowed or not (Default: null [means
+          that the default behavior, as defined by the workflows
+          infrastructure, will be used]).
+      run_by_dependency_order:
+        default: false
+        description: >
+          A boolean describing whether the operation should execute on the
+          relevant nodes according to the order of their relationships
+          dependencies or rather execute on all relevant nodes in parallel
+          (Default: false).
+      type_names:
+        default: []
+        description: >
+          A list of type names. The operation will be executed only on node
+          instances which are of these types or of types which (recursively)
+          derive from them. An empty list means no filtering will take place
+          and all type names are valid (Default: []).
+      node_ids:
+        default: []
+        description: >
+          A list of node ids. The operation will be executed only on node
+          instances which are instances of these nodes. An empty list means
+          no filtering will take place and all nodes are valid (Default: []).
+      node_instance_ids:
+        default: []
+        description: >
+          A list of node instance ids. The operation will be executed only on
+          the node instances specified. An empty list means no filtering will
+          take place and all node instances are valid (Default: []).
+      node_field:
+        default: ['config', 'name']
+        description: >
+          Node runtime properties field name for search value, supported search
+          by ['a', 'b'] on {'a': {'b': 'c'}} return 'c'
+      node_field_value:
+        default: ""
+        description: >
+         Node runtime properties field value for search. Can be provided as
+         list of possible values.
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_update_branch:
+    mapping: scalelist.cloudify_scalelist.workflows.execute_operation
+    parameters:
+      operation:
+        type: string
+        default: cloudify.interfaces.lifecycle.update
+        description: >
+          The name of the operation to execute
+          (Default: cloudify.interfaces.lifecycle.update).
+      operation_kwargs:
+        default: {}
+        description: >
+          A dictionary of keyword arguments that will be passed to the
+          operation invocation (Default: {}).
+      allow_kwargs_override:
+        default: null
+        description: >
+          A boolean describing whether overriding operations inputs defined in
+          the blueprint by using inputs of the same name in the
+          operation_kwargs parameter is allowed or not (Default: null [means
+          that the default behavior, as defined by the workflows
+          infrastructure, will be used]).
+      run_by_dependency_order:
+        default: false
+        description: >
+          A boolean describing whether the operation should execute on the
+          relevant nodes according to the order of their relationships
+          dependencies or rather execute on all relevant nodes in parallel
+          (Default: false).
+      type_names:
+        default: []
+        description: >
+          A list of type names. The operation will be executed only on node
+          instances which are of these types or of types which (recursively)
+          derive from them. An empty list means no filtering will take place
+          and all type names are valid (Default: []).
+      node_ids:
+        default: []
+        description: >
+          A list of node ids. The operation will be executed only on node
+          instances which are instances of these nodes. An empty list means
+          no filtering will take place and all nodes are valid (Default: []).
+      node_instance_ids:
+        default: []
+        description: >
+          A list of node instance ids. The operation will be executed only on
+          the node instances specified. An empty list means no filtering will
+          take place and all node instances are valid (Default: []).
+      node_field:
+        default: ['config', 'branch_name']
+        description: >
+          Node runtime properties field name for search value, supported search
+          by ['a', 'b'] on {'a': {'b': 'c'}} return 'c'
+      node_field_value:
+        default: ""
+        description: >
+         Node runtime properties field value for search. Can be provided as
+         list of possible values.
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+  tree_update_leaf:
+    mapping: scalelist.cloudify_scalelist.workflows.execute_operation
+    parameters:
+      operation:
+        type: string
+        default: cloudify.interfaces.lifecycle.update
+        description: >
+          The name of the operation to execute
+          (Default: cloudify.interfaces.lifecycle.update).
+      operation_kwargs:
+        default: {}
+        description: >
+          A dictionary of keyword arguments that will be passed to the
+          operation invocation (Default: {}).
+      allow_kwargs_override:
+        default: null
+        description: >
+          A boolean describing whether overriding operations inputs defined in
+          the blueprint by using inputs of the same name in the
+          operation_kwargs parameter is allowed or not (Default: null [means
+          that the default behavior, as defined by the workflows
+          infrastructure, will be used]).
+      run_by_dependency_order:
+        default: false
+        description: >
+          A boolean describing whether the operation should execute on the
+          relevant nodes according to the order of their relationships
+          dependencies or rather execute on all relevant nodes in parallel
+          (Default: false).
+      type_names:
+        default: []
+        description: >
+          A list of type names. The operation will be executed only on node
+          instances which are of these types or of types which (recursively)
+          derive from them. An empty list means no filtering will take place
+          and all type names are valid (Default: []).
+      node_ids:
+        default: []
+        description: >
+          A list of node ids. The operation will be executed only on node
+          instances which are instances of these nodes. An empty list means
+          no filtering will take place and all nodes are valid (Default: []).
+      node_instance_ids:
+        default: []
+        description: >
+          A list of node instance ids. The operation will be executed only on
+          the node instances specified. An empty list means no filtering will
+          take place and all node instances are valid (Default: []).
+      node_field:
+        default: ['config', 'leaf_name']
+        description: >
+          Node runtime properties field name for search value, supported search
+          by ['a', 'b'] on {'a': {'b': 'c'}} return 'c'
+      node_field_value:
+        default: ""
+        description: >
+         Node runtime properties field value for search. Can be provided as
+         list of possible values.
+      node_sequence:
+        default: false
+        description: >
+          Optional, sequence of nodes for run for override relationships.
+
+node_types:
+
+  leaf_node:
+    derived_from: cloudify.nodes.Root
+    properties:
+      convert_inputs:
+        description: >
+          Map blueprint inputs <-> runtime name
+        default:
+          tree_name: name
+      name:
+        description: >
+          tree name
+        default: ""
+      branch_name:
+        description: >
+          Branch name
+        default: ""
+      leaf_name:
+        description: >
+          Toplology name
+        default: ""
+      width:
+        description: >
+          width value
+        default: "narrow"
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/leaf_create.py
+          executor: central_deployment_agent
+          inputs: {}
+        update:
+          implementation: scripts/leaf_update.py
+          executor: central_deployment_agent
+          inputs: {}
+        delete:
+          implementation: scripts/leaf_delete.py
+          executor: central_deployment_agent
+          inputs: {}
+
+  branch_node:
+    derived_from: cloudify.nodes.Root
+    properties:
+      convert_inputs:
+        description: >
+          Map blueprint inputs <-> runtime name
+        default:
+          tree_name: name
+      name:
+        description: >
+          tree name
+        default: ""
+      branch_name:
+        description: >
+          Branch name
+        default: ""
+      width:
+        description: >
+          width value
+        default: "narrow"
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/branch_create.py
+          executor: central_deployment_agent
+          inputs: {}
+        update:
+          implementation: scripts/branch_update.py
+          executor: central_deployment_agent
+          inputs: {}
+        delete:
+          implementation: scripts/branch_delete.py
+          executor: central_deployment_agent
+          inputs: {}
+
+  tree_node:
+    derived_from: cloudify.nodes.Root
+    properties:
+      convert_inputs:
+        description: >
+          Map blueprint inputs <-> runtime name
+        default:
+          tree_name: name
+      name:
+        description: >
+          tree name
+        default: ""
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/tree_create.py
+          executor: central_deployment_agent
+          inputs: {}
+        update:
+          implementation: scripts/tree_update.py
+          executor: central_deployment_agent
+          inputs: {}
+        delete:
+          implementation: scripts/tree_delete.py
+          executor: central_deployment_agent
+          inputs: {}
+
+node_templates:
+
+  root:
+    type: cloudify.nodes.Root
+
+  tree:
+    type: tree_node
+    properties:
+      name: { get_input: tree_name }
+
+  branch:
+    type: branch_node
+    properties:
+      name: { get_input: tree_name }
+      branch_name: { get_input: branch_name }
+
+  leaf:
+    type: leaf_node
+    properties:
+      name: { get_input: tree_name }
+      branch_name: { get_input: branch_name }
+      leaf_name: { get_input: leaf_name }
+
+groups:
+
+  full_scale:
+    members:
+      - tree
+      - branch
+      - leaf
+
+  tree_scale:
+    members:
+      - tree
+
+  branch_scale:
+    members:
+      - branch
+
+  leaf_scale:
+    members:
+      - leaf
+
+policies:
+
+  tree_scaling_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances:  1
+    targets: [tree_scale]
+
+  branch_scaling_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances:  1
+    targets: [branch_scale]
+
+  leaf_scaling_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances:  0
+    targets: [leaf_scale]
+
+  # Failed to validate blueprint Nodes and groups cannot be members in multiple
+  # groups, but member 'tree' belongs to the following multiple groups:
+  # ['tree_scale', 'full_scale']
+  # full_scale_scaling_policy:
+  #   type: cloudify.policies.scaling
+  #   properties:
+  #     default_instances:  0
+  #   targets: [full_scale]
