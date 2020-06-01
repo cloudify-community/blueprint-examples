@@ -111,7 +111,9 @@ Instance runtime properties:
 
 ```
 
-Please provide 'cacert_bundle' secret from a file:
+Please provide 
+
+* 'cacert_bundle' secret from a file:
 
 Ubuntu, usually at: "/usr/lib/python2.7/dist-packages/certifi/cacert.pem"
 
@@ -120,6 +122,10 @@ Centos, usually at: "/opt/manager/env/lib/python2.7/site-packages/certifi/cacert
 Example for centos:
 
 `cfy secrets create -f /opt/manager/env/lib/python2.7/site-packages/certifi/cacert.pem cacert_bundle`
+
+* Use /inputs/rest_endpoint_cert.yaml as input.
+
+`cfy install example-1-blueprint.yaml  -i ./inputs/rest_endpoint_cert.yaml`
 
 ### Example 2
 
