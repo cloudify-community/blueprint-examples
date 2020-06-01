@@ -111,9 +111,9 @@ Instance runtime properties:
 
 ```
 
-Please provide 
+**Notes**:
 
-* 'cacert_bundle' secret from a file:
+* Please provide 'cacert_bundle' secret from a file:
 
 Ubuntu, usually at: "/usr/lib/python2.7/dist-packages/certifi/cacert.pem"
 
