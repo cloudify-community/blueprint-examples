@@ -27,6 +27,7 @@ inputs:
     description: The name of your OpenStack project.
     type: string
     default:  default
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -68,6 +69,7 @@ node_templates:
         install_method: remote
         port: 22
         key: { get_secret: agent_key_private }
+        network: external
       resource_config:
 #        key_name: ''
         image_id: { get_secret: centos_core_image }
