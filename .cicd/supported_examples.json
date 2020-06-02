@@ -140,7 +140,7 @@
     "example-6-blueprint.yaml",
     "example-7-blueprint.yaml",
     "example-8-blueprint.yaml",
-    "example-2-blueprint.yaml",
+    "example-9-blueprint.yaml",
     "example-github-status.yaml"
   ],
   "utilities-examples/cloudify_scalelist": [
