@@ -154,7 +154,7 @@
   "utilities-examples/cloudify_ssh_key": [
     "create_secret_agent_key_using_exising_secret.yaml",
     "create-key-and-store-in-path.yaml",
-    "create_secret_agent_key.yaml"
+    "create-secret-agent-key.yaml"
   ],
   "utilities-examples/cloudify_suspend": [
     "example.yaml"
