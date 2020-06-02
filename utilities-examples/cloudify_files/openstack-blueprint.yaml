@@ -1,0 +1,197 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint provides the basic architecture for an Openstack blueprint.
+
+imports:
+
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-openstack-plugin
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  security_group_rules:
+    default:
+      - direction: ingress
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+
+  user_domain_name:
+    description: Openstack user domain name.
+    type: string
+    default:  default
+
+  project_domain_name:
+    description: The name of your OpenStack project.
+    type: string
+    default:  default
+
+dsl_definitions:
+
+  openstack_config: &openstack_config
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    tenant_name: { get_secret: openstack_tenant_name }
+    auth_url: { get_secret: openstack_auth_url }
+    region_name: { get_secret: openstack_region }
+    user_domain_name: { get_input: user_domain_name }
+    project_domain_name: { get_input: project_domain_name }
+
+node_templates:
+
+  docker_yum_repo:
+    type: cloudify.nodes.File
+    properties:
+      resource_config:
+        resource_path: resources/docker.repo
+        file_path: /etc/yum.repos.d/docker.repo
+        owner: root:root
+        mode: 644
+        use_sudo: true
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: host
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          executor: host_agent
+        delete:
+          executor: host_agent
+
+  host:
+    type: cloudify.nodes.openstack.Server
+    properties:
+      client_config: *openstack_config
+      agent_config:
+        user: centos
+        install_method: remote
+        port: 22
+        key: { get_secret: agent_key_private }
+        network: external
+      resource_config:
+#        key_name: ''
+        image_id: { get_secret: centos_core_image }
+        flavor_id: { get_secret: small_image_flavor }
+        user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+    relationships:
+      - target: public_subnet_nic
+        type: cloudify.relationships.openstack.server_connected_to_port
+      - target: private_subnet_nic
+        type: cloudify.relationships.openstack.server_connected_to_port
+      - type: cloudify.relationships.depends_on
+        target: cloudify_host_cloud_config
+
+
+  cloudify_host_cloud_config:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+          - name: centos
+            primary-group: wheel
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_secret: agent_key_public }
+
+  public_subnet_nic:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: public_network
+      - type: cloudify.relationships.depends_on
+        target: public_subnet
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
+        target: security_group
+      - type: cloudify.relationships.openstack.port_connected_to_floating_ip
+        target: public_ip
+
+  private_subnet_nic:
+    type: cloudify.nodes.openstack.Port
+    properties:
+      client_config: *openstack_config
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: private_network
+      - type: cloudify.relationships.depends_on
+        target: private_subnet
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
+        target: security_group
+
+  security_group:
+    type: cloudify.nodes.openstack.SecurityGroup
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        name: basic_security_group
+      security_group_rules: { get_input: security_group_rules }
+
+  public_ip:
+    type: cloudify.nodes.openstack.FloatingIP
+    properties:
+      client_config: *openstack_config
+      resource_config:
+        floating_network_name: { get_property: [ external_network, resource_config, name ] }
+
+  private_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: private_subnet_name }
+    relationships:
+      - target: private_network
+        type: cloudify.relationships.contained_in
+
+  private_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: private_network_name }
+
+  public_subnet:
+    type: cloudify.nodes.openstack.Subnet
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: public_subnet_name }
+    relationships:
+      - target: public_network
+        type: cloudify.relationships.contained_in
+      - target: router
+        type: cloudify.relationships.openstack.subnet_connected_to_router
+
+  public_network:
+    type:  cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: public_network_name }
+
+  router:
+    type: cloudify.nodes.openstack.Router
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: router_name }
+    relationships:
+      - target: external_network
+        type: cloudify.relationships.connected_to
+
+  external_network:
+    type: cloudify.nodes.openstack.Network
+    properties:
+      client_config: *openstack_config
+      use_external_resource: true
+      resource_config:
+        name: { get_secret: openstack_external_network }

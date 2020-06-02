@@ -1,0 +1,54 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  rest_endpoint:
+    description: >
+      REST API endpoint
+    default: "jsonplaceholder.typicode.com"
+
+node_templates:
+
+  user-details:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            template_file: templates/get-user-all-properties-template.yaml
+
+  user-post:
+    type: cloudify.rest.Requests
+    properties:
+      hosts: [{ get_input: rest_endpoint }]
+      port: 443
+      ssl: true
+      verify: false
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          inputs:
+            template_file: templates/create-user-post-template.yaml
+            prerender: true
+            params:
+              USER_ID: {get_attribute: [user-details, user, id]}
+              USERNAME: { get_attribute: [user-details, user, username] }
+              WEBSITE: { get_attribute: [user-details, user, website] }
+              POST_ID: "1"
+        stop:
+            inputs:
+                template_file: templates/delete-user-post-template.yaml
+                params:
+                  POST_ID: "1"
+    relationships:
+    - type: cloudify.relationships.depends_on
+      target: user-details

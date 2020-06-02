@@ -1,0 +1,88 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/5.0.0/types.yaml
+  - plugin:cloudify-utilities-plugin
+
+inputs:
+
+  terminal_ip:
+    type: string
+    description: >
+       terminal server ip
+    default: 127.0.0.1
+
+  terminal_user:
+    type: string
+    description: >
+       terminal server user
+    default: root
+
+  terminal_password:
+    type: string
+    description: >
+       terminal server user password
+    default: ssh_password
+
+  terminal_key_content:
+    type: string
+    description: >
+       terminal server user rsa key content, can be used instead password
+    default: { get_secret: agent_key_private }
+
+  terminal_port:
+    type: integer
+    description: >
+       terminal server port, for cisco ssh by default 22
+    default: 22
+
+relationships:
+  cloudify.terminal.raw:
+    derived_from: cloudify.relationships.depends_on
+    target_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        establish:
+          implementation: terminal.cloudify_terminal.tasks.run
+          inputs:
+            calls:
+              default:
+              - action: uptime
+                save_to: domain
+
+
+node_templates:
+
+  fake_node:
+    type: cloudify.nodes.Root
+    relationships:
+      - type: cloudify.terminal.raw
+        target: linux_impl
+
+  linux_impl:
+    type: cloudify.terminal.raw
+    properties:
+      terminal_auth:
+        user: { get_input: terminal_user }
+        password: { get_input: terminal_password }
+        ip: { get_input: terminal_ip }
+        key_content: { get_input: terminal_key_content }
+        port: { get_input: terminal_port }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          inputs:
+            terminal_auth:
+              smart_device: true
+              promt_check:
+                - '#'
+                - '$'
+            calls:
+              - action: hostname
+                save_to: domain
+              - action: uname -a
+                save_to: uname
+
+outputs:
+  responses:
+    description: repsonses from commands
+    value: { get_attribute: [ linux_impl, domain ] }

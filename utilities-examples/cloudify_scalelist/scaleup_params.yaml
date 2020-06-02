@@ -1,0 +1,21 @@
+node_sequence:
+- six
+- five
+- four
+- three
+- two
+- one
+scalable_entity_properties:
+  two:
+  - resource_name: two1
+    deep:
+      search: check
+  - resource_name: two2
+  three:
+  - {}
+  - {}
+  - {}
+  four:
+  - resource_name: four1
+  - resource_name: four2
+  - resource_name: four3

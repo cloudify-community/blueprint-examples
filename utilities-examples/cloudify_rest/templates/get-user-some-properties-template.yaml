@@ -1,0 +1,20 @@
+rest_calls:
+  # get user details and store only selected parts of response under distinct runtime properties
+  - path: /users/10
+    method: GET
+    headers:
+      Content-type: application/json
+    payload:
+    response_format: json
+    recoverable_codes: [400]
+    response_translation:
+      name: [user-full-name]
+      email: [user-email]
+      address:
+        city: [user-city]
+        zipcode: [user-city-zip]
+        geo:
+          lat: [user-city-geo, latitude]
+          lng: [user-city-geo, longnitude]
+    response_expectation:
+        - ['id', '10']

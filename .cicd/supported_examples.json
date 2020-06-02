@@ -110,5 +110,57 @@
   "docker/terraform": [
     "terraform-container-using-docker-terraform-module.yaml",
     "terraform-container.yaml"
+  ],
+  "utilities-examples/cloudify_cloudinit": [
+    "simple.yaml",
+    "aws.yaml"
+  ],
+  "utilities-examples/cloudify_configuration": [
+    "simple.yaml"
+  ],
+  "utilities-examples/cloudify_files": [
+    "simple.yaml",
+    "openstack-blueprint.yaml"
+  ],
+  "utilities-examples/cloudify_ftp": [
+    "upload_ftp.yaml"
+  ],
+  "utilities-examples/cloudify_hooks_workflow": [
+    "check-failure.yaml"
+  ],
+  "utilities-examples/cloudify_custom_workflow": [
+    "example.yaml"
+  ],
+  "utilities-examples/cloudify_rest": [
+    "example-1-blueprint.yaml",
+    "example-2-blueprint.yaml",
+    "example-3-blueprint.yaml",
+    "example-4-blueprint.yaml",
+    "example-5-blueprint.yaml",
+    "example-6-blueprint.yaml",
+    "example-7-blueprint.yaml",
+    "example-8-blueprint.yaml",
+    "example-9-blueprint.yaml",
+    "example-github-status.yaml"
+  ],
+  "utilities-examples/cloudify_scalelist": [
+    "blueprint.yaml",
+    "tree_blueprint.yaml"
+  ],
+  "utilities-examples/cloudify_secrets": [
+    "write-secret-blueprint.yaml",
+    "read-secret-blueprint.yaml"
+  ],
+  "utilities-examples/cloudify_ssh_key": [
+    "create_secret_agent_key_using_exising_secret.yaml",
+    "create-key-and-store-in-path.yaml",
+    "create-secret-agent-key.yaml"
+  ],
+  "utilities-examples/cloudify_suspend": [
+    "example.yaml"
+  ],
+  "utilities-examples/cloudify_terminal": [
+    "linux-ssh.yaml",
+    "fortigate.yaml"
   ]
 }

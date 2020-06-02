@@ -1,0 +1,12 @@
+rest_calls:
+  # get user details and store all the response under "user" runtime property
+  - path: /users/10
+    method: GET
+    headers:
+      Content-type: application/json
+    payload:
+    response_format: json
+    recoverable_codes: [400]
+    response_translation: [saved_user] # will be reused in next call
+    response_expectation:
+        - ['id', '10']

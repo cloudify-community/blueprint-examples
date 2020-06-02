@@ -1,0 +1,12 @@
+rest_calls:
+
+  # create user post
+  - path: /posts/{{POST_ID}}
+    method: PUT
+    headers:
+      Content-type: application/json
+    raw_payload: templates/create-user-precoded-3.json
+    payload_format: raw
+    recoverable_codes: [400]
+    response_expectation:
+      - ['id', '{{POST_ID}}']

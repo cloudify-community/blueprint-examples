@@ -1,0 +1,14 @@
+rest_calls:
+  # create user post
+  - path: /posts/{{ saved_user.id }}
+    method: PUT
+    headers:
+      Content-type: application/json
+    payload:
+      name: '{{ saved_user.name }}-new'
+      username: '{{ saved_user.username }}-new'
+      email: '{{ saved_user.email }}-new'
+    response_format: json
+    recoverable_codes: [400]
+    response_expectation:
+      - ['id', '{{ saved_user.id }}']

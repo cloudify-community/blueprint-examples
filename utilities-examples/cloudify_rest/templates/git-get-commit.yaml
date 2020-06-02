@@ -1,0 +1,7 @@
+rest_calls:
+  - path: /repos/cloudify-incubator/cloudify-utilities-plugin/commits/{{COMMIT}}
+    method: GET
+    headers:
+      Content-type: application/json
+    response_format: json
+    response_translation: [commit]

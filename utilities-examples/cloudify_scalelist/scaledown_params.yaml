@@ -1,0 +1,6 @@
+scale_node_name: two
+scale_node_field: resource_name
+scale_node_field_value: two2
+# cleanup db also
+force_db_cleanup: true
+all_results: true

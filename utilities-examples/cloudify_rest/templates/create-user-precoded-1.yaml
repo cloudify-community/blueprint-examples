@@ -1,0 +1,12 @@
+rest_calls:
+
+ # create user post
+  - path: /posts/{{POST_ID}}
+    method: PUT
+    headers:
+      Content-type: application/json
+    payload: '{% if USER is not string %}{{ USER|tojson }}{% endif %}'
+    response_format: json
+    recoverable_codes: [400]
+    response_expectation:
+      - ['id', '{{POST_ID}}']

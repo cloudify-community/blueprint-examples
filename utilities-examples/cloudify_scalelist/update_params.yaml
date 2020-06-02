@@ -1,0 +1,6 @@
+operation_kwargs:
+  check: true
+node_ids:
+ - two
+node_field: resource_name
+node_field_value: two0
