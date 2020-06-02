@@ -5,7 +5,7 @@ description: >
 
 imports:
   - http://www.getcloudify.org/spec/cloudify/5.0.0/types.yaml
-  - plugin:cloudify-utilities-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.18.0
 
 node_types:
 

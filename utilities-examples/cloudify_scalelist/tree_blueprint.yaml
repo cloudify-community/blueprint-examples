@@ -32,7 +32,7 @@ description: >
 
 imports:
   - http://www.getcloudify.org/spec/cloudify/5.0.0/types.yaml
-  - http://www.getcloudify.org/spec/utilities-plugin/1.18.0/plugin.yaml
+  - plugin:cloudify-utilities-plugin?version= >=1.18.0
 
 inputs:
 
