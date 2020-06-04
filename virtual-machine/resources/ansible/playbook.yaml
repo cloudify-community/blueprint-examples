@@ -1,0 +1,157 @@
+- hosts: all
+  #ask Tramell if we need to get host not then decide
+  connection: local
+
+  vars:
+    # instance_type: t2.micro
+    #need to do dictionary for regions!see if it works later!or create one with module!
+    vpc_name: Cloudify_virtual_machine_example_vpc
+    #*******just for the check!!!!*******
+    key_pair: adar_pair
+    count: 1
+    AWS_REGION: us-east-1
+    # ami_owner_filter: 057448758665
+    # ami_name_filter: CentOS 7.7.1908 x86_64 with cloud-init (HVM)
+
+  tasks:
+    # maybe we need to install pip before
+    - name: Install boto
+      pip:
+        name: boto
+
+    - name: Install boto3
+      pip:
+        name: boto3
+
+    # saving the output into `create_vpc`
+    - name: create VPC
+      ec2_vpc_net:
+        name: "{{ vpc_name }}"
+        cidr_block: 10.10.0.0/16
+      register: create_vpc
+
+    - name: "set fact: VPC ID"
+      set_fact:
+        vpc_id: "{{ create_vpc.vpc.id }}"
+
+    - name: create VPC subnet
+      ec2_vpc_subnet:
+        vpc_id: "{{ vpc_id }}"
+        cidr: 10.10.4.0/24
+        az: "{{ AWS_REGION }}b"
+        tags:
+          Name: Cloudify-virtual-machine-example-subnet
+      register: create_vpc_subnet
+
+    # for subnet created, define a "name: id" entry in the `vpc_subnet_ids` dictionary (or empty dictionary if it doesn't exist)
+    - name: "set fact: VPC subnet ID"
+      set_fact:
+        vpc_subnet_ids: "{{ vpc_subnet_ids | default({}) | combine({ create_vpc_subnet.subnet.tags.Name: create_vpc_subnet.subnet.id }) }}"
+    #maybe need the results here.check this out later
+
+    - name: Create a security group
+      ec2_group:
+        name: virtual_machine_example_sg
+        description: Cloudify virtual machine example sg
+        vpc_id: "{{ vpc_id }}"
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 8080
+            to_port: 8080
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 9990
+            to_port: 9990
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 2375
+            to_port: 2375
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+      register: create_sg
+
+    - name: "set facts: Gateway IDs and IP"
+      set_fact:
+        security_group_id: "{{ create_sg.group_id }}"
+
+
+    # create the internet gateway, saving the output to extract the ID later
+    - name: create internet gateway
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+      register: create_gateway
+
+    - name: "set facts: Gateway ID"
+      set_fact:
+        vpc_gateway_id: "{{ create_gateway.gateway_id }}"
+
+    # public route table that routes through the internet gateway - attach it to public subnet
+    - name: Create route table for public subnets
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        tags:
+          Name: "{{ vpc_name }}-public"
+        subnets:
+          - "{{ vpc_subnet_ids['Cloudify-virtual-machine-example-subnet'] }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ vpc_gateway_id }}"
+
+    # create elastic network interface
+    - name: Create elastic network interface
+      ec2_eni:
+        subnet_id: "{{ vpc_subnet_ids['Cloudify-virtual-machine-example-subnet'] }}"
+        security_groups:
+          - "{{ security_group_id }}"
+      register: create_eni
+
+    - name: "set facts: eni_id"
+      set_fact:
+        eni_id: "{{ create_eni.interface.id }}"
+
+    - name: find ami instance-id for centos 7.7
+      ec2_ami_info:
+        filters:
+          name: "{{ami_name_filter}}"
+          owner-id: "{{ ami_owner_filter }}"
+      register: AMIs
+
+    
+    - name: "set facts: ami_id"
+      set_fact:
+        ami_id:  "{{ AMIs.images[0]['image_id']}}"
+
+    # create elastic ip
+    - name: Create elastic ip
+      ec2_eip:
+        device_id: "{{ eni_id }}"
+        #try to delete this(like in the example in the docs )
+        in_vpc: yes
+
+    # # create an EC2 key -- pretty simple
+    # - name: create EC2 key
+    #   ec2_key:
+    #     name: virtul_machine_keypair
+
+    - name: Launch EC2 Instance
+      ec2:
+        instance_type: "{{ instance_type }}"
+        image: "{{ ami_id }}"
+        wait: true
+        user_data: "{{ ec2_instance_user_data }}"
+        key_name: "{{ key_pair }}"
+        count: "{{count}}"
+        network_interfaces: 
+          - "{{ eni_id }}"  
+      register: ec2
+

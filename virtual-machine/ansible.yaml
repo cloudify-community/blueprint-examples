@@ -1,0 +1,94 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates an AWS infrastructure environment using Ansible.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  aws_region_name:
+      type: string
+      default: 'us-east-1'
+
+  availability_zone:
+    type: string
+    description: The availability zone in the AWS Region.
+    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
+
+  ami_owner_filter:
+    type: string
+    description: The AWS AMI owner number.
+    default: '057448758665'
+
+  ami_name_filter:
+    type: string
+    description: The name of the AWS AMI in the AWS region.
+    default: 'CentOS 7.7.1908 x86_64 with cloud-init (HVM)'
+
+  instance_type:
+    type: string
+    default: t2.micro
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'ec2-user'
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+node_templates:
+
+  install-infra-playbook:
+    type: cloudify.nodes.ansible.Executor
+    properties:
+      playbook_path: resources/ansible/playbook.yaml
+      start_at_task: "Install boto"
+      sources: resources/ansible/inventory.yaml
+      ansible_become: true
+      run_data:
+        instance_type: { get_input: instance_type }
+        ami_owner_filter: { get_input: ami_owner_filter  }
+        ami_name_filter: { get_input: ami_name_filter }
+        ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
+      ansible_env_vars:
+        AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
+        AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
+        AWS_REGION: { get_input: aws_region_name} 
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
