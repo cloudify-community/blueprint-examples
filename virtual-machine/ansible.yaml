@@ -48,7 +48,7 @@ node_templates:
     type: cloudify.nodes.ansible.Executor
     properties:
       playbook_path: resources/ansible/playbook.yaml
-      start_at_task: "Install boto"
+      start_at_task: "Create VPC"
       sources: resources/ansible/inventory.yaml
       ansible_become: true
       run_data:

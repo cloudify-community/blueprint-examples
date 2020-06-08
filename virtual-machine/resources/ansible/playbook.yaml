@@ -5,21 +5,8 @@
     count: 1
  
   tasks:
-
-    - name: Install boto
-      pip:
-        name: boto
-
-    - name: Install boto3
-      pip:
-        name: boto3
-    
-    # permission denied error
-    # -name:
-    #    pip:
-    #     name: selinux      
-    
-    - name: create VPC
+  
+    - name: Create VPC
       ec2_vpc_net:
         name: "{{ vpc_name }}"
         cidr_block: 10.10.0.0/16
@@ -30,7 +17,7 @@
       set_fact:
         vpc_id: "{{ create_vpc.vpc.id }}"
 
-    - name: create VPC subnet
+    - name: Create VPC subnet
       ec2_vpc_subnet:
         vpc_id: "{{ vpc_id }}"
         cidr: 10.10.4.0/24
@@ -76,7 +63,7 @@
             cidr_ip: 0.0.0.0/0
       register: create_sg
 
-    - name: "set facts: Gateway IDs and IP"
+    - name: "Set fact: Gateway IDs and IP"
       set_fact:
         security_group_id: "{{ create_sg.group_id }}"
 
@@ -87,12 +74,12 @@
           Name: Cloudify_virtual_machine_example_igw
       register: create_gateway
 
-    - name: "set facts: Gateway ID"
+    - name: "Set fact: Gateway ID"
       set_fact:
         internet_gateway_id: "{{ create_gateway.gateway_id }}"
 
     # public route table that routes through the internet gateway - attach it to public subnet
-    - name: Create route table.
+    - name: Create route table
       ec2_vpc_route_table:
         vpc_id: "{{ vpc_id }}"
         tags:
@@ -104,7 +91,7 @@
             gateway_id: "{{ internet_gateway_id }}"
       register: create_route_table
 
-    - name: "set fact: route_table_id"
+    - name: "Set fact: route_table_id"
       set_fact:
         route_table_id: "{{ create_route_table.route_table.id }}"
 
@@ -115,18 +102,18 @@
           - "{{ security_group_id }}"
       register: create_eni
 
-    - name: "set facts: eni_id"
+    - name: "Set fact: eni_id"
       set_fact:
         eni_id: "{{ create_eni.interface.id }}"
 
-    - name: find ami instance-id for centos 7.7
+    - name: Find ami instance-id for centos 7.7
       ec2_ami_info:
         filters:
           name: "{{ami_name_filter}}"
           owner-id: "{{ ami_owner_filter }}"
       register: AMIs
 
-    - name: "set fact: ami_id"
+    - name: "Set fact: ami_id"
       set_fact:
         ami_id:  "{{ AMIs.images[0]['image_id']}}"
 
@@ -140,7 +127,7 @@
         release_on_disassociation: yes
       register: eip
 
-    - name: "set fact: public ip"
+    - name: "Set fact: public ip"
       set_fact:
         public_ip:  "{{ eip.public_ip }}"
 
@@ -157,7 +144,7 @@
           Name: Cloudify_virtual_machine_example_instance
       register: ec2
 
-    - name: "set fact: output dictionary"
+    - name: "Set fact: output dictionary"
       set_fact:
         output_dict: 
           public_ip:  "{{ public_ip }}"
