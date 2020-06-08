@@ -216,6 +216,15 @@ jobs:
       - checkout
       - test_examples
 
+  getting-started-ansible:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      IAAS: ansible
+    steps:
+      - checkout
+      - test_examples
+
   openshift:
     executor: cloudify-machine
     environment:
@@ -274,6 +283,12 @@ workflows:
           filters:
             branches:
               only: master
+      - getting-started-ansible:
+          requires:
+            - blueprint-validation
+          filters:
+            branches:
+              only: master
       - openshift:
           requires:
           - blueprint-validation
@@ -295,6 +310,7 @@ workflows:
             - getting-started-azure
             - getting-started-azure-arm
             - getting-started-gcp
+            - getting-started-ansible
             - openshift
             - getting-started-openstack
           filters:
@@ -346,6 +362,12 @@ workflows:
           requires:
           - blueprint-validation
           - getting-started-aws-cloudformation
+          filters:
+            branches:
+              only: master
+      - getting-started-ansible:
+          requires:
+            - blueprint-validation
           filters:
             branches:
               only: master
