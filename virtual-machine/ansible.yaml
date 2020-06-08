@@ -64,6 +64,21 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: cloud_init
 
+  uninstall-infra-playbook:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            playbook_path: resources/ansible/uninstall-playbook.yaml
+            start_at_task: "Load vars"
+            sources: resources/ansible/inventory.yaml
+            ansible_env_vars:
+              AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
+              AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
+              AWS_REGION: { get_input: aws_region_name} 
+  
   cloud_init:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -92,3 +107,4 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
+
