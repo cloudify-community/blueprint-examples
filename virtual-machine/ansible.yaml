@@ -56,6 +56,7 @@ node_templates:
         ami_owner_filter: { get_input: ami_owner_filter  }
         ami_name_filter: { get_input: ami_name_filter }
         ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
+        availability_zone: { get_input: availability_zone }
       ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
@@ -72,7 +73,7 @@ node_templates:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
             playbook_path: resources/ansible/uninstall-playbook.yaml
-            start_at_task: "Load vars"
+            start_at_task: "Terminate vm"
             sources: resources/ansible/inventory.yaml
             run_data:
               ec2_instance_ids: { get_attribute: [aws_infra_info, ec2_instance_ids] }

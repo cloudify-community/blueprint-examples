@@ -22,7 +22,7 @@
 
     - name: Delete internet gateway
       ec2_vpc_igw:
-        vpc_id: "{{ aws_nodes_info.vpc_id }}"
+        vpc_id: "{{ vpc_id }}"
         state: absent
 
     - name: Delete security group

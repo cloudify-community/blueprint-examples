@@ -3,7 +3,6 @@
   vars:
     vpc_name: Cloudify_virtual_machine_example_vpc
     count: 1
-    AWS_REGION: us-east-1
  
   tasks:
 
@@ -14,6 +13,11 @@
     - name: Install boto3
       pip:
         name: boto3
+    
+    # permission denied error
+    # -name:
+    #    pip:
+    #     name: selinux      
     
     - name: create VPC
       ec2_vpc_net:
@@ -30,7 +34,7 @@
       ec2_vpc_subnet:
         vpc_id: "{{ vpc_id }}"
         cidr: 10.10.4.0/24
-        az: "{{ AWS_REGION }}b"
+        az: "{{ availability_zone }}"
         tags:
           Name: Cloudify_virtual_machine_example_subnet
       register: create_vpc_subnet
