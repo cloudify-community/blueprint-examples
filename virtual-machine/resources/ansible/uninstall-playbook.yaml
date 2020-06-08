@@ -2,29 +2,21 @@
   connection: local
   tasks:
 
-    - name: Load vars
-      include_vars:
-        file: /tmp/virtual-machine-example-vars.json
-        name: aws_nodes_info
-
-
     - name: Terminate vm
       ec2:
-        instance_ids: '{{ aws_nodes_info.ec2_instance_ids }}'
+        instance_ids: '{{ ec2_instance_ids }}'
         state: absent
         wait: True
 
-
-
     - name: Delete elastic network interface
       ec2_eni:
-        eni_id: "{{ aws_nodes_info.eni_id }}"
+        eni_id: "{{ eni_id }}"
         state: absent
 
     - name: Delete route table
       ec2_vpc_route_table:
-        vpc_id: "{{ aws_nodes_info.vpc_id}}"
-        route_table_id: "{{ aws_nodes_info.route_table_id}}"
+        vpc_id: "{{ vpc_id }}"
+        route_table_id: "{{ route_table_id }}"
         lookup: id
         state: absent
 
@@ -35,23 +27,23 @@
 
     - name: Delete security group
       ec2_group:
-        group_id: "{{ aws_nodes_info.security_group_id }}"
+        group_id: "{{ security_group_id }}"
         state: absent
 
     - name: Delete VPC subnet
       ec2_vpc_subnet:
-        vpc_id: "{{ aws_nodes_info.vpc_id }}"
+        vpc_id: "{{ vpc_id }}"
         cidr: 10.10.4.0/24
         state: absent
 
     - name: delete VPC
       local_action:
         module: ec2_vpc_net
-        name: "{{ aws_nodes_info.vpc_name }}"
+        name: "{{ vpc_name }}"
         cidr_block: 10.10.0.0/16
         state: absent
 
     - name: Release elastic IP
       ec2_eip:
-        public_ip: aws_nodes_info.public_ip
+        public_ip: "{{ public_ip }}"
         state: absent

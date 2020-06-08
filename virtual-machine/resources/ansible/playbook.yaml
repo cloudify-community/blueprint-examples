@@ -1,15 +1,10 @@
 - hosts: all
-  #ask Tramell if we need to get host not then decide
   connection: local
   vars:
-    # instance_type: t2.micro
-    #need to do dictionary for regions!see if it works later!or create one with module!
     vpc_name: Cloudify_virtual_machine_example_vpc
-    #*******just for the check!!!!*******
     count: 1
     AWS_REGION: us-east-1
-    # ami_owner_filter: 057448758665
-    # ami_name_filter: CentOS 7.7.1908 x86_64 with cloud-init (HVM)
+ 
   tasks:
 
     - name: Install boto
@@ -20,7 +15,6 @@
       pip:
         name: boto3
     
-     # saving the output into `create_vpc`
     - name: create VPC
       ec2_vpc_net:
         name: "{{ vpc_name }}"
@@ -82,8 +76,6 @@
       set_fact:
         security_group_id: "{{ create_sg.group_id }}"
 
-
-    # create the internet gateway, saving the output to extract the ID later
     - name: create internet gateway
       ec2_vpc_igw:
         vpc_id: "{{ vpc_id }}"
@@ -112,7 +104,6 @@
       set_fact:
         route_table_id: "{{ create_route_table.route_table.id }}"
 
-    # create elastic network interface
     - name: Create elastic network interface
       ec2_eni:
         subnet_id: "{{ vpc_subnet_id }}"
@@ -131,12 +122,10 @@
           owner-id: "{{ ami_owner_filter }}"
       register: AMIs
 
-    
     - name: "set fact: ami_id"
       set_fact:
         ami_id:  "{{ AMIs.images[0]['image_id']}}"
 
-    # create elastic ip
     - name: Create elastic ip
       ec2_eip:
         device_id: "{{ eni_id }}"

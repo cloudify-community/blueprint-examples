@@ -56,7 +56,7 @@ node_templates:
         ami_owner_filter: { get_input: ami_owner_filter  }
         ami_name_filter: { get_input: ami_name_filter }
         ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
-      ansible_env_vars:
+      ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
         AWS_REGION: { get_input: aws_region_name} 
@@ -74,11 +74,32 @@ node_templates:
             playbook_path: resources/ansible/uninstall-playbook.yaml
             start_at_task: "Load vars"
             sources: resources/ansible/inventory.yaml
-            ansible_env_vars:
-              AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
-              AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
-              AWS_REGION: { get_input: aws_region_name} 
+            run_data:
+              ec2_instance_ids: { get_attribute: [aws_infra_info, ec2_instance_ids] }
+              eni_id: { get_attribute: [aws_infra_info, eni_id] }
+              internet_gateway_id: { get_attribute: [aws_infra_info, internet_gateway_id] }
+              public_ip: { get_attribute: [aws_infra_info, public_ip] }
+              route_table_id: { get_attribute: [aws_infra_info, route_table_id] }
+              security_group_id: { get_attribute: [aws_infra_info, security_group_id] }
+              subnet_id: { get_attribute: [aws_infra_info, subnet_id] }
+              vpc_id: { get_attribute: [aws_infra_info, vpc_id] }
+              vpc_name:  { get_attribute: [aws_infra_info, vpc_name] }
+            ansible_env_vars: *env_vars
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: aws_infra_info
   
+  aws_infra_info:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/ansible/store_deployment_info.py
+          executor: central_deployment_agent
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: install-infra-playbook
+
   cloud_init:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -108,3 +129,16 @@ node_templates:
           inputs:
             store_private_key_material: true
 
+capabilities:
+
+  endpoint:
+    description: The external endpoint of the application.
+    value:  { get_attribute: [aws_infra_info, public_ip] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_attribute: [agent_key, private_key_export] }
