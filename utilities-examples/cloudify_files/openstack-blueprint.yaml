@@ -75,6 +75,7 @@ node_templates:
         image_id: { get_secret: centos_core_image }
         flavor_id: { get_secret: small_image_flavor }
         user_data: { get_attribute: [ cloudify_host_cloud_config, cloud_config ] }
+      use_public_ip: true
     relationships:
       - target: public_subnet_nic
         type: cloudify.relationships.openstack.server_connected_to_port
