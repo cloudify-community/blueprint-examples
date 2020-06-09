@@ -1,0 +1,49 @@
+- hosts: all
+  connection: local
+  tasks:
+
+    - name: Terminate vm
+      ec2:
+        instance_ids: '{{ ec2_instance_ids }}'
+        state: absent
+        wait: True
+
+    - name: Delete elastic network interface
+      ec2_eni:
+        eni_id: "{{ eni_id }}"
+        state: absent
+
+    - name: Delete route table
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        route_table_id: "{{ route_table_id }}"
+        lookup: id
+        state: absent
+
+    - name: Delete internet gateway
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+        state: absent
+
+    - name: Delete security group
+      ec2_group:
+        group_id: "{{ security_group_id }}"
+        state: absent
+
+    - name: Delete VPC subnet
+      ec2_vpc_subnet:
+        vpc_id: "{{ vpc_id }}"
+        cidr: 10.10.4.0/24
+        state: absent
+
+    - name: delete VPC
+      local_action:
+        module: ec2_vpc_net
+        name: "{{ vpc_name }}"
+        cidr_block: 10.10.0.0/16
+        state: absent
+
+    - name: Release elastic IP
+      ec2_eip:
+        public_ip: "{{ public_ip }}"
+        state: absent

@@ -89,7 +89,8 @@
     "azure.yaml",
     "azure-arm.yaml",
     "openstack.yaml",
-    "gcp.yaml"
+    "gcp.yaml",
+    "ansible.yaml"
   ],
   "getting-started": [
     "mc-jboss.yaml"
