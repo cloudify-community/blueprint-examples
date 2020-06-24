@@ -47,6 +47,10 @@ inputs:
     type: string
     default: agent_key
 
+  template_url:
+    type: string
+    default: https://raw.githubusercontent.com/cloudify-community/blueprint-examples/latest/virtual-machine/resources/cloudformation/template.yaml
+
 dsl_definitions:
 
   client_config: &client_config
@@ -83,7 +87,7 @@ node_templates:
             ParameterValue: { get_input: vpc_cidr }
           - ParameterKey: SubnetCIDR
             ParameterValue: { get_input: subnet_cidr }
-          TemplateURL: https://two-tier-example-cf.s3-eu-west-1.amazonaws.com/template.yaml
+          TemplateURL: { get_input: template_url }
     relationships:
       - type: cloudify.relationships.depends_on
         target: two_tier_keypair
