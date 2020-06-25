@@ -84,12 +84,17 @@ node_templates:
         target: kubernetes-cluster-node-pool
     interfaces:
       cloudify.interfaces.lifecycle:
+        precreate: {}
         create:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
+        configure: {}
         start:
           implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
-        post-start: {}
+        poststart: {}
+        prestop: {}
+        stop: {}
         delete: {}
+        postdelete: {}
 
 
 capabilities:
