@@ -49,7 +49,7 @@ inputs:
 
   template_url:
     type: string
-    default: https://raw.githubusercontent.com/cloudify-community/blueprint-examples/latest/virtual-machine/resources/cloudformation/template.yaml
+    default: https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/blueprints/5.0.5/cloudformation/template.yaml
 
 dsl_definitions:
 
@@ -77,7 +77,7 @@ node_templates:
       client_config: *client_config
       resource_config:
         kwargs:
-          StackName: Two-Tier-Sample-Stack
+          StackName: { concat: [ 'Two-Tier-Sample-Stack', { get_input: resource_suffix } ] }
           Parameters:
           - ParameterKey: InstanceType
             ParameterValue: m1.small
