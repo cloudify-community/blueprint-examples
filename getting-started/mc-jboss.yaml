@@ -14,6 +14,7 @@ inputs:
     constraints:
       - valid_values:
           - openstack
+          - openstack-v2
           - azure
           - azure-arm
           - aws
@@ -21,6 +22,7 @@ inputs:
           - aws-cloudformation
           - gcp
           - ansible
+          - vsphere
 
   infra_archive:
     description: >

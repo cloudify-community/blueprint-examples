@@ -22,15 +22,19 @@ inputs:
     description: The UUID of small flavor in your Openstack account.
     default: { get_secret: base_flavor_id }
 
+  resource_suffix:
+    type: string
+    default: '4'
+
   network_id:
     type: string
     description: A name for your new Openstack Network.
-    default: cloudify-demo-network
+    default: { concat: [ cloudify-demo-network-, { get_input: resource_suffix } ] }
 
   subnet_id:
     type: string
     description: A name for your new Openstack Subnet.
-    default: cloudify-demo-subnet
+    default: { concat: [ cloudify-demo-subnet-, { get_input: resource_suffix } ] }
 
   agent_user:
     description: >
@@ -43,7 +47,7 @@ inputs:
 
   cidr:
     type: string
-    default: "4"
+    default: { get_input: resource_suffix }
 
   user_domain_name:
     description: Openstack user domain name.
@@ -58,6 +62,14 @@ inputs:
   encode_cloud_init:
     default: false
 
+  use_existing_server:
+    type: boolean
+    default: false
+
+  server_name:
+    type: string
+    default: { concat: [ cloudify-demo-server-, { get_input: resource_suffix } ] }
+
 dsl_definitions:
 
   openstack_config: &openstack_config
@@ -69,21 +81,28 @@ dsl_definitions:
     user_domain_name: { get_input: user_domain_name }
     project_domain_name: { get_input: project_domain_name }
 
+  compute_config: &compute_config
+    kwargs:
+      compute_default_microversion: 2.42
+
 node_templates:
 
   vm:
     type: cloudify.nodes.openstack.Server
     properties:
-      client_config: *openstack_config
+      client_config:
+        <<: *openstack_config
+        <<: *compute_config
       agent_config:
         install_method: none
         key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       resource_config:
-        name: vm
+        name: { get_input: server_name }
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloud_init, cloud_config ] }
+      use_external_resource: { get_input: use_existing_server }
       use_public_ip: true
     relationships:
       - type: cloudify.relationships.openstack.server_connected_to_port
@@ -104,6 +123,8 @@ node_templates:
         target: security-group
       - type: cloudify.relationships.openstack.port_connected_to_floating_ip
         target: ip
+#      - type: cloudify.relationships.openstack.port_connected_to_server
+#        target: vm
 
   subnet:
     type: cloudify.nodes.openstack.Subnet

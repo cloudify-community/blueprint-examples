@@ -20,7 +20,8 @@ import pytest
 from ecosystem_tests.dorkl import (
     blueprints_upload,
     basic_blueprint_test,
-    cleanup_on_failure, prepare_test
+    cleanup_on_failure,
+    prepare_test, vpn
 )
 
 from __init__ import (
@@ -58,16 +59,29 @@ def basic_blueprint_test_with_getting_started_filter(request):
     for blueprint_path in getting_started_list:
         blueprint_id = '{0}-{1}'.format(
             blueprint_id_filter(blueprint_path), infra_name)
-        try:
-            basic_blueprint_test(
-                blueprint_path,
-                blueprint_id,
-                inputs='infra_name={0} -i infra_exists=true'.format(
-                    infra_name),
-                timeout=3000)
-        except:
-            cleanup_on_failure(blueprint_id)
-            raise
+        if 'vsphere' in infra_name:
+            with vpn():
+                try:
+                    basic_blueprint_test(
+                        blueprint_path,
+                        blueprint_id,
+                        inputs='infra_name={0} -i infra_exists=true'.format(
+                            infra_name),
+                        timeout=600)
+                except:
+                    cleanup_on_failure(blueprint_id)
+                    raise
+        else:
+            try:
+                basic_blueprint_test(
+                    blueprint_path,
+                    blueprint_id,
+                    inputs='infra_name={0} -i infra_exists=true'.format(
+                        infra_name),
+                    timeout=600)
+            except:
+                cleanup_on_failure(blueprint_id)
+                raise
 
 
 @pytest.fixture(scope='function', params=openshift_list)
