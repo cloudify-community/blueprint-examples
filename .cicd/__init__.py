@@ -90,6 +90,16 @@ SECRETS_TO_CREATE = {
     'gcp_credentials': True,
     'openshift_secret_token': False,
     'openshift_master_endpoint': False,
+    'vsphere_username': False,
+    'vsphere_password': False,
+    'vsphere_host': False,
+    'vsphere_port': False,
+    'vsphere_datacenter_name': False,
+    'vsphere_resource_pool_name': False,
+    'vsphere_auto_placement': False,
+    'vsphere_centos_template': False,
+    'vsphere_private_key': True,
+    'vsphere_public_key': True
 }
 
 

@@ -18,9 +18,13 @@ inputs:
     type: boolean
     default: false
 
+  resource_suffix:
+    type: string
+    default: '1'
+
   server_name:
     type: string
-    default: meta_vm
+    default: { concat: [ 'example-vm-1', { get_input: resource_suffix } ] }
 
   template_name:
     type: string
