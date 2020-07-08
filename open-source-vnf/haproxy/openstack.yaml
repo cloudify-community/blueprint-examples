@@ -47,7 +47,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_attribute: [ openstack, deployment, outputs, public_network ] }
+        id: { get_capability: [ openstack , public_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
@@ -58,7 +58,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_attribute: [ openstack, deployment, outputs, mgmt_network ] }
+        id: { get_capability: [ openstack , mgmt_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
@@ -68,7 +68,7 @@ node_templates:
     properties:
       client_config: *client_config
       resource_config:
-        floating_network_id: { get_attribute: [ openstack, deployment, outputs, external_network ] }
+        id: { get_capability: [ openstack , external_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
@@ -82,8 +82,3 @@ node_templates:
           external_resource: true
         deployment:
           id: { get_input: network_deployment_name }
-          outputs:
-            external_network: external_network
-            mgmt_network: mgmt_network
-            public_network: public_network
-          external_resource: true
