@@ -75,7 +75,7 @@ node_templates:
       target: openstack
 
   openstack:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -89,4 +89,3 @@ node_templates:
             mgmt_network: mgmt_network
             private_network: private_network
           external_resource: true
-        reexecute: false

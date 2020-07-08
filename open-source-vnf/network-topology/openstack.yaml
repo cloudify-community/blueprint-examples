@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: >
   This blueprint describes a generic network topology in Openstack that is used by other blueprints in this opensource VNF series.
   Install a deployment with this blueprint. Other applications in the series will use a deployment proxy to attach to these recourses.
-  For more information on this feature, see: https://docs.cloudify.co/4.5.5/working_with/official_plugins/utilities/deploymentproxy/.
+  For more information on this feature, see: https://docs.cloudify.co/5.0.0/working_with/service_composition/component/.
 
 dsl_definitions:
 
