@@ -46,7 +46,9 @@ openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 
 @pytest.fixture(scope='function', params=blueprint_list)
 def upload_blueprints_for_validation(request):
-    blueprints_upload(request.param, blueprint_id_filter(request.param))
+    category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
+    if category in request.param:
+        blueprints_upload(request.param, blueprint_id_filter(request.param))
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
