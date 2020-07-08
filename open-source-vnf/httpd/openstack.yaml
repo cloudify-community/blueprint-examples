@@ -45,7 +45,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_attribute: [ openstack, deployment, outputs, private_network ] }
+        id: { get_capability: [ openstack , private_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
@@ -56,13 +56,13 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_attribute: [ openstack, deployment, outputs, mgmt_network ] }
+        id: { get_capability: [ openstack , mgmt_network ] }
     relationships:
     - type: cloudify.relationships.contained_in
       target: openstack
 
   openstack:
-    type: cloudify.nodes.DeploymentProxy
+    type: cloudify.nodes.Component
     properties:
       resource_config:
         blueprint:
@@ -70,9 +70,3 @@ node_templates:
           external_resource: true
         deployment:
           id: { get_input: network_deployment_name }
-          outputs:
-            external_network: external_network
-            mgmt_network: mgmt_network
-            private_network: private_network
-          external_resource: true
-        reexecute: false

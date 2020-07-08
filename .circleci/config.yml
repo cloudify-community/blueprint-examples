@@ -145,10 +145,119 @@ commands:
 
 jobs:
 
-  blueprint-validation:
+  virtual-machine-blueprint-validation:
     executor: cloudify-machine
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: virtual-machine
+    steps:
+      - checkout
+      - validate_examples
+
+  utilities-examples-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: utilities-examples
+    steps:
+      - checkout
+      - validate_examples
+
+  hello-world-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: hello-world
+    steps:
+      - checkout
+      - validate_examples
+
+  rest-plugin-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: rest-plugin
+    steps:
+      - checkout
+      - validate_examples
+
+  prometheus-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: prometheus
+    steps:
+      - checkout
+      - validate_examples
+
+  example-network-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: example-network
+    steps:
+      - checkout
+      - validate_examples
+
+  vnf-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: vnf
+    steps:
+      - checkout
+      - validate_examples
+
+  automation-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: automation
+    steps:
+      - checkout
+      - validate_examples
+
+  kubernetes-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: kubernetes
+    steps:
+      - checkout
+      - validate_examples
+
+  infoblox-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: infoblox
+    steps:
+      - checkout
+      - validate_examples
+
+  getting-started-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: getting-started
+    steps:
+      - checkout
+      - validate_examples
+
+  db-lb-app-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: db-lb-app
+    steps:
+      - checkout
+      - validate_examples
+
+  docker-blueprint-validation:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+      VALIDATION_TEST_CATEGORY: docker
     steps:
       - checkout
       - validate_examples
@@ -245,65 +354,91 @@ workflows:
   version: 2
   tests:
     jobs:
+      - virtual-machine-blueprint-validation
+      - utilities-examples-blueprint-validation
+      - hello-world-blueprint-validation
+      - rest-plugin-blueprint-validation
+      - prometheus-blueprint-validation
+      - example-network-blueprint-validation
+      - vnf-blueprint-validation
+      - automation-blueprint-validation
+      - kubernetes-blueprint-validation
+      - infoblox-blueprint-validation
+      - getting-started-blueprint-validation
+      - db-lb-app-blueprint-validation
+      - docker-blueprint-validation
       - getting-started-aws:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-aws-terraform:
           requires:
-          - getting-started-aws
-          - blueprint-validation
+            - getting-started-aws
           filters:
             branches:
               only: master
       - getting-started-aws-cloudformation:
           requires:
-          - blueprint-validation
-          - getting-started-aws-terraform
+            - getting-started-aws-terraform
           filters:
             branches:
               only: master
       - getting-started-azure:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-azure-arm:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-gcp:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-ansible:
           requires:
-            - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - openshift:
           requires:
-          - blueprint-validation
+            - kubernetes-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-openstack:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
-      - blueprint-validation
       - release:
           requires:
+            - utilities-examples-blueprint-validation
+            - hello-world-blueprint-validation
+            - rest-plugin-blueprint-validation
+            - prometheus-blueprint-validation
+            - example-network-blueprint-validation
+            - vnf-blueprint-validation
+            - automation-blueprint-validation
+            - infoblox-blueprint-validation
+            - db-lb-app-blueprint-validation
+            - docker-blueprint-validation
             - getting-started-aws
             - getting-started-aws-cloudformation
             - getting-started-aws-terraform
@@ -325,61 +460,76 @@ workflows:
             only:
               - master
     jobs:
-      - blueprint-validation
-      - openshift
+      - virtual-machine-blueprint-validation
+      - utilities-examples-blueprint-validation
+      - hello-world-blueprint-validation
+      - rest-plugin-blueprint-validation
+      - prometheus-blueprint-validation
+      - example-network-blueprint-validation
+      - vnf-blueprint-validation
+      - automation-blueprint-validation
+      - kubernetes-blueprint-validation
+      - infoblox-blueprint-validation
+      - getting-started-blueprint-validation
+      - db-lb-app-blueprint-validation
+      - docker-blueprint-validation
       - getting-started-aws:
           requires:
-          - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-azure:
-          requires:
-          - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-gcp:
-          requires:
-          - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-azure-arm:
-          requires:
-          - blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-cloudformation:
-          requires:
-          - blueprint-validation
-          - getting-started-aws
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-aws-terraform:
           requires:
-          - blueprint-validation
-          - getting-started-aws-cloudformation
+            - getting-started-aws
+          filters:
+            branches:
+              only: master
+      - getting-started-aws-cloudformation:
+          requires:
+            - getting-started-aws-terraform
+          filters:
+            branches:
+              only: master
+      - getting-started-azure:
+          requires:
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-azure-arm:
+          requires:
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-gcp:
+          requires:
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-ansible:
           requires:
-            - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
       - openshift:
           requires:
-          - blueprint-validation
+            - kubernetes-blueprint-validation
           filters:
             branches:
               only: master
       - getting-started-openstack:
           requires:
-          - blueprint-validation
+            - virtual-machine-blueprint-validation
+            - getting-started-blueprint-validation
           filters:
             branches:
               only: master
