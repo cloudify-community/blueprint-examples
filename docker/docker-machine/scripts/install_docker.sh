@@ -1,7 +1,8 @@
 #!/bin/bash -e
-
+ME=$(echo $USER)
+sudo su
 curl -fsSL https://get.docker.com -o get-docker.sh; sh get-docker.sh
-usermod -aG docker $USER
+/usr/sbin/usermod -aG docker $ME
 
 if [ -f /etc/redhat-release ]; then
   sed -i '/ExecStart/s/usr\/bin\/dockerd/usr\/bin\/dockerd --mtu=1450/' /lib/systemd/system/docker.service
