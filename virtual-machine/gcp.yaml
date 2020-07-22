@@ -28,6 +28,11 @@ inputs:
     description: The name of your GCP Virtual Network.
     default: cfysubnet
 
+#  disk_name:
+#    type: string
+#    description: the name of your disk.
+#    default: cfydisk
+
   image:
     type: string
     description: Centos image.
@@ -64,8 +69,8 @@ node_templates:
         key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
-      image_id: { get_input: image }
-      instance_type: { get_input: instance_type }
+      # image_id: { get_input: image }
+      # instance_type: { get_input: instance_type }
       zone: { get_input: zone }
       external_ip: true
     relationships:
@@ -73,6 +78,8 @@ node_templates:
       target: subnet
     - type: cloudify.relationships.depends_on
       target: agent_key
+    - type: cloudify.relationships.depends_on
+      target: disk
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -83,6 +90,14 @@ node_templates:
             ssh_keys:
               - { get_attribute: [agent_key, public_key_export] }
 
+  disk:
+    type: cloudify.gcp.nodes.Volume
+    properties:
+      # name: { get_input: disk_name }
+      gcp_config: *gcp_config
+      image: { get_input: image }
+      size: 20
+      boot: true
 
   firewall:
     type: cloudify.gcp.nodes.FirewallRule
@@ -92,9 +107,11 @@ node_templates:
         tcp:
           - 22
           - 80
+          - 443
           - 9990
           - 8080
           - 2375
+          - 53333
       sources:
         - 0.0.0.0/0
     relationships:
@@ -133,6 +150,21 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
+
+groups:
+
+  vm-group:
+    members:
+    - vm
+    - disk
+
+policies:
+
+  vm-group-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [vm-group]
 
 capabilities:
 
