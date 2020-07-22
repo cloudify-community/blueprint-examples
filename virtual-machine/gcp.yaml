@@ -18,16 +18,6 @@ inputs:
     description: The GCP zone to deploy the application in, such as europe-west1-b.
     default: 'europe-west1-b'
 
-#  network_name:
-#    type: string
-#    description: The name of your GCP Virtual Network.
-#    default: cfynet
-#
-#  subnet_name:
-#    type: string
-#    description: The name of your GCP Virtual Network.
-#    default: cfysubnet
-
   image:
     type: string
     description: Centos image.
@@ -67,6 +57,8 @@ node_templates:
       zone: { get_input: zone }
       external_ip: true
     relationships:
+    - type: cloudify.relationships.connected_to
+      target: firewall
     - type: cloudify.relationships.depends_on
       target: subnet
     - type: cloudify.relationships.depends_on
@@ -113,7 +105,6 @@ node_templates:
   subnet:
     type: cloudify.gcp.nodes.SubNetwork
     properties:
-#      name: { get_input: subnet_name }
       region: { get_input: region }
       subnet: 10.11.12.0/22
       gcp_config: *gcp_config
@@ -124,7 +115,6 @@ node_templates:
   network:
     type: cloudify.gcp.nodes.Network
     properties:
-#      name: { get_input: network_name }
       gcp_config: *gcp_config
       auto_subnets: false
 
