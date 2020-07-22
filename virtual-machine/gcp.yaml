@@ -18,20 +18,15 @@ inputs:
     description: The GCP zone to deploy the application in, such as europe-west1-b.
     default: 'europe-west1-b'
 
-  network_name:
-    type: string
-    description: The name of your GCP Virtual Network.
-    default: cfynet
-
-  subnet_name:
-    type: string
-    description: The name of your GCP Virtual Network.
-    default: cfysubnet
-
-#  disk_name:
+#  network_name:
 #    type: string
-#    description: the name of your disk.
-#    default: cfydisk
+#    description: The name of your GCP Virtual Network.
+#    default: cfynet
+#
+#  subnet_name:
+#    type: string
+#    description: The name of your GCP Virtual Network.
+#    default: cfysubnet
 
   image:
     type: string
@@ -69,8 +64,6 @@ node_templates:
         key: { get_attribute: [agent_key, private_key_export] }
         user: { get_input: agent_user }
       use_public_ip: true
-      # image_id: { get_input: image }
-      # instance_type: { get_input: instance_type }
       zone: { get_input: zone }
       external_ip: true
     relationships:
@@ -93,7 +86,6 @@ node_templates:
   disk:
     type: cloudify.gcp.nodes.Volume
     properties:
-      # name: { get_input: disk_name }
       gcp_config: *gcp_config
       image: { get_input: image }
       size: 20
@@ -121,7 +113,7 @@ node_templates:
   subnet:
     type: cloudify.gcp.nodes.SubNetwork
     properties:
-      name: { get_input: subnet_name }
+#      name: { get_input: subnet_name }
       region: { get_input: region }
       subnet: 10.11.12.0/22
       gcp_config: *gcp_config
@@ -132,7 +124,7 @@ node_templates:
   network:
     type: cloudify.gcp.nodes.Network
     properties:
-      name: { get_input: network_name }
+#      name: { get_input: network_name }
       gcp_config: *gcp_config
       auto_subnets: false
 
