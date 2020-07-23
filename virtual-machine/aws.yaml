@@ -12,7 +12,7 @@ inputs:
 
   aws_region_name:
       type: string
-      default: 'ca-central-1'
+      default: 'us-east-1'
 
   availability_zone:
     type: string
