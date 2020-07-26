@@ -20,7 +20,8 @@ import pytest
 from ecosystem_tests.dorkl import (
     blueprints_upload,
     basic_blueprint_test,
-    cleanup_on_failure, prepare_test
+    cleanup_on_failure,
+    prepare_test
 )
 
 from __init__ import (
@@ -64,7 +65,8 @@ def basic_blueprint_test_with_getting_started_filter(request):
                 blueprint_id,
                 inputs='infra_name={0} -i infra_exists=true'.format(
                     infra_name),
-                timeout=3000)
+                timeout=600,
+                use_vpn='vsphere' in infra_name)
         except:
             cleanup_on_failure(blueprint_id)
             raise
