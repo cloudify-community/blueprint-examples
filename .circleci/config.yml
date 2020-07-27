@@ -414,12 +414,12 @@ workflows:
           filters:
             branches:
               only: master
-      - openshift:
-          requires:
-            - kubernetes-blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - openshift:
+#          requires:
+#            - kubernetes-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
       - getting-started-openstack:
           requires:
             - virtual-machine-blueprint-validation
@@ -446,7 +446,7 @@ workflows:
             - getting-started-azure-arm
             - getting-started-gcp
             - getting-started-ansible
-            - openshift
+            # - openshift
             - getting-started-openstack
           filters:
             branches:
@@ -520,12 +520,12 @@ workflows:
           filters:
             branches:
               only: master
-      - openshift:
-          requires:
-            - kubernetes-blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - openshift:
+#          requires:
+#            - kubernetes-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
       - getting-started-openstack:
           requires:
             - virtual-machine-blueprint-validation
