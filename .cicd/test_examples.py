@@ -59,13 +59,14 @@ def basic_blueprint_test_with_getting_started_filter(request):
     for blueprint_path in getting_started_list:
         blueprint_id = '{0}-{1}'.format(
             blueprint_id_filter(blueprint_path), infra_name)
+        timeout = 1800 if infra_name == 'azure' else 600
         try:
             basic_blueprint_test(
                 blueprint_path,
                 blueprint_id,
                 inputs='infra_name={0} -i infra_exists=true'.format(
                     infra_name),
-                timeout=600,
+                timeout=timeout,
                 use_vpn='vsphere' in infra_name)
         except:
             cleanup_on_failure(blueprint_id)
