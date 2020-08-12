@@ -39,9 +39,11 @@ inputs:
 
   external_network_id:
     type: string
+    description: The Openstack external network for floating IPs.
 
   public_subnet_cidr:
     type: string
+    description: Classless Inter-Domain Routing IP Addressing Scheme for IP allocation.
     default: 10.10.1.0/24
 
   image_id:
