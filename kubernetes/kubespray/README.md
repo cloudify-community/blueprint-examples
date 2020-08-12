@@ -3,9 +3,22 @@
 ## Prerequisites:
 
   * Cloudify Manager host requires `python-netaddr` rpm: `yum install python-netaddr`. You also need the `netaddr` package: `pip install netaddr`.
+
+**How to install required packages**
+
+This must be executed on your manager (inside a Cloudify Manager container or on the VM):
+
+```bash
+sudo su
+yum install -y git python-netaddr
+source /opt/mgmtworker/env/bin/activate
+pip install netaddr ipaddr
+```
+
   * `kube-master` compute host minimum memory `1500` MB.
   * `kube-node` compute host minimum memory `1024` MB.
   * Openstack users require cloudify-openstack-plugin 3.0.0 or greater.
+
 
 ### Install the plugins
 
