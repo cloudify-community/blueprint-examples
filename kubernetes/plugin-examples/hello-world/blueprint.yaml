@@ -30,10 +30,10 @@ inputs:
   container_port:
     description: Exposed container port to reference
     type: integer
-    default: 80
+    default: 8080
 
   validate_status:
-    default: false
+    default: true
 
 node_templates:
 
@@ -49,3 +49,10 @@ node_templates:
           PORT: { get_input: container_port }
           CONTAINER_NAME: { get_input: app_name }
           CONTAINER_IMAGE: { get_input: container }
+
+outputs:
+
+  service:
+    description: Service endpoint
+    value:
+      endpoint: { concat: ["http://", { get_attribute: [hello-world, kubernetes, resources.yaml#1, status, load_balancer, ingress, 0, ip] } ] }

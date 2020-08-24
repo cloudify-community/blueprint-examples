@@ -43,7 +43,7 @@ metadata:
     manager: cloudify
     tier: app
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: {{ APP_NAME }}
     manager: cloudify
@@ -51,19 +51,4 @@ spec:
   ports:
   - port: 80
     targetPort: {{ PORT }}
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: "{{ APP_NAME }}-ingress"
-  labels:
-    app: {{ APP_NAME }}
-    manager: cloudify
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: "{{ APP_NAME }}-svc"
-          servicePort: 80
+    protocol: TCP
