@@ -82,8 +82,9 @@ dsl_definitions:
     project_domain_name: { get_input: project_domain_name }
 
   compute_config: &compute_config
-    kwargs:
-      compute_default_microversion: 2.42
+    kwargs: {}
+    # Delete this line and uncomment the below in order to use API microversion.
+    #  compute_default_microversion: 2.42
 
 node_templates:
 
