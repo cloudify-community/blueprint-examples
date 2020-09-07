@@ -19,8 +19,8 @@ from re import sub
 
 from os import path
 
-from ecosystem_cicd_tools.release import (
-    blueprint_release_with_latest, get_most_recent_release)
+from ecosystem_cicd_tools.github_stuff import get_most_recent_release
+from ecosystem_cicd_tools.release import blueprint_release_with_latest
 
 from __init__ import (SUPPORTED_EXAMPLES,
                       CWD,
