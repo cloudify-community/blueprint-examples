@@ -80,7 +80,7 @@ node_templates:
           StackName: { concat: [ 'Two-Tier-Sample-Stack', { get_input: resource_suffix } ] }
           Parameters:
           - ParameterKey: InstanceType
-            ParameterValue: m1.small
+            ParameterValue: t2.small
           - ParameterKey: KeyName
             ParameterValue: { get_input: key_pair_name }
           - ParameterKey: VpcCIDR
