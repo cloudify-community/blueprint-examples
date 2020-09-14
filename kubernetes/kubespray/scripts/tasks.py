@@ -5,6 +5,7 @@ import pip
 from tempfile import NamedTemporaryFile
 
 from fabric2 import task
+
 try:
     import yaml
 except ImportError:
@@ -14,7 +15,6 @@ except ImportError:
 from cloudify import manager
 from cloudify import ctx
 from cloudify.exceptions import (RecoverableError, NonRecoverableError)
-
 
 cfy_client = manager.get_rest_client()
 
@@ -98,7 +98,9 @@ def get_config_content(filename):
 @task
 def setup_secrets(connection):
     f = NamedTemporaryFile()
-    connection.get(MASTER_KUBE_PATH, f.name, use_sudo=True)
+    connection.sudo(
+        'chmod 775 {kubeconfig}'.format(kubeconfig=MASTER_KUBE_PATH))
+    connection.get(MASTER_KUBE_PATH, f.name)
     rp = ctx.target.instance.runtime_properties
     rp['configuration_file_content'] = get_config_content(f.name)
     for cluster in rp['configuration_file_content'].get('clusters'):

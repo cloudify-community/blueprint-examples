@@ -56,7 +56,6 @@ def generate_traceback_exception():
             response['traceback'], response['message']))
 
 
-@task
 def generate_token_and_port(connection):
     # Command to get the service account name
     service_account_cmd_1 = \
@@ -70,11 +69,12 @@ def generate_token_and_port(connection):
     if not output:
         raise NonRecoverableError('Failed to get the service account')
 
+    print(dir(output))
     # Command to get the associated bearer token with service account
     service_account_cmd_2 = \
         "kubectl -n kube-system describe secret {0}" \
         " | grep -E '^token' | cut -f2 -d':' | tr -d '\t'".format(
-            output.strip())
+            output.stdout.strip())
 
     # Execute the command and fetch the token associated with account
     bearer_token = connection.run(service_account_cmd_2)
@@ -98,17 +98,18 @@ def generate_token_and_port(connection):
         )
 
     # Set the generated token and set it as run time properties for  instance
-    token = bearer_token.strip()
+    token = bearer_token.stdout.strip()
     client = get_rest_client()
     client.secrets.create('kubernetes_token', token, update_if_exists=True)
     ctx.instance.runtime_properties['bearer_token'] = token
     # Set the exposed port and set it as run time properties for instance
-    ctx.instance.runtime_properties['dashboard_port'] = port.strip()
+    ctx.instance.runtime_properties['dashboard_port'] = port.stdout.strip()
 
 
-def setup_dashboard_access():
+@task
+def setup_dashboard_access(connection):
     try:
-        generate_token_and_port()
+        generate_token_and_port(connection)
     except Exception:
         generate_traceback_exception()
         raise SystemExit('Failed To setup dashboard access')
