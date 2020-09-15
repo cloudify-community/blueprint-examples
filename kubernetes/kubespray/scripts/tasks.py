@@ -4,6 +4,8 @@ import os
 import pip
 from tempfile import NamedTemporaryFile
 
+from fabric2 import task
+
 try:
     import yaml
 except ImportError:
@@ -13,8 +15,6 @@ except ImportError:
 from cloudify import manager
 from cloudify import ctx
 from cloudify.exceptions import (RecoverableError, NonRecoverableError)
-
-from fabric.api import sudo, get, put, shell_env, run
 
 cfy_client = manager.get_rest_client()
 
@@ -55,7 +55,8 @@ def create_cluster_secrets(cluster, rp):
     create_secret('kubernetes-cluster-name', name)
     create_secret('kubernetes-server', cluster_config.get('server'))
     secret_name = '{0}-certificate-authority-data'.format(name)
-    certificate_authority_content = cluster_config.get('certificate-authority-data')
+    certificate_authority_content = cluster_config.get(
+        'certificate-authority-data')
     create_secret(secret_name, certificate_authority_content)
     rp[secret_name] = certificate_authority_content
 
@@ -76,12 +77,13 @@ def create_user_secrets(user, rp):
     del secret_name
 
 
-def setup_kubectl(username):
+@task
+def setup_kubectl(connection, username):
     kube_config_path = KUBE_PATH.format(username)
-    run('mkdir {0}'.format(os.path.dirname(kube_config_path)))
-    sudo('cp {0} {1}'.format(MASTER_KUBE_PATH, kube_config_path))
-    sudo('chown {0} {1}'.format(username, kube_config_path))
-    sudo('chmod 755 {0}'.format(kube_config_path))
+    connection.run('mkdir {0}'.format(os.path.dirname(kube_config_path)))
+    connection.sudo('cp {0} {1}'.format(MASTER_KUBE_PATH, kube_config_path))
+    connection.sudo('chown {0} {1}'.format(username, kube_config_path))
+    connection.sudo('chmod 755 {0}'.format(kube_config_path))
 
 
 def get_config_content(filename):
@@ -93,9 +95,12 @@ def get_config_content(filename):
                 'Unable to read file: {0}: {1}'.format(filename, str(e)))
 
 
-def setup_secrets():
+@task
+def setup_secrets(connection):
     f = NamedTemporaryFile()
-    get(MASTER_KUBE_PATH, f.name, use_sudo=True)
+    connection.sudo(
+        'chmod 775 {kubeconfig}'.format(kubeconfig=MASTER_KUBE_PATH))
+    connection.get(MASTER_KUBE_PATH, f.name)
     rp = ctx.target.instance.runtime_properties
     rp['configuration_file_content'] = get_config_content(f.name)
     for cluster in rp['configuration_file_content'].get('clusters'):
@@ -104,20 +109,21 @@ def setup_secrets():
         create_user_secrets(user, rp)
 
 
-def kubectl_apply(username, resource):
+@task
+def kubectl_apply(connection, username, resource):
     f = NamedTemporaryFile()
     kube_config_path = KUBE_PATH.format(username)
     ctx.download_resource('resources/{0}'.format(resource), f.name)
-    put(f.name, '/home/{0}/{1}'.format(username, resource))
-    with shell_env(KUBE_CONFIG=kube_config_path):
-        run('kubectl apply --namespace=kube-system -f {0}/{1}'.format(
-            os.path.dirname(
-                os.path.dirname(kube_config_path)
-            ), resource
-        ))
+    connection.put(f.name, '/home/{0}/{1}'.format(username, resource))
+    connection.run('kubectl apply --namespace=kube-system -f {0}/{1}'.format(
+        os.path.dirname(
+            os.path.dirname(kube_config_path)
+        ), resource
+    ), env={"KUBE_CONFIG": kube_config_path})
 
 
-def setup_helm(username, resource):
+@task
+def setup_helm(connection, username, resource):
     """
     This task will install.setup helm inside K8S cluster and will init the
     tiller server
@@ -132,29 +138,29 @@ def setup_helm(username, resource):
     ctx.logger.debug(
         'Copy {0} to {1}'.format(temp_file.name, helm_script_path)
     )
-    put(temp_file.name, helm_script_path)
+    connection.put(temp_file.name, helm_script_path)
 
     # Change owner for the helm script file
     ctx.logger.debug(
         'Change file {0} owner to {1}'.format(helm_script_path, username)
     )
-    sudo('chown {0} {1}'.format(username, helm_script_path))
+    connection.sudo('chown {0} {1}'.format(username, helm_script_path))
 
     # Update Permissions
     ctx.logger.debug(
         'Change file {0} permission to 700'.format(helm_script_path)
     )
-    sudo('chmod 700 {0}'.format(helm_script_path))
+    connection.sudo('chmod 700 {0}'.format(helm_script_path))
 
     # Install Helm client
     ctx.logger.debug(
         'Install helm client using script file {0}'.format(
             helm_script_path)
     )
-    response = run('bash {0}'.format(helm_script_path))
+    response = connection.run('bash {0}'.format(helm_script_path))
     handle_fabric_response(response)
 
     # Initialize helm and install tiller server
     ctx.logger.debug('Initialize helm and install tiller server')
-    response = run('helm init')
+    response = connection.run('helm init')
     handle_fabric_response(response)
