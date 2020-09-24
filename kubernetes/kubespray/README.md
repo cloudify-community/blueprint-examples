@@ -11,8 +11,6 @@ This must be executed on your manager (inside a Cloudify Manager container or on
 ```bash
 sudo su
 yum install -y git python-netaddr
-source /opt/mgmtworker/env/bin/activate
-pip install netaddr ipaddr
 ```
 
   * `kube-master` compute host minimum memory `1500` MB.
