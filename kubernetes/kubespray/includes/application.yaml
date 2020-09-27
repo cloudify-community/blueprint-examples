@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Install Kubernetes on kube-master and kube-node with kubespray.
 
 imports:
-  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-ansible-plugin?version= >=2.10.0
 
 inputs:
 
@@ -69,6 +69,10 @@ relationships:
         establish:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
+            extra_packages:
+              default:
+                - netaddr
+                - ipaddr
             site_yaml_path:
               default: { get_input: kubespray_ansible_playbook_path_scale }
             remerge_sources:
@@ -115,6 +119,9 @@ node_templates:
         configure:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
+            extra_packages:
+            - netaddr
+            - ipaddr
             site_yaml_path: { get_input: kubespray_ansible_playbook_path }
             run_data:
               dns_mode: { get_input: kubespray_dns_mode}

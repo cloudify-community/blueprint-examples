@@ -6,7 +6,7 @@ imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
   - plugin:cloudify-fabric-plugin
-  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-ansible-plugin?version= >=2.10.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-kubernetes-plugin
   - includes/cloud-init.yaml
