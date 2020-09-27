@@ -28,7 +28,7 @@ OS_VERSION = '3.2.15'
 UT_VERSION = '1.21.0'
 TF_VERSION = '0.13.2'
 DK_VERSION = '2.0.1'
-AN_VERSION = '2.9.1'
+AN_VERSION = '2.10.0'
 
 TF_WAGON = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
            'releases/download/{v}/cloudify_terraform_plugin-{v}-py27-none-' \
