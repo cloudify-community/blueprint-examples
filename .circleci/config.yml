@@ -420,13 +420,13 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - getting-started-openstack:
-          requires:
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - getting-started-openstack:
+#          requires:
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
       - release:
           requires:
             - utilities-examples-blueprint-validation
@@ -447,7 +447,7 @@ workflows:
             - getting-started-gcp
             - getting-started-ansible
             # - openshift
-            - getting-started-openstack
+#            - getting-started-openstack
           filters:
             branches:
               only: master
@@ -526,10 +526,10 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - getting-started-openstack:
-          requires:
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
+#      - getting-started-openstack:
+#          requires:
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
