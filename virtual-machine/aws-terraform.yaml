@@ -8,38 +8,19 @@ imports:
   - plugin:cloudify-terraform-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
-dsl_definitions:
-
-  terraform_config: &terraform_config
-    executable_path: {get_input: terraform_executable}
-    storage_path: {get_input: terraform_storage_path}
-    plugins_dir: {get_input: terraform_plugins_dir}
-
 inputs:
 
   terraform_installation_source:
     description: >
       Where to get Terraform from.
     type: string
-    default: 'https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip'
+    default: 'https://releases.hashicorp.com/terraform/0.13.3/terraform_0.13.3_linux_amd64.zip'
 
   terraform_plugins:
-    type: list
+    type: dict
     default:
-      - 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
-      - 'https://releases.hashicorp.com/terraform-provider-aws/2.49.0/terraform-provider-aws_2.49.0_linux_amd64.zip'
-
-  terraform_executable:
-    type: string
-    default: '/tmp/terraform/bin/terraform'
-
-  terraform_plugins_dir:
-    type: string
-    default: '/tmp/terraform/plugins'
-
-  terraform_storage_path:
-    type: string
-    default: '/tmp/terraform/storage'
+      registry.terraform.io/hashicorp/template/2.1.2/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
+      registry.terraform.io/hashicorp/aws/3.8.0/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-aws/3.8.0/terraform-provider-aws_3.8.0_linux_amd64.zip'
 
   agent_user:
     description: >
@@ -60,10 +41,10 @@ inputs:
     default: agent_key
 
 node_templates:
+
   terraform:
     type: cloudify.nodes.terraform
     properties:
-      terraform_config: *terraform_config
       resource_config:
         use_existing_resource: false
         installation_source: { get_input: terraform_installation_source }
@@ -73,7 +54,8 @@ node_templates:
     type: cloudify.nodes.terraform.Module
     properties:
       resource_config:
-        source: resources/terraform/template.zip
+        source: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
+        source_path: virtual-machine/resources/terraform/template
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
@@ -86,7 +68,6 @@ node_templates:
         type: cloudify.terraform.relationships.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
-
 
   agent_key:
     type: cloudify.keys.nodes.RSAKey
