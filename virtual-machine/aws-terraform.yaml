@@ -10,18 +10,6 @@ imports:
 
 inputs:
 
-  terraform_installation_source:
-    description: >
-      Where to get Terraform from.
-    type: string
-    default: 'https://releases.hashicorp.com/terraform/0.13.3/terraform_0.13.3_linux_amd64.zip'
-
-  terraform_plugins:
-    type: dict
-    default:
-      registry.terraform.io/hashicorp/template/2.1.2/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
-      registry.terraform.io/hashicorp/aws/3.8.0/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-aws/3.8.0/terraform-provider-aws_3.8.0_linux_amd64.zip'
-
   agent_user:
     description: >
       The username of the agent running on the instance created from the image.
@@ -44,11 +32,6 @@ node_templates:
 
   terraform:
     type: cloudify.nodes.terraform
-    properties:
-      resource_config:
-        use_existing_resource: false
-        installation_source: { get_input: terraform_installation_source }
-        plugins: { get_input: terraform_plugins }
 
   cloud_resources:
     type: cloudify.nodes.terraform.Module
