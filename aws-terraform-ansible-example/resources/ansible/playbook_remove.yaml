@@ -1,0 +1,10 @@
+---
+- name: uninstall nginx
+  hosts: all
+  become: true
+  tasks:
+  - name: Install nginx
+    yum:
+      name: nginx
+      state: absent
+  

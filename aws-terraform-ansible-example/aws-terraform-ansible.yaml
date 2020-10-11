@@ -1,0 +1,156 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates infrastructure on AWS using Terraform.
+  Then runs ansible playbook that installs NGINX on the created infrastructue.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-terraform-plugin?version= >=0.14.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+  - plugin:cloudify-ansible-plugin
+
+
+inputs:
+
+  terraform_installation_source:
+    description: >
+      Where to get Terraform from.
+    type: string
+    default: 'https://releases.hashicorp.com/terraform/0.13.3/terraform_0.13.3_linux_amd64.zip'
+
+  terraform_plugins:
+    type: dict 
+    default:
+      registry.terraform.io/hashicorp/template/2.1.2/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
+      registry.terraform.io/hashicorp/aws/3.10.0/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-aws/3.10.0/terraform-provider-aws_3.10.0_linux_amd64.zip'
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'centos'
+
+  aws_region_name:
+    type: string
+    default: 'us-east-1'
+
+  aws_zone_name:
+    type: string
+    default: { concat: [ { get_input: aws_region_name }, 'd' ] }
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+  vm_count:
+     description: "Number of VM's"
+     type: integer
+     default: 1
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        use_existing_resource: false
+        installation_source: { get_input: terraform_installation_source }
+        plugins: { get_input: terraform_plugins }
+
+  cloud_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source: resources/terraform/template.zip
+        variables:
+          access_key: { get_secret: aws_access_key_id }
+          secret_key: { get_secret: aws_secret_access_key }
+          aws_region: { get_input: aws_region_name }
+          aws_zone: { get_input: aws_zone_name }
+          admin_user: { get_input: agent_user }
+          admin_key_public: { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - target: terraform
+        type: cloudify.terraform.relationships.run_on_host
+      - target: agent_key
+        type: cloudify.relationships.depends_on
+
+  ansible_playbook:
+    type: cloudify.nodes.ansible.Executor
+    properties:
+      playbook_path: resources/ansible/playbook.yaml
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            playbook_path: resources/ansible/playbook.yaml
+            sources: { get_attribute: [ SELF, sources ] }
+        stop:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            playbook_path: resources/ansible/playbook_remove.yaml
+            sources: { get_attribute: [ SELF, sources ] }
+        delete:
+          implementation: ansible.cloudify_ansible.tasks.cleanup
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cloud_resources
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            preconfigure:
+              implementation: scripts/inventory.py
+              executor: central_deployment_agent
+              inputs:
+                agent_user: { get_input: agent_user }
+                private_key: { get_attribute: [agent_key, private_key_export] }
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
+capabilities:
+  name:
+   value: { get_attribute: [ cloud_resources, resources, example_vm, instances, 0, attributes, tags, Name ] }
+
+  endpoint:
+   description: The external endpoint of the application.
+   value: { get_attribute: [ cloud_resources, resources, eip, instances, 0, attributes, public_ip ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_attribute: [agent_key, private_key_export] }
+
+
+groups:
+
+  RG_1:
+    members:
+    - cloud_resources
+    - ansible_playbook
+
+policies:
+
+  scale_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: { get_input: vm_count }
+      min_instances: 1
+      max_instances: 3
+    targets: [RG_1]
