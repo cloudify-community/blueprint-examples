@@ -26,15 +26,15 @@ SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 
 OS_VERSION = '3.2.15'
 UT_VERSION = '1.21.0'
-TF_VERSION = '0.13.2'
+TF_VERSION = '0.14.1'
 DK_VERSION = '2.0.1'
 AN_VERSION = '2.10.0'
 
 TF_WAGON = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
-           'releases/download/{v}/cloudify_terraform_plugin-{v}-py27-none-' \
-           'linux_x86_64-centos-Core.wgn'.format(v=TF_VERSION)
+           'releases/download/latest/cloudify_terraform_plugin-{v}-centos-' \
+           'Core-py27.py36-none-linux_x86_64.wgn'.format(v=TF_VERSION)
 TF_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
-            'releases/download/{v}/plugin.yaml'.format(v=TF_VERSION)
+            'releases/download/latest/plugin.yaml'
 OS_WAGON = 'https://github.com/cloudify-cosmo/cloudify-openstack-plugin/' \
            'releases/download/{v}/cloudify_openstack_plugin-{v}-py27-none-' \
            'linux_x86_64-centos-Core.wgn'.format(v=OS_VERSION)
