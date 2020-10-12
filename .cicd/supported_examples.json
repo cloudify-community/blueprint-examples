@@ -165,5 +165,8 @@
   "utilities-examples/cloudify_terminal": [
     "linux-ssh.yaml",
     "fortigate.yaml"
+  ],
+  "aws-terraform-ansible-example": [
+    "aws-terraform-ansible.yaml"
   ]
 }
