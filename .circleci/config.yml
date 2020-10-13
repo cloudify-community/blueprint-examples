@@ -395,6 +395,7 @@ workflows:
               only: master
       - getting-started-azure-arm:
           requires:
+            - getting-started-azure
             - virtual-machine-blueprint-validation
             - getting-started-blueprint-validation
           filters:
@@ -501,6 +502,7 @@ workflows:
               only: master
       - getting-started-azure-arm:
           requires:
+            - getting-started-azure
             - virtual-machine-blueprint-validation
             - getting-started-blueprint-validation
           filters:
