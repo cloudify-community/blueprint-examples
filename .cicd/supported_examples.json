@@ -8,7 +8,8 @@
     "azure.yaml",
     "gcp.yaml",
     "openstack.yaml",
-    "aws-cloudformation.yaml"
+    "aws-cloudformation.yaml",
+    "aws-terraform.yaml"
   ],
   "simple-hello-world-example": ["blueprint.yaml"],
   "db-lb-app/infrastructure": [
@@ -165,8 +166,5 @@
   "utilities-examples/cloudify_terminal": [
     "linux-ssh.yaml",
     "fortigate.yaml"
-  ],
-  "aws-terraform-ansible-example": [
-    "aws-terraform-ansible.yaml"
   ]
 }
