@@ -2,14 +2,14 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
   This blueprint creates infrastructure on AWS using Terraform.
-  Then runs ansible playbook that installs NGINX on the created infrastructue.
+  Then runs ansible playbook that installs an application on top of it.
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
   - plugin:cloudify-terraform-plugin?version= >=0.14.1
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-ansible-plugin
-
+  - includes/ansible.yaml
 
 inputs:
 
@@ -17,7 +17,7 @@ inputs:
     description: >
       The username of the agent running on the instance created from the image.
     type: string
-    default: 'centos'
+    default: 'ubuntu'
 
   aws_region_name:
     type: string
@@ -31,10 +31,6 @@ inputs:
     type: string
     default: agent_key
 
-  vm_count:
-     description: "Number of VM's"
-     type: integer
-     default: 1
 
 node_templates:
 
@@ -44,11 +40,11 @@ node_templates:
       resource_config:
         use_existing_resource: false
 
-  cloud_resources:
+  vm:
     type: cloudify.nodes.terraform.Module
     properties:
       resource_config:
-        source: aws-terraform-resources/resources/terraform/template.zip
+        source: resources/terraform/template.zip
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
@@ -61,36 +57,13 @@ node_templates:
         type: cloudify.terraform.relationships.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
-
-  ansible_playbook:
-    type: cloudify.nodes.ansible.Executor
-    properties:
-      playbook_path: aws-terraform-resources/resources/ansible/playbook.yaml
     interfaces:
       cloudify.interfaces.lifecycle:
-        start:
-          implementation: ansible.cloudify_ansible.tasks.run
+        poststart:
+          implementation: scripts/terraform/inject_ip.py
+          executor: central_deployment_agent
           inputs:
-            playbook_path: aws-terraform-resources/resources/ansible/playbook.yaml
-            sources: { get_attribute: [ SELF, sources ] }
-        stop:
-          implementation: ansible.cloudify_ansible.tasks.run
-          inputs:
-            playbook_path: aws-terraform-resources/resources/ansible/playbook_remove.yaml
-            sources: { get_attribute: [ SELF, sources ] }
-        delete:
-          implementation: ansible.cloudify_ansible.tasks.cleanup
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: cloud_resources
-        source_interfaces:
-          cloudify.interfaces.relationship_lifecycle:
-            preconfigure:
-              implementation: aws-terraform-resources/scripts/inventory.py
-              executor: central_deployment_agent
-              inputs:
-                agent_user: { get_input: agent_user }
-                private_key: { get_attribute: [agent_key, private_key_export] }
+            ip: { get_attribute: [ SELF, resources, eip, instances, 0, attributes, public_ip ] }
 
   agent_key:
     type: cloudify.keys.nodes.RSAKey
@@ -107,36 +80,10 @@ node_templates:
           inputs:
             store_private_key_material: true
 
-capabilities:
-  name:
-   value: { get_attribute: [ cloud_resources, resources, example_vm, instances, 0, attributes, tags, Name ] }
+outputs:
 
-  endpoint:
+  application_endpoint:
    description: The external endpoint of the application.
-   value: { get_attribute: [ cloud_resources, resources, eip, instances, 0, attributes, public_ip ] }
-
-  user:
-    description: user ID.
-    value: { get_input: agent_user }
-
-  key_content:
-    description: Private agent key
-    value: { get_attribute: [agent_key, private_key_export] }
+   value: { concat: [ 'http://', { get_attribute: [ vm, resources, eip, instances, 0, attributes, public_ip ] }, ':80' ] }
 
 
-groups:
-
-  RG_1:
-    members:
-    - cloud_resources
-    - ansible_playbook
-
-policies:
-
-  scale_policy:
-    type: cloudify.policies.scaling
-    properties:
-      default_instances: { get_input: vm_count }
-      min_instances: 1
-      max_instances: 3
-    targets: [RG_1]

@@ -31,10 +31,10 @@ variable "secret_key" {
 variable "aws_amis" {
   type = map(string)
   default = {
-    ca-central-1 = "ami-033e6106180a626d0"
-    us-east-1 = "ami-03248a0341eadb1f1"
-    us-west-1 = "ami-01dd5a8ef26e6341d"
-    us-west-2 = "ami-024b56adf74074ca6"
-    eu-west-1 = "ami-0eee6eb870dc1cefa"
+    ca-central-1 = "ami-2e00bf4a"
+    us-east-1 = "ami-841f46ff"
+    us-west-1 = "ami-b2527ad2"
+    us-west-2 = "ami-718c6909"
+    eu-west-1 = "ami-1e749f67"
   }
 }
