@@ -6,24 +6,12 @@ description: >
 
 imports:
   - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
-  - plugin:cloudify-terraform-plugin?version= >=0.14.0
+  - plugin:cloudify-terraform-plugin?version= >=0.14.1
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-ansible-plugin
 
 
 inputs:
-
-  terraform_installation_source:
-    description: >
-      Where to get Terraform from.
-    type: string
-    default: 'https://releases.hashicorp.com/terraform/0.13.3/terraform_0.13.3_linux_amd64.zip'
-
-  terraform_plugins:
-    type: dict 
-    default:
-      registry.terraform.io/hashicorp/template/2.1.2/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-template/2.1.2/terraform-provider-template_2.1.2_linux_amd64.zip'
-      registry.terraform.io/hashicorp/aws/3.10.0/linux_amd64: 'https://releases.hashicorp.com/terraform-provider-aws/3.10.0/terraform-provider-aws_3.10.0_linux_amd64.zip'
 
   agent_user:
     description: >
@@ -55,14 +43,12 @@ node_templates:
     properties:
       resource_config:
         use_existing_resource: false
-        installation_source: { get_input: terraform_installation_source }
-        plugins: { get_input: terraform_plugins }
 
   cloud_resources:
     type: cloudify.nodes.terraform.Module
     properties:
       resource_config:
-        source: resources/terraform/template.zip
+        source: aws-terraform-resources/resources/terraform/template.zip
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
@@ -79,18 +65,18 @@ node_templates:
   ansible_playbook:
     type: cloudify.nodes.ansible.Executor
     properties:
-      playbook_path: resources/ansible/playbook.yaml
+      playbook_path: aws-terraform-resources/resources/ansible/playbook.yaml
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
-            playbook_path: resources/ansible/playbook.yaml
+            playbook_path: aws-terraform-resources/resources/ansible/playbook.yaml
             sources: { get_attribute: [ SELF, sources ] }
         stop:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
-            playbook_path: resources/ansible/playbook_remove.yaml
+            playbook_path: aws-terraform-resources/resources/ansible/playbook_remove.yaml
             sources: { get_attribute: [ SELF, sources ] }
         delete:
           implementation: ansible.cloudify_ansible.tasks.cleanup
@@ -100,7 +86,7 @@ node_templates:
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
             preconfigure:
-              implementation: scripts/inventory.py
+              implementation: aws-terraform-resources/scripts/inventory.py
               executor: central_deployment_agent
               inputs:
                 agent_user: { get_input: agent_user }
