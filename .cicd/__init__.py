@@ -31,10 +31,10 @@ DK_VERSION = '2.0.1'
 AN_VERSION = '2.10.0'
 
 TF_WAGON = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
-           'releases/download/latest/cloudify_terraform_plugin-{v}-centos-' \
-           'Core-py27.py36-none-linux_x86_64.wgn'.format(v=TF_VERSION)
+           'releases/download/{v}/cloudify_terraform_plugin-{v}-centos' \
+           '-Core-py27.py36-none-linux_x86_64.wgn'.format(v=TF_VERSION)
 TF_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
-            'releases/download/latest/plugin.yaml'
+            'releases/download/{v}/plugin.yaml'.format(v=TF_VERSION)
 OS_WAGON = 'https://github.com/cloudify-cosmo/cloudify-openstack-plugin/' \
            'releases/download/{v}/cloudify_openstack_plugin-{v}-py27-none-' \
            'linux_x86_64-centos-Core.wgn'.format(v=OS_VERSION)
