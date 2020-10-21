@@ -388,6 +388,7 @@ workflows:
               only: master
       - getting-started-azure:
           requires:
+            - getting-started-gcp
             - virtual-machine-blueprint-validation
             - getting-started-blueprint-validation
           filters:
@@ -412,6 +413,7 @@ workflows:
           requires:
             - virtual-machine-blueprint-validation
             - getting-started-blueprint-validation
+            - getting-started-aws-cloudformation
           filters:
             branches:
               only: master
