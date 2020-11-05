@@ -85,7 +85,7 @@ dsl_definitions:
           - "1"
           - "2"
           - "3"
-        enableNodePublicIP: true
+        # enableNodePublicIP: true
         mode: "System"
     linux_profile:
       adminUsername: "azureuser"
