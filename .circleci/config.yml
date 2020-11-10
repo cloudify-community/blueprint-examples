@@ -38,13 +38,13 @@ commands:
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
       - run:
           name: download manager docker image
-          command:  wget https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/5.1.0/.dev1-release/cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: load docker image
-          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: retain space by dumping the tar
-          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
+          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+#      - run:
+#          name: load docker image
+#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
+#      - run:
+#          name: retain space by dumping the tar
+#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
@@ -72,13 +72,13 @@ commands:
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
       - run:
           name: download manager docker image
-          command:  wget https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/5.1.0/.dev1-release/cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: load docker image
-          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: retain space by dumping the tar
-          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
+          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+#      - run:
+#          name: load docker image
+#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
+#      - run:
+#          name: retain space by dumping the tar
+#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
@@ -106,13 +106,13 @@ commands:
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
       - run:
           name: download manager docker image
-          command:  wget https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/5.1.0/.dev1-release/cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: load docker image
-          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-      - run:
-          name: retain space by dumping the tar
-          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
+          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+#      - run:
+#          name: load docker image
+#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
+#      - run:
+#          name: retain space by dumping the tar
+#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
