@@ -21,7 +21,9 @@ def run_server():
     os.chdir('/opt/manager/resources/blueprints/{0}/{1}'.format(
         ctx.tenant_name,
         ctx.blueprint.id))
-    webserver_cmd = [sys.executable, '-m', 'SimpleHTTPServer', str(PORT)]
+    server_module = ('SimpleHTTPServer' if sys.version_info < (3, 0)
+                     else 'http.server')
+    webserver_cmd = [sys.executable, '-m', server_module, str(PORT)]
     if not IS_WIN:
         webserver_cmd.insert(0, 'nohup')
 
