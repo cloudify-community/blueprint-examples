@@ -58,9 +58,6 @@ AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
             'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 
 PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN),
-                     (TF_WAGON, TF_PLUGIN),
-                     (UT_WAGON, UT_PLUGIN),
-                     (AN_WAGON, AN_PLUGIN),
                      (DK_WAGON, DK_PLUGIN)]
 
 SECRETS_TO_CREATE = {
