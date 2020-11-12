@@ -1,0 +1,95 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Cloudify Helm-eks blueprint. Creates EKS cluster and installs helm chart on top of it.
+
+imports:
+  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - plugin:cloudify-helm-plugin
+
+inputs:
+
+  infra_archive:
+    description: >
+      URL of EKS example zip file.
+    type: string
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/kubernetes-aws-eks.zip'
+
+  infra_exists:
+    description: >
+      Whether a getting eks example blueprint has already been uploaded to the manager or not.
+    default: false
+
+  infra_deployment_id:
+    description: The blueprint name, the deployment name.
+    default: 'aws-eks'
+
+  repo_name:
+    description: >
+      Name of the repo to add.
+    type: string
+
+  chart_name:
+    description: >
+      Chart package name to deploy from repo.
+
+  helm_installation_source:
+    description: >
+      Helm download link.
+    type: string
+    default: 'https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz'
+
+  repo_url:
+    description: >
+      URL of the repo to add. For example:
+      https://kubernetes-charts.storage.googleapis.com/
+    type: string
+
+node_templates:
+
+  eks_cluster:
+    type: cloudify.nodes.Component
+    properties:
+      resource_config:
+        blueprint:
+          id: { get_input: infra_deployment_id }
+          blueprint_archive: { get_input: infra_archive }
+          main_file_name: 'blueprint.yaml'
+          external_resource: { get_input: infra_exists }
+        deployment:
+          id: { get_input: infra_deployment_id }
+
+
+  helm_install:
+    type: cloudify.nodes.helm.Binary
+    properties:
+      use_existing_resource: false
+      installation_source: { get_input: helm_installation_source }
+
+  repo:
+    type: cloudify.nodes.helm.Repo
+    properties:
+      resource_config:
+        name: { get_input: repo_name }
+        repo_url: { get_input: repo_url }
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+
+  release:
+    type: cloudify.nodes.helm.Release
+    properties:
+      client_config:
+        configuration:
+          file_content: { get_secret: kubernetes_config }
+          api_options:
+            api_key: { get_secret: kubernetes_token }
+      resource_config:
+        name: "examplerelease"
+        chart: { concat: [ { get_input: repo_name },'/', { get_input: chart_name } ] }
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+      - target: repo
+        type: cloudify.relationships.depends_on
+      - target: eks_cluster
+        type: cloudify.relationships.depends_on
