@@ -22,11 +22,11 @@ inputs:
 
   availability_zone_1:
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'd' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'a' ] }
 
   availability_zone_2:
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'e' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'b' ] }
 
   resource_suffix:
     default: '-1'
@@ -618,15 +618,16 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: new_service_account
 
-  store_token:
+  store_token_and_kubeconfig:
     type: cloudify.nodes.Root
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
-          implementation: scripts/store_kube_token.py
+          implementation: scripts/store_kube_token_and_config.py
           executor: central_deployment_agent
           inputs:
             kube_token: { get_attribute: [ secret, kubernetes, data, token ] }
+            kube_config: { get_attribute: [ eks_cluster, kubeconf ] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: secret
@@ -638,7 +639,7 @@ node_templates:
         configuration:
           api_options:
             host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
-            api_key: { get_attribute: [ store_token, token ] }
+            api_key: { get_attribute: [ store_token_and_kubeconfig, token ] }
             debug: false
             verify_ssl: false
       validate_resource_status: true
@@ -646,7 +647,7 @@ node_templates:
         resource_path: resources/template.yaml
     relationships:
       - type: cloudify.relationships.depends_on
-        target: store_token
+        target: store_token_and_kubeconfig
     interfaces:
       cloudify.interfaces.lifecycle:
         precreate: {}
