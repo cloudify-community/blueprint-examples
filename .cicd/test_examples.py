@@ -36,7 +36,7 @@ from __init__ import (
 prepare_test(plugins=PLUGINS_TO_UPLOAD,
              secrets=SECRETS_TO_CREATE,
              plugin_test=False,
-             pip_packages=['boto', 'boto3', 'selinux'])
+             pip_packages=['boto', 'boto3==1.15.18', 'selinux'])
 
 virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
                         in b and os.environ.get('IAAS', '') ==
