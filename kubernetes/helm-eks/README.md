@@ -32,5 +32,5 @@ cfy install blueprint.yaml -i repo_name=bitnami -i chart_name=postgresql
 -i repo_url=https://charts.bitnami.com/bitnami 
 ```
 
-### Install Helm chart on an existing cluser
+### Install Helm chart on an existing cluster
 The example above creates EKS cluster, If you want to use your own kubernetes cluster, look at these [Helm examples.](https://github.com/cloudify-incubator/cloudify-helm-plugin/tree/master/examples) 
