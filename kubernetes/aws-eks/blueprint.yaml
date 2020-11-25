@@ -22,11 +22,11 @@ inputs:
 
   availability_zone_1:
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'a' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'd' ] }
 
   availability_zone_2:
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'b' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'e' ] }
 
   resource_suffix:
     default: '-1'
