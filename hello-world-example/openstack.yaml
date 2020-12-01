@@ -8,7 +8,7 @@ imports:
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
-  - includes/ansible.yaml
+  - includes/hello-world-ansible.yaml
 
 inputs:
 

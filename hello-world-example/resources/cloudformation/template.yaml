@@ -270,3 +270,8 @@ Outputs:
             - ServerInstance
             - PublicIp
     Description: URL for Server Site
+  IP:
+    Value: !GetAtt
+      - ServerInstance
+      - PublicIp
+    Description: URL for Server Site

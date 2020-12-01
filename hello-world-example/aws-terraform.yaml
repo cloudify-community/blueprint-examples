@@ -9,7 +9,7 @@ imports:
   - plugin:cloudify-terraform-plugin?version= >=0.14.1
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-ansible-plugin
-  - includes/ansible.yaml
+  - includes/hello-world-ansible.yaml
 
 inputs:
 
@@ -60,7 +60,7 @@ node_templates:
     interfaces:
       cloudify.interfaces.lifecycle:
         poststart:
-          implementation: scripts/terraform/inject_ip.py
+          implementation: scripts/terraform/expose_ip.py
           executor: central_deployment_agent
           inputs:
             ip: { get_attribute: [ SELF, resources, eip, instances, 0, attributes, public_ip ] }
