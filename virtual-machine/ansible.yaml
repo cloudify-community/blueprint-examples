@@ -60,7 +60,10 @@ node_templates:
       ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
-        AWS_REGION: { get_input: aws_region_name} 
+        AWS_REGION: { get_input: aws_region_name}
+      extra_packages: &extra_packages
+        - boto3==1.16.26
+        - boto==2.49.0
     relationships:
       - type: cloudify.relationships.depends_on
         target: cloud_init
@@ -86,6 +89,7 @@ node_templates:
               vpc_id: { get_attribute: [aws_infra_info, vpc_id] }
               vpc_name:  { get_attribute: [aws_infra_info, vpc_name] }
             ansible_env_vars: *env_vars
+            extra_packages: *extra_packages
     relationships:
       - type: cloudify.relationships.depends_on
         target: aws_infra_info
