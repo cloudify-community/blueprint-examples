@@ -13,7 +13,7 @@ This blueprint installs a web-server on the Cloudify Manager machine. It is supp
  
 ### Install 
 
-The `cfy install <blueprint-path>` command will automatically upload the blueprint to your Cloudify Manager, create a deployment out of it, and install the created deployment. 
+The `cfy install <blueprint-path>` command will upload the blueprint to your Cloudify Manager, create a deployment out of it, and install the created deployment. 
 
 ```bash
 cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/latest/simple-hello-world-example.zip
@@ -25,7 +25,7 @@ This will run a `Hello World` web-server on your Cloudify Manager machine in por
  * http://<VM or container IP>:8000  if you are using a VM, or a docker container as the Cloudify Manager machine.
 
 ### Uninstall
-To uninstall the webserver, simply run:
+To uninstall the web-server, simply run:
 
 ```bash
 cfy uninstall simple-hello-world-example
