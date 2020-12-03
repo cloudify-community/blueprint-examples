@@ -9,7 +9,9 @@
     "gcp.yaml",
     "openstack.yaml",
     "aws-cloudformation.yaml",
-    "aws-terraform.yaml"
+    "aws-terraform.yaml",
+    "vsphere.yaml",
+    "vcloud.yaml"
   ],
   "simple-hello-world-example": ["blueprint.yaml"],
   "db-lb-app/infrastructure": [
@@ -94,7 +96,8 @@
     "openstack-v2.yaml",
     "gcp.yaml",
     "ansible.yaml",
-    "vsphere.yaml"
+    "vsphere.yaml",
+    "vcloud.yaml"
   ],
   "getting-started": [
     "mc-jboss.yaml"
