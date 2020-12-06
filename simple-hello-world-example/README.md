@@ -1,42 +1,32 @@
-# simple-python-webserver-blueprint
+# Simple Hello-World Example
 
-The blueprint installs a webserver on your local machine. It is supported on Linux and most *nix machines.
+This blueprint installs a web-server on the Cloudify Manager machine. It is supported on Linux and most *nix machines.
 
 
 ## Prerequisites
 
-- [Cloudify CLI](http://docs.cloudify.co/4.3.0/installation/installing-cli/) installed on your computer.
-- Your workstation's firewall should allow HTTP connections on port 8000.
+- [Cloudify CLI](https://docs.cloudify.co/latest/install_maintain/installation/installing-cli/) installed on your computer. It is used to run commands on the Cloudify Manager.
+- The Cloudify Manager machine's firewall should allow HTTP connections on port 8000.
 
 
 ## Usage
+ 
+### Install 
 
-* Clone the repository
+The `cfy install <blueprint-path>` command will upload the blueprint to your Cloudify Manager, create a deployment out of it, and install the created deployment. 
 
 ```bash
-git clone https://github.com/cloudify-examples/local-simple-python-webserver-blueprint.git
-cd local-simple-python-webserver-blueprint
+cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/latest/simple-hello-world-example.zip
 ```
 
-* Install
+This will run a `Hello World` web-server on your Cloudify Manager machine in port 8000. To access it, simply open your browser to:
+
+ * http://localhost:8000, if you are using your local machine as the Cloudify Manager machine.
+ * http://<VM or container IP>:8000  if you are using a VM, or a docker container as the Cloudify Manager machine.
+
+### Uninstall
+To uninstall the web-server, simply run:
 
 ```bash
-cfy install blueprint.yaml
-```
-
-This will run a `Hello World` server on your local machine in port 8000.
-
-```bash
-Open your browser to http://localhost:8000
-```
-
-You will see the following in your browser:
-
-![hwimage](/hello-world.png)
-
-
-* Uninstall
-
-```bash
-cfy uninstall -b local-simple-python-webserver-blueprint
+cfy uninstall simple-hello-world-example
 ```
