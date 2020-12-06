@@ -21,8 +21,8 @@ cfy install https://github.com/cloudify-community/blueprint-examples/releases/do
 
 This will run a `Hello World` web-server on your Cloudify Manager machine in port 8000. To access it, simply open your browser to:
 
- * http://localhost:8000, if you are using your local machine as the Cloudify Manager machine.
- * http://<VM or container IP>:8000  if you are using a VM, or a docker container as the Cloudify Manager machine.
+ * `http://localhost:8000` if you are using your local machine as the Cloudify Manager machine.
+ * `http://<VM or container IP>:8000` if you are using a VM, or a docker container as the Cloudify Manager machine.
 
 ### Uninstall
 To uninstall the web-server, simply run:
