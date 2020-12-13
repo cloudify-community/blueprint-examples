@@ -44,7 +44,7 @@ OS_PLUGIN = 'https://github.com/cloudify-cosmo/' \
 UT_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            'cloudify-utilities-plugin/{v}/cloudify_utilities_plugin' \
            '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=UT_VERSION)
-UT_PLUGIN = 'http://www.getcloudify.org/spec/utilities-plugin/' \
+UT_PLUGIN = 'http://www.cloudify.co/spec/utilities-plugin/' \
             '{v}/plugin.yaml'.format(v=UT_VERSION)
 DK_WAGON = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
            'releases/download/{v}/cloudify_docker_plugin-{v}-py27-none-' \
