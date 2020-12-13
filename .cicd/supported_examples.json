@@ -96,7 +96,7 @@
     "openstack-v2.yaml",
     "gcp.yaml",
     "ansible.yaml",
-    "vsphere.yaml",
+    "vsphere.yaml"
   ],
   "getting-started": [
     "mc-jboss.yaml"
