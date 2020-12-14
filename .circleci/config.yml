@@ -52,6 +52,9 @@ commands:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
       - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
+      - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
@@ -86,6 +89,9 @@ commands:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
       - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
+      - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
@@ -119,6 +125,9 @@ commands:
       - run:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
