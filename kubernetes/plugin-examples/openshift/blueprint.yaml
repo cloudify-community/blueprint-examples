@@ -5,7 +5,7 @@ description: >
   Designed for use with Red Hat's OpenShift Online PaaS. 
 
 imports:
-- https://getcloudify.org/spec/cloudify/5.0.5/types.yaml
+- https://cloudify.co/spec/cloudify/5.1.0/types.yaml
 - plugin:cloudify-kubernetes-plugin
 
 inputs:

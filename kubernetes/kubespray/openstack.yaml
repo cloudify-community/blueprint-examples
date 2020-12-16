@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Install Kubernetes using Kubespray on Openstack.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-ansible-plugin?version= >=2.10.0

@@ -4,7 +4,7 @@ description: >
   This blueprint creates infrastructure on AWS using Terraform.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-terraform-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 

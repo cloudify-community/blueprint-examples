@@ -43,7 +43,9 @@
     "azure.yaml",
     "gcp.yaml",
     "openstack.yaml",
-    "baremetal.yaml"
+    "baremetal.yaml",
+    "vsphere.yaml",
+    "vcloud.yaml"
   ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
   "kubernetes/azure-aks": ["blueprint.yaml"],

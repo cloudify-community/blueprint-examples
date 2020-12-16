@@ -11,9 +11,9 @@ checkout:
 
 executors:
 
-  py27:
+  py36:
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:3.6
 
   cloudify-machine:
     machine:
@@ -35,7 +35,7 @@ commands:
           command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
+          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
@@ -51,6 +51,9 @@ commands:
       - run:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -69,7 +72,7 @@ commands:
           command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
+          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
@@ -85,6 +88,9 @@ commands:
       - run:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -103,7 +109,7 @@ commands:
           command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
+          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
@@ -119,6 +125,9 @@ commands:
       - run:
           name: start docker container
           command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -137,7 +146,7 @@ commands:
           command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==3.10
+          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -343,7 +352,7 @@ jobs:
       - test_openshift
 
   release:
-    executor: py27
+    executor: py36
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:

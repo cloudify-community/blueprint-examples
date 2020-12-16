@@ -5,7 +5,7 @@ description: >
   Update Centos AMI Product Code: https://wiki.centos.org/Cloud/AWS#head-cc841c2a7d874025ae24d427776e05c7447024b2.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
