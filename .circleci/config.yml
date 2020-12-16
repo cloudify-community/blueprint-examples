@@ -146,7 +146,7 @@ commands:
           command: pip install -U pip
       - run:
           name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
+          command: pip install -U cloudify==5.1 pytest==4.6.3
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
