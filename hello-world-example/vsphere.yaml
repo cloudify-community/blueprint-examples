@@ -118,12 +118,6 @@ node_templates:
             network: { get_input: network_cidr }
             gateway: { get_input: gateway }
             ip: { get_input: ip }
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: vsphere.vsphere_server_plugin.server.create
-          inputs:
-            max_wait_time: 5
 
   agent_key:
     type: cloudify.keys.nodes.RSAKey
