@@ -3,6 +3,9 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-vsphere-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+  - plugin:cloudify-ansible-plugin
+  - includes/hello-world-ansible.yaml
 
 inputs:
 
@@ -28,7 +31,7 @@ inputs:
 
   template_name:
     type: string
-    default: CentOS-7.8.2003-tmpl
+    default: ubuntu-14.04.5-server-amd64-tmpl
 
   cpus:
     type: string
@@ -72,11 +75,11 @@ inputs:
 
   agent_user:
     type: string
-    default: centos
+    default: ubuntu
 
-  agent_key_private:
+  agent_key_name:
     type: string
-    default: { get_secret: vsphere_private_key }
+    default: vsphere_key
 
 dsl_definitions:
 
@@ -116,16 +119,25 @@ node_templates:
             gateway: { get_input: gateway }
             ip: { get_input: ip }
 
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_public_key_material: true
+            store_private_key_material: true
+
+
 capabilities:
 
-  endpoint:
+  application_endpoint:
     description: The external endpoint of the application.
-    value: { get_attribute: [ vm, public_ip ] }
-
-  user:
-    description: user ID.
-    value: { get_input: agent_user }
-
-  key_content:
-    description: Private SSH key
-    value: { get_input: agent_key_private }
+    value: { concat: [ 'http://', { get_attribute: [ vm, ip ] }, ':80' ] }

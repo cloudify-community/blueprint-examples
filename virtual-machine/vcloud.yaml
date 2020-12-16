@@ -1,0 +1,168 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-vcloud-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  vcloud_user:
+    type: string
+    default: { get_secret: vcloud_user }
+
+  vcloud_password:
+    type: string
+    default: { get_secret: vcloud_password }
+
+  vcloud_org:
+    type: string
+    default: { get_secret: vcloud_org }
+
+  vcloud_uri:
+    type: string
+    default: { get_secret: vcloud_uri }
+
+  vcloud_vdc:
+    type: string
+    default: { get_secret: vcloud_vdc }
+
+  vcloud_gateway:
+    type: string
+    default: { get_secret: vcloud_gateway }
+
+  resource_suffix:
+    type: string
+    default: '1'
+
+  catalog:
+    type: string
+    default: defaultcatalogue
+
+  template:
+    type: string
+    default: Centos7-GenericCloud
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+  agent_user:
+    type: string
+    default: centos
+
+dsl_definitions:
+
+  client_config: &client_config
+    uri: { get_input: vcloud_uri }
+    org: { get_input: vcloud_org }
+    vdc: { get_input: vcloud_vdc }
+    user: { get_input: vcloud_user }
+    password: { get_input: vcloud_password }
+    verify_ssl_certs: false
+
+node_templates:
+
+  vm:
+    type: cloudify.nodes.vcloud.VM
+    properties:
+      client_config: *client_config
+      resource_config:
+        catalog: { get_input: catalog }
+        template: { get_input: template }
+        ip_allocation_mode: 'manual'
+        deploy: false
+        power_on: false
+        accept_all_eulas: true
+        hostname: cloudifyvm
+        ip_address: '192.178.1.2'
+      agent_config:
+        install_method: none
+    relationships:
+      - type: cloudify.relationships.vcloud.vm_connected_to_network
+        target: routed_network
+      - type: cloudify.relationships.vcloud.vm_contained_in_vapp
+        target: vapp
+      - type: cloudify.relationships.vcloud.vm_connected_to_media
+        target: media
+
+  media:
+    type: cloudify.nodes.vcloud.Media
+    properties:
+      client_config: *client_config
+      resource_config:
+        catalog_name: { get_input: catalog }
+      iso:
+        vol_ident: config-2
+        sys_ident: ''
+        files:
+          openstack/latest/user_data: { get_attribute: [cloud_init, cloud_config ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+
+  vapp:
+    type: cloudify.nodes.vcloud.VApp
+    properties:
+      client_config: *client_config
+      resource_config:
+        description: test description
+        fence_mode: natRouted
+        accept_all_eulas: true
+    relationships:
+      - type: cloudify.relationships.vcloud.vapp_connected_to_network
+        target: routed_network
+
+  routed_network:
+    type: cloudify.nodes.vcloud.RoutedVDCNetwork
+    properties:
+      client_config: *client_config
+      resource_config:
+        gateway_name: { get_attribute: [ gateway, resource_id ] }
+        network_cidr: 192.178.1.1/24
+        description: test routed network
+        primary_dns_ip: 8.8.8.4
+        secondary_dns_ip: 8.8.8.8
+        ip_range_start: 192.178.1.2
+        ip_range_end: 192.178.1.254
+    relationships:
+      - type: cloudify.relationships.vcloud.network_connected_to_gateway
+        target: gateway
+
+  gateway:
+    type: cloudify.nodes.vcloud.Gateway
+    properties:
+      client_config: *client_config
+      resource_id: { get_input: vcloud_gateway }
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      encode_base64: false
+      resource_config:
+        users:
+        - name: { get_input: agent_user }
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+          - { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_public_key_material: true
+            store_private_key_material: true
+

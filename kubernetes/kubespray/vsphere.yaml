@@ -1,0 +1,188 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-vsphere-plugin
+  - plugin:cloudify-ansible-plugin?version= >=2.10.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+  - includes/application.yaml
+  - includes/kube-config.yaml
+
+inputs:
+
+
+  vsphere_port:
+    type: string
+    default: '443'
+
+  vsphere_allow_insecure:
+    type: string
+    default: true
+
+  resource_suffix:
+    type: string
+    default: '1'
+
+  template_name:
+    type: string
+    default: CentOS-7.8.2003-tmpl
+
+  cpus:
+    type: string
+    default: 4
+
+  memory:
+    type: string
+    default: 2048
+
+  domain:
+    type: string
+    default: localdom
+
+  dns_servers:
+    type: list
+    default: ['8.8.8.8']
+
+  network_name:
+    type: string
+    default: Internal
+
+  switch_distributed:
+    type: boolean
+    default: false
+
+  use_dhcp:
+    type: boolean
+    default: true
+
+  network_cidr:
+    type: string
+    default: 172.16.168.0/24
+
+  gateway:
+    type: string
+    default: 172.16.168.1
+
+  ip:
+    type: string
+    default: 172.16.168.201
+
+  agent_user:
+    type: string
+    default: centos
+
+  agent_key_name:
+    type: string
+    default: vsphere_key
+
+dsl_definitions:
+
+  connection_config: &connection_config
+    username: { get_secret: vsphere_username }
+    password: { get_secret: vsphere_password }
+    host: { get_secret: vsphere_host }
+    port: { get_input: vsphere_port }
+    datacenter_name: { get_secret: vsphere_datacenter_name }
+    resource_pool_name: { get_secret: vsphere_resource_pool_name }
+    auto_placement: { get_secret: vsphere_auto_placement }
+    allow_insecure: { get_input: vsphere_allow_insecure }
+
+node_types:
+
+  k8s-cluster: &k8s-cluster
+    derived_from: cloudify.vsphere.nodes.Server
+    properties:
+      connection_config:
+        default: *connection_config
+      agent_config:
+        default:
+          install_method: none
+          key: { get_attribute: [agent_key, private_key_export] }
+          user: { get_input: agent_user }
+      server:
+        default:
+          template: { get_input: template_name }
+          cpus: { get_input: cpus }
+          memory: { get_input: memory }
+          name: { get_input: server_name }
+      networking:
+        default:
+          domain: { get_input: domain }
+          dns_servers: { get_input: dns_servers }
+          connect_networks:
+            - name: { get_input: network_name }
+              management: true
+              switch_distributed: { get_input: switch_distributed }
+              use_dhcp: { get_input: use_dhcp }
+              network: { get_input: network_cidr }
+              gateway: { get_input: gateway }
+
+  kube-master: *k8s-cluster
+
+  kube-node: *k8s-cluster
+
+node_templates:
+
+  kube-master:
+    type: kube-master
+    properties:
+      server:
+        template: { get_input: template_name }
+        cpus: { get_input: cpus }
+        memory: { get_input: memory }
+        name: { concat: [ 'kube-master-1', { get_input: resource_suffix } ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  kube-node:
+    type: kube-node
+    properties:
+      server:
+        template: { get_input: template_name }
+        cpus: { get_input: cpus }
+        memory: { get_input: memory }
+        name: { concat: [ 'kube-node-1', { get_input: resource_suffix } ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_public_key_material: true
+            store_private_key_material: true
+
+groups:
+
+  kube-master-group:
+    members:
+    - kube-master
+
+  kube-node-group:
+    members:
+    - kube-node
+
+policies:
+
+  kube-master-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-master-group]
+
+  kube-node-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [kube-node-group]
