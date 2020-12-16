@@ -114,7 +114,9 @@ node_templates:
         ip_address_mode: 'DHCP'
     relationships:
       - type: cloudify.relationships.vcloud.nic_connected_to_network
-        target: network
+        target: routed_network
+      - type: cloudify.relationships.contained_in
+        target: kube-master-vapp
 
   kube-master-vapp:
     type: cloudify.nodes.vcloud.VApp
@@ -164,7 +166,9 @@ node_templates:
         ip_address_mode: 'DHCP'
     relationships:
       - type: cloudify.relationships.vcloud.nic_connected_to_network
-        target: network
+        target: routed_network
+      - type: cloudify.relationships.contained_in
+        target: kube-node-vapp
 
   kube-node-vapp:
     type: cloudify.nodes.vcloud.VApp
