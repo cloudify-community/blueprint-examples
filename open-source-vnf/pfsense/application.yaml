@@ -7,7 +7,7 @@ description: >
   FauxAPI is a REST API interface for pfSense (https://github.com/ndejong/pfsense_fauxapi)
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:

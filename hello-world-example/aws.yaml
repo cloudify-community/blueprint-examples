@@ -4,7 +4,7 @@ description: >
   This blueprint installs an application using Cloudify on AWS.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1

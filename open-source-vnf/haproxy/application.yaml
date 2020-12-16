@@ -7,7 +7,7 @@ description: >
   here: resources/haproxy.cfg.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-fabric-plugin
 
 inputs:

@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Install Drupal7 on infrastructure.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - infrastructure--blueprint:public-cloud-vm
   - plugin:cloudify-ansible-plugin
 

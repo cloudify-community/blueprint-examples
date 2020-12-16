@@ -1,8 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://www.cloudify.co/spec/cloudify/4.5/types.yaml
-  - http://www.cloudify.co/spec/utilities-plugin/1.17.0/plugin.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-utilities-plugin
 
 inputs:
 

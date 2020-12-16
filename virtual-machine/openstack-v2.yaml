@@ -4,7 +4,7 @@ description: >
   Create an Example Openstack Network.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=2.14.17,  <=3.0.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
