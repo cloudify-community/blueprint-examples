@@ -31,6 +31,16 @@ commands:
       - attach_workspace:
           at: workspace
       - run:
+          name: Set Python
+          command: |
+            if ! pyenv -v COMMAND &> /dev/null
+            then
+                echo "pyenv could not be found"
+                exit
+            else
+                pyenv global 3.6.5
+            fi
+      - run:
           name: update pip
           command: pip install -U pip
       - run:
