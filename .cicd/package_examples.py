@@ -23,8 +23,8 @@ from ecosystem_cicd_tools.github_stuff import get_most_recent_release
 from ecosystem_cicd_tools.release import blueprint_release_with_latest
 
 from __init__ import (SUPPORTED_EXAMPLES,
-               CWD,
-               get_cloudify_version)
+                      CWD,
+                      get_cloudify_version)
 
 BLUEPRINTS_RELEASE_NAME = 'Cloudify 5.0.5 Blueprint Examples Bundle v{0}'
 GETTING_STARTED = ['getting-started/mc-jboss.yaml',
