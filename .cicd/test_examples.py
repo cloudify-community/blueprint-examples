@@ -24,7 +24,7 @@ from ecosystem_tests.dorkl import (
     prepare_test
 )
 
-from . import (
+from __init__ import (
     blueprint_id_filter,
     get_dirname_and_infra_name,
     blueprint_list,
