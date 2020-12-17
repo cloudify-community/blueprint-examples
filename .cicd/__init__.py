@@ -14,7 +14,10 @@
 # limitations under the License.
 
 import os
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 from collections import OrderedDict
 from json import load as load_json
 from yaml import load as yaml_load, YAMLError
@@ -161,7 +164,7 @@ def get_cloudify_version():
             next_version = import_url.path.split('/')[-2:-1]
             if isinstance(next_version, list):
                 next_version = next_version.pop()
-            if not isinstance(next_version, basestring):
+            if not isinstance(next_version, (bytes, str)):
                 raise VersionsException(
                     'Cloudify version problem: {0}'.format(cloudify_version))
             if cloudify_version and next_version != cloudify_version:
