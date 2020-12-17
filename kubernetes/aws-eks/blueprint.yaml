@@ -41,7 +41,7 @@ inputs:
 
   kubernetes_version:
     type: string
-    default: '1.14'
+    default: ''
 
   service_account_name:
     type: string
