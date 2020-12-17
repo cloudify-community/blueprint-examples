@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import os
-from urlparse import urlparse
+import urllib.parse as urlparse
 from collections import OrderedDict
 from json import load as load_json
 from yaml import load as yaml_load, YAMLError
