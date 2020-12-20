@@ -36,14 +36,16 @@ Parameters:
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
 Mappings:
   RegionMap:
+    ca-central-1:
+      AMI: ami-2e00bf4a
     us-east-1:
-      AMI: ami-03248a0341eadb1f1
+      AMI: ami-841f46ff
     us-west-1:
-      AMI: ami-01dd5a8ef26e6341d
+      AMI: ami-b2527ad2
     us-west-2:
-      AMI: ami-024b56adf74074ca6
+      AMI: ami-718c6909
     eu-west-1:
-      AMI: ami-0eee6eb870dc1cefa
+      AMI: ami-1e749f67
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
@@ -269,4 +271,9 @@ Outputs:
         - !GetAtt
             - ServerInstance
             - PublicIp
+    Description: URL for Server Site
+  IP:
+    Value: !GetAtt
+      - ServerInstance
+      - PublicIp
     Description: URL for Server Site

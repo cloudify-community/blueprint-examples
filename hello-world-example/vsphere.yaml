@@ -1,0 +1,143 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-vsphere-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+  - plugin:cloudify-ansible-plugin
+  - includes/hello-world-ansible.yaml
+
+inputs:
+
+  vsphere_port:
+    type: string
+    default: '443'
+
+  vsphere_allow_insecure:
+    type: string
+    default: true
+
+  use_external_resource:
+    type: boolean
+    default: false
+
+  resource_suffix:
+    type: string
+    default: '1'
+
+  server_name:
+    type: string
+    default: { concat: [ 'example-vm-1', { get_input: resource_suffix } ] }
+
+  template_name:
+    type: string
+    default: ubuntu-14.04.5-server-amd64-tmpl
+
+  cpus:
+    type: string
+    default: 1
+
+  memory:
+    type: string
+    default: 1024
+
+  domain:
+    type: string
+    default: localdom
+
+  dns_servers:
+    type: list
+    default: ['8.8.8.8']
+
+  network_name:
+    type: string
+    default: Internal
+
+  switch_distributed:
+    type: boolean
+    default: false
+
+  use_dhcp:
+    type: boolean
+    default: true
+
+  network_cidr:
+    type: string
+    default: 172.16.168.0/24
+
+  gateway:
+    type: string
+    default: 172.16.168.1
+
+  ip:
+    type: string
+    default: 172.16.168.201
+
+  agent_user:
+    type: string
+    default: ubuntu
+
+  agent_key_name:
+    type: string
+    default: vsphere_key
+
+dsl_definitions:
+
+  connection_config: &connection_config
+    username: { get_secret: vsphere_username }
+    password: { get_secret: vsphere_password }
+    host: { get_secret: vsphere_host }
+    port: { get_input: vsphere_port }
+    datacenter_name: { get_secret: vsphere_datacenter_name }
+    resource_pool_name: { get_secret: vsphere_resource_pool_name }
+    auto_placement: { get_secret: vsphere_auto_placement }
+    allow_insecure: { get_input: vsphere_allow_insecure }
+
+node_templates:
+
+  vm:
+    type: cloudify.vsphere.nodes.Server
+    properties:
+      use_external_resource: { get_input: use_external_resource }
+      connection_config: *connection_config
+      agent_config:
+        install_method: none
+      server:
+        template: { get_input: template_name }
+        cpus: { get_input: cpus }
+        memory: { get_input: memory }
+        name: { get_input: server_name }
+      networking:
+        domain: { get_input: domain }
+        dns_servers: { get_input: dns_servers }
+        connect_networks:
+          - name: { get_input: network_name }
+            management: true
+            switch_distributed: { get_input: switch_distributed }
+            use_dhcp: { get_input: use_dhcp }
+            network: { get_input: network_cidr }
+            gateway: { get_input: gateway }
+            ip: { get_input: ip }
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_public_key_material: true
+            store_private_key_material: true
+
+
+capabilities:
+
+  application_endpoint:
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://', { get_attribute: [ vm, ip ] }, ':80' ] }

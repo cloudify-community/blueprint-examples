@@ -4,11 +4,11 @@ description: >
   This blueprint installs an application using Cloudify on GCP.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
-  - includes/ansible.yaml
+  - includes/hello-world-ansible.yaml
 
 inputs:
 

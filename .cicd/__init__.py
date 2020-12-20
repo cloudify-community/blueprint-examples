@@ -14,7 +14,10 @@
 # limitations under the License.
 
 import os
-from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 from collections import OrderedDict
 from json import load as load_json
 from yaml import load as yaml_load, YAMLError
@@ -29,6 +32,7 @@ UT_VERSION = '1.21.0'
 TF_VERSION = '0.14.1'
 DK_VERSION = '2.0.1'
 AN_VERSION = '2.10.0'
+VC_VERSION = '2.0.0'
 
 TF_WAGON = 'https://github.com/cloudify-cosmo/cloudify-terraform-plugin/' \
            'releases/download/{v}/cloudify_terraform_plugin-{v}-centos' \
@@ -44,7 +48,7 @@ OS_PLUGIN = 'https://github.com/cloudify-cosmo/' \
 UT_WAGON = 'http://repository.cloudifysource.org/cloudify/wagons/' \
            'cloudify-utilities-plugin/{v}/cloudify_utilities_plugin' \
            '-{v}-py27-none-linux_x86_64-centos-Core.wgn'.format(v=UT_VERSION)
-UT_PLUGIN = 'http://www.getcloudify.org/spec/utilities-plugin/' \
+UT_PLUGIN = 'http://www.cloudify.co/spec/utilities-plugin/' \
             '{v}/plugin.yaml'.format(v=UT_VERSION)
 DK_WAGON = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
            'releases/download/{v}/cloudify_docker_plugin-{v}-py27-none-' \
@@ -56,9 +60,17 @@ AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
            '-py27.py36-none-linux_x86_64.wgn'.format(v=AN_VERSION)
 AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
             'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
+VC_WAGON = 'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/' \
+           'cloudify/wagons/cloudify-vcloud-plugin/{0}/' \
+           'cloudify_vcloud_plugin-{0}-' \
+           'py36-none-linux_x86_64.wgn'.format(VC_VERSION)
+VC_PLUGIN = 'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/' \
+            'cloudify/wagons/cloudify-vcloud-plugin/{0}/' \
+            'plugin.yaml'.format(VC_VERSION)
 
 PLUGINS_TO_UPLOAD = [(OS_WAGON, OS_PLUGIN),
-                     (DK_WAGON, DK_PLUGIN)]
+                     (DK_WAGON, DK_PLUGIN),
+                     (VC_WAGON, VC_PLUGIN)]
 
 SECRETS_TO_CREATE = {
     'aws_access_key_id': False,
@@ -96,7 +108,14 @@ SECRETS_TO_CREATE = {
     'vsphere_auto_placement': False,
     'vsphere_centos_template': False,
     'vsphere_private_key': True,
-    'vsphere_public_key': True
+    'vsphere_public_key': True,
+    'vcloud_user': False,
+    'vcloud_password': False,
+    'vcloud_org': False,
+    'vcloud_uri': False,
+    'vcloud_vdc': False,
+    'vcloud_gateway': False,
+
 }
 
 
@@ -145,7 +164,7 @@ def get_cloudify_version():
             next_version = import_url.path.split('/')[-2:-1]
             if isinstance(next_version, list):
                 next_version = next_version.pop()
-            if not isinstance(next_version, basestring):
+            if not isinstance(next_version, (bytes, str)):
                 raise VersionsException(
                     'Cloudify version problem: {0}'.format(cloudify_version))
             if cloudify_version and next_version != cloudify_version:

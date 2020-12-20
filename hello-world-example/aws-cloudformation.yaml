@@ -4,9 +4,11 @@ description: >
   This blueprint installs an application using Cloudify on AWS.
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/5.0.5/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
+  - plugin:cloudify-ansible-plugin
+  - includes/hello-world-ansible.yaml
 
 inputs:
 
@@ -24,7 +26,7 @@ inputs:
 
   availability_zone:
     type: string
-    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
+    default: { concat: [ { get_input: aws_region_name }, 'e' ] }
 
   vpc_cidr:
     type: string
@@ -44,6 +46,12 @@ inputs:
   agent_key_name:
     type: string
     default: agent_key
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'centos'
 
 dsl_definitions:
 
@@ -65,7 +73,7 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: agent_key
 
-  hello_world_stack:
+  vm:
     type: cloudify.nodes.aws.CloudFormation.Stack
     properties:
       client_config: *client_config
@@ -85,6 +93,11 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: hello_world_keypair
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        poststart:
+          executor: central_deployment_agent
+          implementation: scripts/cloudformation/expose_ip.py
 
   agent_key:
       type: cloudify.keys.nodes.RSAKey
@@ -105,4 +118,4 @@ outputs:
 
   application_endpoint:
     description: The external endpoint of the application.
-    value: { get_attribute: [ hello_world_stack, Outputs, 0, OutputValue ] }
+    value: { get_attribute: [ vm, Outputs, 0, OutputValue ] }

@@ -3,7 +3,7 @@ description: >
     Starts webserver process on VM.
 
 imports:
-  - http://cloudify.co/spec/cloudify/5.0.5/types.yaml
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:
