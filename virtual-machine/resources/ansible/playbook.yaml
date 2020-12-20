@@ -5,7 +5,7 @@
     count: 1
  
   tasks:
-  
+
     - name: Create VPC
       ec2_vpc_net:
         name: "{{ vpc_name }}"
@@ -138,7 +138,7 @@
         wait: true
         user_data: "{{ ec2_instance_user_data }}"
         count: "{{count}}"
-        network_interfaces: 
+        network_interfaces:
           - "{{ eni_id }}"
         instance_tags:
           Name: Cloudify_virtual_machine_example_instance
@@ -146,7 +146,7 @@
 
     - name: "Set fact: output dictionary"
       set_fact:
-        output_dict: 
+        output_dict:
           public_ip:  "{{ public_ip }}"
           ec2_instance_ids: "{{ ec2.instance_ids}}"
           vpc_id: "{{ vpc_id }}"
@@ -157,11 +157,11 @@
           eni_id: "{{ eni_id }}"
           route_table_id: "{{route_table_id}}"
 
-    - name: Create /tmp/virtual-machine-example-vars.json  
+    - name: Create /tmp/virtual-machine-example-vars.json
       file:
         name: '/tmp/virtual-machine-example-vars.json'
         state: touch
-    
+
     - name: Write variables to /tmp/virtual-machine-example-vars.json
       copy:
         content: "{{ output_dict | to_nice_json }}"

@@ -2,6 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
   This blueprint creates an AWS infrastructure environment using Ansible.
+  libselinux-python/libselinux-python3 on the manager VM is prerequisite.
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
@@ -64,6 +65,7 @@ node_templates:
       extra_packages: &extra_packages
         - boto3==1.16.26
         - boto==2.49.0
+        - selinux
     relationships:
       - type: cloudify.relationships.depends_on
         target: cloud_init
