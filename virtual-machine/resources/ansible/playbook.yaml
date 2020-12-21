@@ -156,6 +156,11 @@
           Name: "{{ vm_name }}"
       register: ec2
 
+    - name: Sleep 90 seconds for initializing the vm.
+      wait_for:
+        timeout: 90
+      delegate_to: localhost
+
     - name: "Set fact: output dictionary"
       set_fact:
         output_dict:
