@@ -43,13 +43,16 @@ inputs:
     type: string
     default: agent_key
 
+  resource_suffix:
+    default: '0'
+
 node_templates:
 
   install-infra-playbook:
     type: cloudify.nodes.ansible.Executor
     properties:
       playbook_path: resources/ansible/playbook.yaml
-      start_at_task: "Create VPC"
+      start_at_task: "Check if vpc exists"
       sources: resources/ansible/inventory.yaml
       ansible_become: true
       run_data:
@@ -58,6 +61,7 @@ node_templates:
         ami_name_filter: { get_input: ami_name_filter }
         ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
         availability_zone: { get_input: availability_zone }
+        resource_suffix: { get_input: resource_suffix }
       ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
