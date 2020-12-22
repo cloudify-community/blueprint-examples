@@ -2,6 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
   This blueprint creates an AWS infrastructure environment using Ansible.
+  libselinux-python/libselinux-python3 on the manager VM is prerequisite.
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
@@ -42,13 +43,16 @@ inputs:
     type: string
     default: agent_key
 
+  resource_suffix:
+    default: '0'
+
 node_templates:
 
   install-infra-playbook:
     type: cloudify.nodes.ansible.Executor
     properties:
       playbook_path: resources/ansible/playbook.yaml
-      start_at_task: "Create VPC"
+      start_at_task: "Check if vpc exists"
       sources: resources/ansible/inventory.yaml
       ansible_become: true
       run_data:
@@ -57,10 +61,15 @@ node_templates:
         ami_name_filter: { get_input: ami_name_filter }
         ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
         availability_zone: { get_input: availability_zone }
+        resource_suffix: { get_input: resource_suffix }
       ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
-        AWS_REGION: { get_input: aws_region_name} 
+        AWS_REGION: { get_input: aws_region_name}
+      extra_packages: &extra_packages
+        - boto3==1.16.26
+        - boto==2.49.0
+        - selinux
     relationships:
       - type: cloudify.relationships.depends_on
         target: cloud_init
@@ -86,6 +95,7 @@ node_templates:
               vpc_id: { get_attribute: [aws_infra_info, vpc_id] }
               vpc_name:  { get_attribute: [aws_infra_info, vpc_name] }
             ansible_env_vars: *env_vars
+            extra_packages: *extra_packages
     relationships:
       - type: cloudify.relationships.depends_on
         target: aws_infra_info
