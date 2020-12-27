@@ -617,6 +617,9 @@ node_templates:
         target: new_role_binding
       - type: cloudify.relationships.depends_on
         target: new_service_account
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        delete: {}
 
   store_token_and_kubeconfig:
     type: cloudify.nodes.Root
