@@ -5,7 +5,7 @@ description: >
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-terraform-plugin
+  - plugin:cloudify-terraform-plugin?version= >=0.15.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
@@ -37,7 +37,8 @@ node_templates:
     type: cloudify.nodes.terraform.Module
     properties:
       resource_config:
-        source: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
+        source:
+          location: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
         source_path: virtual-machine/resources/terraform/template
         variables:
           access_key: { get_secret: aws_access_key_id }

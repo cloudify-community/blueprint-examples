@@ -29,7 +29,7 @@ SUPPORTED_EXAMPLES_FILE = os.path.join(CWD, '.cicd/supported_examples.json')
 
 OS_VERSION = '3.2.15'
 UT_VERSION = '1.21.0'
-TF_VERSION = '0.14.1'
+TF_VERSION = '0.15.0'
 DK_VERSION = '2.0.1'
 AN_VERSION = '2.10.0'
 VC_VERSION = '2.0.0'
