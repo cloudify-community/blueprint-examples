@@ -1,3 +1,3 @@
 #!/bin/bash -e
-rm -f ~/index.html
+rm -f /tmp/index.html
 
