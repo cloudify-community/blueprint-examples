@@ -42,7 +42,7 @@ commands:
             fi
       - run:
           name: update pip
-          command: pip install -U pip
+          command: pip install -U pip===20.3.3
       - run:
           name: install cloudify
           command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
@@ -79,7 +79,7 @@ commands:
           at: workspace
       - run:
           name: update pip
-          command: pip install -U pip
+          command: pip install -U pip===20.3.3
       - run:
           name: install cloudify
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
@@ -116,7 +116,7 @@ commands:
           at: workspace
       - run:
           name: update pip
-          command: pip install -U pip
+          command: pip install -U pip===20.3.3
       - run:
           name: install cloudify
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
@@ -153,7 +153,7 @@ commands:
           at: workspace
       - run:
           name: update pip
-          command: pip install -U pip
+          command: pip install -U pip===20.3.3
       - run:
           name: install cloudify
           command: pip install -U cloudify==5.1 pytest==4.6.3
