@@ -23,3 +23,10 @@ node_templates:
         delete: 
           implementation: uninstall.py
           executor: central_deployment_agent
+
+
+outputs:
+
+  application_endpoint:
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://', { get_attribute: [ http_web_server, ip ] }, ':', { get_input: webserver_port } ] }
