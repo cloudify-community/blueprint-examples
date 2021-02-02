@@ -32,7 +32,7 @@ def run_server():
         webserver_cmd.insert(0, 'nohup')
 
     # The ctx object provides a built in logger.
-    ctx.logger.info('Running WebServer locally on port: {0}'.format(PORT))
+    ctx.logger.info('Running WebServer locally on port: %s', PORT)
     # emulating /dev/null
     with open(os.devnull, 'wb') as dn:
         process = subprocess.Popen(webserver_cmd, stdout=dn, stderr=dn)
@@ -40,7 +40,7 @@ def run_server():
 
 
 def set_pid(pid):
-    ctx.logger.info('Setting `pid` runtime property: {0}'.format(pid))
+    ctx.logger.info('Setting `pid` runtime property: %s', pid)
     # We can set runtime information in our context object which
     # can later be read somewhere in the context of the instance.
     # For instance, we want to save the `pid` here so that when we
@@ -50,11 +50,11 @@ def set_pid(pid):
 
 def get_host_ip():
     host_ip = _find_ip()
-    ctx.logger.info('The application_endpoint is '
-                    '{0}'.format(URL.format(ip=host_ip, port=PORT)))
+    ctx.logger.info('The application endpoint is %s',
+                    URL.format(ip=host_ip, port=PORT))
     if host_ip == DEFAULT_IP:
-        ctx.logger.info('Please replace {0} with the host IP as you know '
-                        'it'.format(DEFAULT_IP))
+        ctx.logger.info(
+            'Please replace %s with the host IP as you know it', DEFAULT_IP)
     ctx.instance.runtime_properties['ip'] = host_ip
 
 
