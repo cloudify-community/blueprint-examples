@@ -3,6 +3,8 @@
 import os
 import sys
 import subprocess
+from requests import get
+from urllib.request import urlopen
 
 # Import Cloudify's context object.
 # This provides several useful functions as well as allowing to pass
@@ -15,6 +17,8 @@ IS_WIN = os.name == 'nt'
 # Get the port from the blueprint. We're running this script in the context of
 # the `http_web_server` node so we can read its `port` property.
 PORT = ctx.node.properties['port']
+DEFAULT_IP = '<manager-ip>'
+URL = 'http://{ip}:{port}'
 
 
 def run_server():
@@ -44,5 +48,38 @@ def set_pid(pid):
     ctx.instance.runtime_properties['pid'] = pid
 
 
+def get_host_ip():
+    host_ip = _find_ip()
+    ctx.logger.info('The application endpoint is '
+                    '{0}'.format(URL.format(ip=host_ip, port=PORT)))
+    if host_ip == DEFAULT_IP:
+        ctx.logger.info('Please replace {0} with the host IP as you know '
+                        'it'.format(DEFAULT_IP))
+    ctx.instance.runtime_properties['ip'] = host_ip
+
+
+def _find_ip():
+    ctx.logger.info('Trying to find the host IP')
+    try:
+        if _is_inside_docker():
+            raw_ip = subprocess.check_output(['hostname', '-i'])
+            ip = raw_ip.decode('utf-8').rstrip()
+        else:
+            ip = get('https://api.ipify.org').text
+            url = URL.format(ip=ip, port=PORT)
+            urlopen(url, timeout=1)  # Trying to open a connection to the URL
+        return ip
+    except Exception:
+        ctx.logger.info('Could not find the host IP.')
+        return DEFAULT_IP
+
+
+def _is_inside_docker():
+    """ Check whether running inside a docker container"""
+    with open('/proc/1/cgroup', 'rt') as f:
+        return 'docker' in f.read()
+
+
 pid = run_server()
 set_pid(pid)
+get_host_ip()
