@@ -77,7 +77,7 @@ node_templates:
         target: cloud_init
 
   # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
-  # execute ansible.cloudify_ansible.tasks.run task in order to do so.
+  # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
   uninstall-infra-playbook:
     type: cloudify.nodes.Root
     interfaces:
