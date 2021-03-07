@@ -98,7 +98,7 @@ def openshift_test(request):
 
 def test_blueprint_validation():
     """All blueprints must pass DSL validation."""
-    assert test_validate_blueprints is None
+    assert test_validate_blueprints() is None
 
 
 def test_versions():
