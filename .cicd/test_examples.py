@@ -17,12 +17,15 @@
 import os
 import pytest
 
+from ecosystem_cicd_tools.github_stuff import (
+    find_changed_files_in_branch_pr_or_master)
+
 from ecosystem_tests.dorkl import (
+    prepare_test,
     blueprints_upload,
-    basic_blueprint_test,
     cleanup_on_failure,
-    prepare_test
-)
+    blueprint_validate,
+    basic_blueprint_test)
 
 from __init__ import (
     blueprint_id_filter,
@@ -44,12 +47,14 @@ virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
 getting_started_list = [b for b in blueprint_list if 'getting-started' in b]
 openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 
+changed_files = find_changed_files_in_branch_pr_or_master()
 
-@pytest.fixture(scope='function', params=blueprint_list)
-def upload_blueprints_for_validation(request):
-    category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
-    if category in request.param:
-        blueprints_upload(request.param, blueprint_id_filter(request.param))
+
+def test_validate_blueprints():
+    blueprints_to_validate = [blueprint for blueprint in blueprint_list if
+                              blueprint.endswith(tuple(changed_files))]
+    for blueprint in blueprints_to_validate:
+        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
@@ -85,9 +90,9 @@ def openshift_test(request):
         raise
 
 
-def test_blueprint_validation(upload_blueprints_for_validation):
+def test_blueprint_validation():
     """All blueprints must pass DSL validation."""
-    assert upload_blueprints_for_validation is None
+    assert test_validate_blueprints() is None
 
 
 def test_versions():

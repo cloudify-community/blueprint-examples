@@ -241,7 +241,6 @@ node_templates:
           inputs:
             store_private_key_material: true
 
-
 capabilities:
 
   endpoint:
