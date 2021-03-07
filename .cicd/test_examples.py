@@ -49,12 +49,16 @@ openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 
 changed_files = find_changed_files_in_branch_pr_or_master()
 
-@pytest.fixture(scope='function', params=blueprint_list)
-def upload_blueprints_for_validation(request):
+
+# @pytest.fixture(scope='function', params=blueprint_list)
+def test_validate_blueprints(request):
+    blueprints_to_validate = [blueprint for blueprint in blueprint_list if
+                              blueprint.endswith(tuple(changed_files))]
     # category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
     # if category in request.param:
     print("changed_files: {}".format(changed_files))
     print ("blueprint_list {}".format(blueprint_list))
+    print ("blueprints_to_validate {}".format(blueprints_to_validate))
         # if request.param.
         # blueprint_validate(request.param, blueprint_id_filter(request.param))
 
@@ -92,9 +96,9 @@ def openshift_test(request):
         raise
 
 
-def test_blueprint_validation(upload_blueprints_for_validation):
+def test_blueprint_validation(test_validate_blueprints):
     """All blueprints must pass DSL validation."""
-    assert upload_blueprints_for_validation is None
+    assert test_validate_blueprints is None
 
 
 def test_versions():
