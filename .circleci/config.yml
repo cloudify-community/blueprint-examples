@@ -386,56 +386,56 @@ workflows:
       - getting-started-blueprint-validation
       - db-lb-app-blueprint-validation
       - docker-blueprint-validation
-      - getting-started-aws:
-          requires:
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-terraform:
-          requires:
-            - getting-started-aws
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-cloudformation:
-          requires:
-            - getting-started-aws-terraform
-          filters:
-            branches:
-              only: master
-      - getting-started-azure:
-          requires:
-            - getting-started-gcp
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-azure-arm:
-          requires:
-            - getting-started-azure
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-gcp:
-          requires:
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-ansible:
-          requires:
-            - virtual-machine-blueprint-validation
-            - getting-started-blueprint-validation
-            - getting-started-aws-cloudformation
-          filters:
-            branches:
-              only: master
+#      - getting-started-aws:
+#          requires:
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-terraform:
+#          requires:
+#            - getting-started-aws
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-cloudformation:
+#          requires:
+#            - getting-started-aws-terraform
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-azure:
+#          requires:
+#            - getting-started-gcp
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-azure-arm:
+#          requires:
+#            - getting-started-azure
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-gcp:
+#          requires:
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-ansible:
+#          requires:
+#            - virtual-machine-blueprint-validation
+#            - getting-started-blueprint-validation
+#            - getting-started-aws-cloudformation
+#          filters:
+#            branches:
+#              only: master
 #      - openshift:
 #          requires:
 #            - kubernetes-blueprint-validation

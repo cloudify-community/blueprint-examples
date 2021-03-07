@@ -17,12 +17,15 @@
 import os
 import pytest
 
+from ecosystem_cicd_tools.github_stuff import (
+    find_changed_files_in_branch_pr_or_master)
+
 from ecosystem_tests.dorkl import (
+    prepare_test,
     blueprints_upload,
-    basic_blueprint_test,
     cleanup_on_failure,
-    prepare_test
-)
+    blueprint_validate,
+    basic_blueprint_test)
 
 from __init__ import (
     blueprint_id_filter,
@@ -44,12 +47,16 @@ virtual_machine_list = [b for b in blueprint_list if 'virtual-machine'
 getting_started_list = [b for b in blueprint_list if 'getting-started' in b]
 openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 
+changed_files = find_changed_files_in_branch_pr_or_master()
 
 @pytest.fixture(scope='function', params=blueprint_list)
 def upload_blueprints_for_validation(request):
-    category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
-    if category in request.param:
-        blueprints_upload(request.param, blueprint_id_filter(request.param))
+    # category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
+    # if category in request.param:
+    print("changed_files: {}".format(changed_files))
+    print ("blueprint_list {}".format(blueprint_list))
+        # if request.param.
+        # blueprint_validate(request.param, blueprint_id_filter(request.param))
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
