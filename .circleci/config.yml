@@ -66,7 +66,7 @@ commands:
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+          command: pip install git+https://github.com/cloudify-incubator/cloudify-ecosystem-test.git@RD-1464-validate-blueprints-changes-a --user
       - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
 
   test_openshift:
@@ -103,7 +103,7 @@ commands:
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
-          command: pip install git+https://github.com/cloudify-incubator/cloudify-ecosystem-test.git@RD-1464-validate-blueprints-changes-a --user
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
 
   test_examples:
