@@ -103,7 +103,7 @@ commands:
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+          command: pip install git+https://github.com/cloudify-incubator/cloudify-ecosystem-test.git@RD-1464-validate-blueprints-changes-a --user
       - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
 
   test_examples:
@@ -461,13 +461,13 @@ workflows:
             - infoblox-blueprint-validation
             - db-lb-app-blueprint-validation
             - docker-blueprint-validation
-            - getting-started-aws
-            - getting-started-aws-cloudformation
-            - getting-started-aws-terraform
-            - getting-started-azure
-            - getting-started-azure-arm
-            - getting-started-gcp
-            - getting-started-ansible
+#            - getting-started-aws
+#            - getting-started-aws-cloudformation
+#            - getting-started-aws-terraform
+#            - getting-started-azure
+#            - getting-started-azure-arm
+#            - getting-started-gcp
+#            - getting-started-ansible
             # - openshift
 #            - getting-started-openstack
           filters:
