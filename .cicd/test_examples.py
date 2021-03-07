@@ -53,9 +53,6 @@ changed_files = find_changed_files_in_branch_pr_or_master()
 def test_validate_blueprints():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list if
                               blueprint.endswith(tuple(changed_files))]
-    print("changed_files: {}".format(changed_files))
-    print("blueprint_list {}".format(blueprint_list))
-    print("blueprints_to_validate {}".format(blueprints_to_validate))
     for blueprint in blueprints_to_validate:
         blueprint_validate(blueprint, blueprint_id_filter(blueprint))
 
