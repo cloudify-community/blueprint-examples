@@ -51,7 +51,7 @@ changed_files = find_changed_files_in_branch_pr_or_master()
 
 
 # @pytest.fixture(scope='function', params=blueprint_list)
-def test_validate_blueprints(request):
+def test_validate_blueprints():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list if
                               blueprint.endswith(tuple(changed_files))]
     # category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
@@ -96,7 +96,7 @@ def openshift_test(request):
         raise
 
 
-def test_blueprint_validation(test_validate_blueprints):
+def test_blueprint_validation():
     """All blueprints must pass DSL validation."""
     assert test_validate_blueprints is None
 
