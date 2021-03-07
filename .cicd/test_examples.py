@@ -50,17 +50,14 @@ openshift_list = ['kubernetes/plugin-examples/openshift/blueprint.yaml']
 changed_files = find_changed_files_in_branch_pr_or_master()
 
 
-# @pytest.fixture(scope='function', params=blueprint_list)
 def test_validate_blueprints():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list if
                               blueprint.endswith(tuple(changed_files))]
-    # category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
-    # if category in request.param:
     print("changed_files: {}".format(changed_files))
     print("blueprint_list {}".format(blueprint_list))
     print("blueprints_to_validate {}".format(blueprints_to_validate))
-        # if request.param.
-        # blueprint_validate(request.param, blueprint_id_filter(request.param))
+    for blueprint in blueprints_to_validate:
+        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
