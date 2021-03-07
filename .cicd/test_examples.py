@@ -57,8 +57,8 @@ def test_validate_blueprints():
     # category = os.environ.get('VALIDATION_TEST_CATEGORY', '')
     # if category in request.param:
     print("changed_files: {}".format(changed_files))
-    print ("blueprint_list {}".format(blueprint_list))
-    print ("blueprints_to_validate {}".format(blueprints_to_validate))
+    print("blueprint_list {}".format(blueprint_list))
+    print("blueprints_to_validate {}".format(blueprints_to_validate))
         # if request.param.
         # blueprint_validate(request.param, blueprint_id_filter(request.param))
 
