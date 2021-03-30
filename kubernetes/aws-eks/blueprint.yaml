@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-aws-plugin?version= >=2.3.1
-  - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
+  - plugin:cloudify-kubernetes-plugin?version= >=2.11.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
@@ -565,7 +565,7 @@ node_templates:
       client_config:
         configuration: *kubernetes_master_configuration
       definition:
-        apiVersion: rbac.authorization.k8s.io/v1beta1
+        apiVersion: rbac.authorization.k8s.io/v1
         kind: ClusterRoleBinding
         metadata:
           name: { get_input: service_account_name }
