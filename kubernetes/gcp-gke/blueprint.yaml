@@ -6,7 +6,7 @@ description: >
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
-  - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
+  - plugin:cloudify-kubernetes-plugin?version= >=2.11.0
 
 inputs:
   gcp_credentials:
@@ -63,6 +63,25 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster
 
+  system_user_sanity_permissions:
+    type: cloudify.kubernetes.resources.FileDefinedResource
+    properties:
+      client_config:
+        authentication:
+          gcp_service_account: { get_input: gcp_credentials }
+        configuration:
+          api_options:
+            host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+            verify_ssl: false
+            debug: false
+      file:
+        resource_path: resources/permissions.yaml
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster-attributes
+      - type: cloudify.relationships.depends_on
+        target: kubernetes-cluster-node-pool
+
   sanity_pod:
     type: cloudify.kubernetes.resources.FileDefinedResource
     properties:
@@ -82,6 +101,8 @@ node_templates:
         target: kubernetes-cluster-attributes
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster-node-pool
+      - type: cloudify.relationships.depends_on
+        target: system_user_sanity_permissions
     interfaces:
       cloudify.interfaces.lifecycle:
         precreate: {}
