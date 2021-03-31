@@ -160,7 +160,7 @@ node_templates:
       client_config:
         configuration: *kubernetes_master_configuration
       definition:
-        apiVersion: rbac.authorization.k8s.io/v1beta1
+        apiVersion: rbac.authorization.k8s.io/v1
         kind: ClusterRoleBinding
         metadata:
           name: { get_input: service_account_name }
