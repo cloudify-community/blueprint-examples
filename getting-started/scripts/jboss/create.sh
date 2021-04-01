@@ -1,4 +1,9 @@
 #!/bin/bash -e
+
+if test -f /etc/yum.repos.d/google-cloud.repo; then
+    sudo sed -i "/enabled=1/c\enabled=0" /etc/yum.repos.d/google-cloud.repo
+fi
+
 sudo yum -y install java-1.8.0-openjdk-devel
 
 sudo groupadd -r wildfly
