@@ -49,12 +49,6 @@ commands:
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
-#      - run:
-#          name: load docker image
-#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-#      - run:
-#          name: retain space by dumping the tar
-#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
@@ -68,6 +62,47 @@ commands:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
+
+  validate_examples_nightlies:
+    steps:
+      - run:
+          name: "Pull Submodules"
+          command: |
+            git submodule update --init --recursive
+      - attach_workspace:
+          at: workspace
+      - run:
+          name: Set Python
+          command: |
+            if ! pyenv -v COMMAND &> /dev/null
+            then
+                echo "pyenv could not be found"
+                exit
+            else
+                pyenv global 3.6.5
+            fi
+      - run:
+          name: update pip
+          command: pip install -U pip===20.3.3
+      - run:
+          name: install cloudify
+          command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
+      - run:
+          name: download manager docker image
+          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+      - run:
+          name: show images
+          command: docker images
+      - run:
+          name: start docker container
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+      - run:
+          name: wait for starter
+          command: docker exec -it cfy_manager cfy_manager wait-for-starter
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+      - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation_nightlies or test_versions'
 
   test_openshift:
     steps:
@@ -86,12 +121,6 @@ commands:
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
-#      - run:
-#          name: load docker image
-#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-#      - run:
-#          name: retain space by dumping the tar
-#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
@@ -123,12 +152,6 @@ commands:
       - run:
           name: download manager docker image
           command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
-#      - run:
-#          name: load docker image
-#          command: docker load -i cloudify-manager-aio-docker-5.1.0.dev1.tar
-#      - run:
-#          name: retain space by dumping the tar
-#          command: rm cloudify-manager-aio-docker-5.1.0.dev1.tar
       - run:
           name: show images
           command: docker images
@@ -310,19 +333,6 @@ workflows:
           filters:
             branches:
               only: master
-#      - openshift:
-#          requires:
-#            - kubernetes-blueprint-validation
-#          filters:
-#            branches:
-#              only: master
-#      - getting-started-openstack:
-#          requires:
-#            - virtual-machine-blueprint-validation
-#            - getting-started-blueprint-validation
-#          filters:
-#            branches:
-#              only: master
       - release:
           requires:
             - blueprints-validation
@@ -333,8 +343,6 @@ workflows:
             - getting-started-azure-arm
             - getting-started-gcp
             - getting-started-ansible
-            # - openshift
-#            - getting-started-openstack
           filters:
             branches:
               only: master
@@ -347,10 +355,10 @@ workflows:
             only:
               - master
     jobs:
-      - blueprints-validation
+      - validate_examples_nightlies
       - getting-started-aws:
           requires:
-            - blueprints-validation
+            - validate_examples_nightlies
           filters:
             branches:
               only: master
@@ -368,39 +376,26 @@ workflows:
               only: master
       - getting-started-azure:
           requires:
-            - blueprints-validation
+            - validate_examples_nightlies
           filters:
             branches:
               only: master
       - getting-started-azure-arm:
           requires:
             - getting-started-azure
-            - blueprints-validation
+            - validate_examples_nightlies
           filters:
             branches:
               only: master
       - getting-started-gcp:
           requires:
-            - blueprints-validation
+            - validate_examples_nightlies
           filters:
             branches:
               only: master
       - getting-started-ansible:
           requires:
-            - blueprints-validation
+            - validate_examples_nightlies
           filters:
             branches:
               only: master
-#      - openshift:
-#          requires:
-#            - kubernetes-blueprint-validation
-#          filters:
-#            branches:
-#              only: master
-#      - getting-started-openstack:
-#          requires:
-#            - virtual-machine-blueprint-validation
-#            - getting-started-blueprint-validation
-#          filters:
-#            branches:
-#              only: master

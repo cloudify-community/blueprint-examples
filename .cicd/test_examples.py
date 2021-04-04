@@ -57,6 +57,12 @@ def test_validate_blueprints():
         blueprint_validate(blueprint, blueprint_id_filter(blueprint))
 
 
+def test_validate_blueprints_nightlies():
+    blueprints_to_validate = [blueprint for blueprint in blueprint_list]
+    for blueprint in blueprints_to_validate:
+        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
+
+
 @pytest.fixture(scope='function', params=virtual_machine_list)
 def basic_blueprint_test_with_getting_started_filter(request):
     _, infra_name = get_dirname_and_infra_name(request.param)
@@ -93,6 +99,11 @@ def openshift_test(request):
 def test_blueprint_validation():
     """All blueprints must pass DSL validation."""
     assert test_validate_blueprints() is None
+
+
+def test_blueprint_validation_nightlies():
+    """All blueprints must pass DSL validation."""
+    assert test_validate_blueprints_nightlies() is None
 
 
 def test_versions():
