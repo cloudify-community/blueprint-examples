@@ -195,6 +195,14 @@ jobs:
       - checkout
       - validate_examples
 
+  blueprints-validation-nightlies:
+    executor: cloudify-machine
+    environment:
+      CLOUDIFY_SSL_TRUST_ALL: true
+    steps:
+      - checkout
+      - validate_examples_nightlies
+
   getting-started-aws:
     executor: cloudify-machine
     environment:
@@ -355,10 +363,10 @@ workflows:
             only:
               - master
     jobs:
-      - validate_examples_nightlies
+      - blueprints-validation-nightlies
       - getting-started-aws:
           requires:
-            - validate_examples_nightlies
+            - blueprints-validation-nightlies
           filters:
             branches:
               only: master
@@ -374,28 +382,27 @@ workflows:
           filters:
             branches:
               only: master
+      - getting-started-ansible:
+          requires:
+            - getting-started-aws-cloudformation
+          filters:
+            branches:
+              only: master
       - getting-started-azure:
           requires:
-            - validate_examples_nightlies
+            - blueprints-validation-nightlies
           filters:
             branches:
               only: master
       - getting-started-azure-arm:
           requires:
             - getting-started-azure
-            - validate_examples_nightlies
           filters:
             branches:
               only: master
       - getting-started-gcp:
           requires:
-            - validate_examples_nightlies
-          filters:
-            branches:
-              only: master
-      - getting-started-ansible:
-          requires:
-            - validate_examples_nightlies
+            - blueprints-validation-nightlies
           filters:
             branches:
               only: master
