@@ -187,13 +187,11 @@ def blueprint_id_filter(blueprint_path):
     # will be the reference.
     # TODO: Add to supported examples.json desired blueprint name.
     dirname_param, infra_name = get_dirname_and_infra_name(blueprint_path)
-    if dirname_param == 'infrastructure' and infra_name == 'azure' or infra_name == 'gcp':
+    if dirname_param == 'infrastructure' and (infra_name == 'azure' or infra_name == 'gcp'):
         return dirname_param
     elif dirname_param == 'infrastructure' and infra_name == 'aws':
         return 'public-cloud-vm'
     elif dirname_param == 'infrastructure' and infra_name == 'openstack':
-        return 'private-cloud-vm'
-    elif dirname_param == 'infrastructure' and infra_name == 'gcp':
         return 'private-cloud-vm'
     else:
         return '{0}-{1}'.format(

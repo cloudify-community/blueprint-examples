@@ -54,13 +54,13 @@ def test_validate_blueprints():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list if
                               blueprint.endswith(tuple(changed_files))]
     for blueprint in blueprints_to_validate:
-        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
+        blueprint_validate(blueprint, blueprint_id_filter(blueprint), skip_delete=True)
 
 
 def test_validate_blueprints_nightlies():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list]
     for blueprint in blueprints_to_validate:
-        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
+        blueprint_validate(blueprint, blueprint_id_filter(blueprint), skip_delete=True)
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
