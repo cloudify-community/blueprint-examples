@@ -54,7 +54,21 @@ def test_validate_blueprints():
     blueprints_to_validate = [blueprint for blueprint in blueprint_list if
                               blueprint.endswith(tuple(changed_files))]
     for blueprint in blueprints_to_validate:
-        blueprint_validate(blueprint, blueprint_id_filter(blueprint))
+        blueprint_validate(
+            blueprint,
+            blueprint_id_filter(blueprint),
+            skip_delete=True,
+            skip_duplicate=True)
+
+
+def test_validate_blueprints_nightlies():
+    blueprints_to_validate = [blueprint for blueprint in blueprint_list]
+    for blueprint in blueprints_to_validate:
+        blueprint_validate(
+            blueprint,
+            blueprint_id_filter(blueprint),
+            skip_delete=True,
+            skip_duplicate=True)
 
 
 @pytest.fixture(scope='function', params=virtual_machine_list)
@@ -93,6 +107,11 @@ def openshift_test(request):
 def test_blueprint_validation():
     """All blueprints must pass DSL validation."""
     assert test_validate_blueprints() is None
+
+
+def test_blueprint_validation_nightlies():
+    """All blueprints must pass DSL validation."""
+    assert test_validate_blueprints_nightlies() is None
 
 
 def test_versions():
