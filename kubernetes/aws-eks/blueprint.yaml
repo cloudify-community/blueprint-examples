@@ -157,7 +157,10 @@ node_templates:
       client_config: *client_config
       Tags:
         - Key: Name
-          Value: VPC
+          Value:
+            concat:
+              - 'vpc-'
+              - { get_input: eks_cluster_name }
         - Key:
             concat:
               - kubernetes.io/cluster/
