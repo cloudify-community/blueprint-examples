@@ -585,6 +585,8 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: kubernetes_master
+      - type: cloudify.relationships.depends_on
+        target: new_service_account
 
   secret:
     type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
