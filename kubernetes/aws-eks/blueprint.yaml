@@ -2,7 +2,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-aws-plugin?version= >=2.3.1
+  - plugin:cloudify-aws-plugin?version= >=2.9.0
   - plugin:cloudify-kubernetes-plugin?version= >=2.11.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
@@ -544,6 +544,8 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: eks_node_group
+      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
+        target: eks_cluster
 
   new_service_account:
     type: cloudify.kubernetes.resources.ServiceAccount
@@ -561,6 +563,8 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: kubernetes_master
+      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
+        target: eks_cluster
 
   new_role_binding:
     type: cloudify.kubernetes.resources.RoleBinding
@@ -587,6 +591,8 @@ node_templates:
         target: kubernetes_master
       - type: cloudify.relationships.depends_on
         target: new_service_account
+      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
+        target: eks_cluster
 
   secret:
     type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
@@ -622,6 +628,8 @@ node_templates:
         target: new_role_binding
       - type: cloudify.relationships.depends_on
         target: new_service_account
+      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
+        target: eks_cluster
     interfaces:
       cloudify.interfaces.lifecycle:
         delete: {}
