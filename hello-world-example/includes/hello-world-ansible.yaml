@@ -10,6 +10,11 @@ node_templates:
       playbook_path: apache2/playbook.yaml
       start_at_task: "install apache2"
       # save_playbook: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: {}
+        configure: {}
+        poststart: {}
     relationships:
       - type: cloudify.ansible.relationships.run_on_host
         target: vm
