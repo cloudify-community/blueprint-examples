@@ -5,7 +5,7 @@ description: >
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-azure-plugin?version= >=2.1.10
+  - plugin:cloudify-azure-plugin?version= >=3.3.0
   - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
