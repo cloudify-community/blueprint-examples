@@ -5,7 +5,7 @@ description: >
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-azure-plugin?version= >=2.1.10
+  - plugin:cloudify-azure-plugin?version= >=3.3.0
   - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
@@ -118,7 +118,7 @@ node_templates:
     type: cloudify.azure.nodes.compute.ManagedCluster
     properties:
       resource_group: { get_input: resource_group_name }
-      cluster_name: { get_input: managed_cluster_name }
+      name: { get_input: managed_cluster_name }
       resource_config: *resource_config
       azure_config: *azure_config
       store_kube_config_in_runtime: true
