@@ -1,0 +1,36 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-web-monitoring-plugin
+
+
+inputs:
+
+  cluster_deployment_name:
+    type: string
+
+node_templates:
+
+  cluster_deployment:
+    type: cloudify.nodes.SharedResource
+    properties:
+      resource_config:
+        deployment:
+          id: { get_input : cluster_deployment_name }
+
+  monitor:
+    type: cloudify.nodes.monitoring.Monitor
+    properties:
+      deployment_id: { get_input : cluster_deployment_name }
+      scalable_entity_name: { get_attribute: [cluster_deployment, capabilities, scalable_entity_name] }
+      delta: 1
+      url: { get_attribute: [cluster_deployment, capabilities, flask_app_endpoint] }
+      low_threshold: 400
+      high_threshold: 1400
+      scaleup_cooldown: 2
+      scaledown_cooldown: 2
+      interval: 1
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cluster_deployment
