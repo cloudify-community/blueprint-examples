@@ -15,6 +15,8 @@ After the cooldown timer has passed and the low threshold is reached Cloudify wi
 
 ### Creating secrets
 
+Refer to Azure plugin documentation to get the following secrets [Azure Authentication](https://docs.cloudify.co/latest/working_with/official_plugins/infrastructure/azure/#authentication)
+
 Replace <value> with actual values, without the <>
 
 ```shell

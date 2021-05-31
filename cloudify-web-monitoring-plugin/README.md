@@ -4,9 +4,9 @@ cloudify-web-monitoring-plugin
 
 # Description
 
-A Cloudify Plugin that monitor a URL response time and based on metrics will trigger scale up or down
+A Cloudify Plugin that monitors a URL response time based on metrics will trigger scale up or down.
 
-Basic contifuration includes what to monitor (URL), thresholds, limits and how to perform the scaling. Please see node type description below for details
+Basic configuration that includes what to monitor (URL), thresholds, limits and how to perform the scaling. Please see node type description below for details
 
 ## Node types
 
@@ -16,8 +16,8 @@ Basic contifuration includes what to monitor (URL), thresholds, limits and how t
 - scalable_entity_name - scaling group or node id that will be scaled by scale workflow. This should be defined in the blueprint used for target deployment defined in deployment_id
 - delta - scaling step (number of instances to add or remove during a single scaling workflow execution)
 - url - URL to monitor the response time for
-- low_threshold - url response miliseconds threshold below which a scale down will be triggered (if there is more than 1 instance)
-- high_threshold - url response miliseconds threshold above which a scale up will be triggered (if the scaleout_limit is not reached)
+- low_threshold - url response milliseconds threshold below which a scale down will be triggered (if there is more than 1 instance)
+- high_threshold - url response milliseconds threshold above which a scale up will be triggered (if the scaleout_limit is not reached)
 - scaleup_cooldown - minutes to wait in between scaleups
 - scaledown_cooldown - minutes to wait in between scaledowns
 - interval - minutes URL monitoring interval. The workflow that performs URL check will be scheduled with this rate
@@ -26,16 +26,14 @@ Basic contifuration includes what to monitor (URL), thresholds, limits and how t
 
 ## Building the plugin
 
-In order to build the plugin you need to have wagon installed on a virtual environment
+In order to build the plugin you can use Cloudify wagon builder Docker images
+
+you can check this repository for more info [Cloudify wagon builders](https://github.com/cloudify-cosmo/cloudify-wagon-build-containers)
+
+after building the docker container , for example centos-7-py3 
 
 ```
-wagon create -r dev-requirements.txt --build-tag "centos-Core" -v -f .
-```
-
-or you can use Cloudify wagon builder Docker images
-
-```
-docker run -v {path_to_plugin}/:/packaging cloudifyplatform/cloudify-centos-7-py3-wagon-builder
+docker run -v {path_to_plugin}/:/packaging cloudify-centos-7-py3-wagon-builder
 ```
 
 
