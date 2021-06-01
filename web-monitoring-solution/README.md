@@ -1,4 +1,4 @@
-cloudify-web-monitoring-plugin
+web-monitoring-solution
 ===================
 
 
@@ -30,10 +30,10 @@ In order to build the plugin you can use Cloudify wagon builder Docker images
 
 you can check this repository for more info [Cloudify wagon builders](https://github.com/cloudify-cosmo/cloudify-wagon-build-containers)
 
-after building the docker container , for example centos-7-py3 
+after building the docker container , for example centos-7-py3
 
 ```
-docker run -v {path_to_plugin}/:/packaging cloudify-centos-7-py3-wagon-builder
+docker run -v ./plugin/:/packaging cloudify-centos-7-py3-wagon-builder
 ```
 
 
