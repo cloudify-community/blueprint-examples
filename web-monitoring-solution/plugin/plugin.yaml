@@ -1,0 +1,69 @@
+plugins:
+  cfy_monitoring:
+    executor: central_deployment_agent
+    package_name: 'cloudify-web-monitoring-plugin'
+    package_version: '1.0'
+
+node_types:
+  cloudify.nodes.monitoring.Monitor:
+    derived_from: cloudify.nodes.Root
+    properties:
+      deployment_id:
+        type: string
+        description: >
+          Deployment ID to execute scale workflow for
+      scalable_entity_name:
+        type: string
+        description: >
+            scaling group or node id that will be scaled by scale
+            workflow. This should be defined in the blueprint used
+            for target deployment defined in deployment_id
+      client:
+        required: false
+        type: dict
+        description: >
+          optional Cloudfiy REST configuration
+      delta:
+        type: integer
+        description: >
+          scaling step (number of instances to add or remove during a
+          single scaling workflow execution)
+      url:
+        type: string
+        description: >
+          URL to monitor the response time for
+      low_threshold:
+        type: integer
+        description: >
+          url response miliseconds threshold below which a scale down
+          will be triggered (if there is more than 1 instance)
+      high_threshold:
+        type: integer
+        description: >
+          url response miliseconds threshold above which a scale up
+          will be triggered (if the scaleout_limit is not reached)
+      scaleup_cooldown:
+        type: integer
+        description: >
+          minutes to wait in between scaleups
+      scaledown_cooldown:
+        type: integer
+        description: >
+          minutes to wait in between scaldowns
+      interval:
+        type: integer
+        description: >
+          minutes URL monitoring interval. The workflow that performs
+          URL check will be sheduled with this rate
+      scaleout_limit:
+        type: integer
+        default: 1
+        description: >
+          maximum number of scale out workflows to execute in a sequence
+          e.g. when scale out is called a counter is incremented and
+          compared to this value. When scale down is called the conter
+          is decremented
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: cfy_monitoring.plugin.tasks.check_and_schedule

@@ -1,0 +1,212 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint create a managed cluster.
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-azure-plugin?version= >=3.3.0
+  - plugin:cloudify-kubernetes-plugin?version= >=2.7.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+node_types:
+  node_agent_pool_scaler:
+    derived_from: cloudify.nodes.Root
+    properties:
+      azure_config:
+        default: {}
+      resource_group_name:
+        type: string
+      cluster_name:
+        type: string
+      agent_pool_name:
+        type: string
+    interfaces:
+      scale_nodes:
+        scale_up:
+          implementation: scripts/scale_nodes.py
+          executor: central_deployment_agent
+          inputs:
+            azure_config:
+              default: { get_property: [ SELF, azure_config ] }
+            resource_group_name:
+              default: { get_property: [ SELF, resource_group_name ] }
+            cluster_name:
+              default: { get_property: [ SELF, cluster_name ] }
+            agent_pool_name:
+              default: { get_property: [ SELF, agent_pool_name ] }
+            delta:
+              default: 1
+        scale_down:
+          implementation: scripts/scale_nodes.py
+          executor: central_deployment_agent
+          inputs:
+            azure_config:
+              default: { get_property: [ SELF, azure_config ] }
+            resource_group_name:
+              default: { get_property: [ SELF, resource_group_name ] }
+            cluster_name:
+              default: { get_property: [ SELF, cluster_name ] }
+            agent_pool_name:
+              default: { get_property: [ SELF, agent_pool_name ] }
+            delta:
+              default: -1
+
+inputs:
+  # Azure account information
+  subscription_id:
+    type: string
+    required: false
+    default: { get_secret: azure_subscription_id }
+
+  tenant_id:
+    type: string
+    required: false
+    default: { get_secret: azure_tenant_id }
+
+  client_id:
+    type: string
+    required: false
+    default: { get_secret: azure_client_id }
+
+  client_secret:
+    type: string
+    required: false
+    default: { get_secret: azure_client_secret }
+
+  location:
+    type: string
+    required: true
+    default: eastus2
+
+  resource_suffix:
+    type: string
+    description: Must be a letter.
+    default: 'a'
+
+  resource_group_name:
+    type: string
+    default: { concat: [ 'aks-test-rg', { get_input: resource_suffix } ] }
+
+  managed_cluster_name:
+    type: string
+    default: { concat: [ 'aks-test-mc', { get_input: resource_suffix } ] }
+
+dsl_definitions:
+  azure_config: &azure_config
+    subscription_id: { get_input: subscription_id }
+    tenant_id: { get_input: tenant_id }
+    client_id: { get_input: client_id }
+    client_secret: { get_input: client_secret }
+
+node_templates:
+
+  managed_cluster:
+    type: cloudify.nodes.Component
+    properties:
+      resource_config:
+        blueprint:
+          id: 'Azure-AKS'
+          blueprint_archive: https://github.com/cloudify-community/blueprint-examples/releases/download/latest/kubernetes-azure-aks.zip
+          main_file_name: 'blueprint.yaml'
+          external_resource: false
+        deployment:
+          id: 'Azure-AKS'
+          inputs:
+            location: { get_input: location }
+            resource_suffix: { get_input: resource_suffix }
+            resource_group_name: { get_input: resource_group_name }
+            managed_cluster_name: { get_input: managed_cluster_name }
+
+  node_agent_pool:
+    type: node_agent_pool_scaler
+    properties:
+      azure_config: *azure_config
+      resource_group_name: { get_input: resource_group_name }
+      cluster_name: { get_input: managed_cluster_name }
+      agent_pool_name: { concat: [ "nodepool1", { get_input: resource_suffix } ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: managed_cluster
+
+  flask_app:
+    type: cloudify.kubernetes.resources.FileDefinedResource
+    properties:
+      client_config:
+        configuration:
+          api_options:
+            host:  { get_attribute: [managed_cluster, capabilities, endpoint] }
+            api_key: { get_secret: kubernetes_token }
+            debug: false
+            verify_ssl: false
+      validate_resource_status: true
+      file:
+        resource_path: resources/template.yaml
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: managed_cluster
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        precreate: {}
+        create:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
+        configure: {}
+        start: {}
+        poststart: {}
+        prestop: {}
+        stop: {}
+        delete:
+          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
+        postdelete: {}
+
+  flask_app_url:
+    type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+    properties:
+      client_config:
+        configuration:
+          api_options:
+            host:  { get_attribute: [managed_cluster, capabilities, endpoint] }
+            api_key: { get_secret: kubernetes_token }
+            debug: false
+            verify_ssl: false
+      use_external_resource: true
+      definition:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: hello-flask-change-service
+      api_mapping:
+        create:
+          api: CoreV1Api
+          method: create_namespaced_service
+          payload: V1Service
+        read:
+          api: CoreV1Api
+          method: read_namespaced_service
+        update:
+          api: CoreV1Api
+          method: replace_namespaced_service
+          payload: V1Service
+        delete:
+          api: CoreV1Api
+          method: delete_namespaced_service
+          payload: V1DeleteOptions
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: flask_app
+
+capabilities:
+
+  flask_app_endpoint:
+    value: { concat: [ 'http://', {get_attribute: [flask_app_url, kubernetes, status, load_balancer, ingress, 0, ip]}] }
+
+  scalable_entity_name:
+    value: 'node_agent_pool'
+
+outputs:
+
+  flask_app_endpoint:
+    value: { concat: [ 'http://', {get_attribute: [flask_app_url, kubernetes, status, load_balancer, ingress, 0, ip]}] }
+
+  scalable_entity_name:
+    value: 'node_agent_pool'
