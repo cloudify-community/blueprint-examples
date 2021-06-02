@@ -1,0 +1,185 @@
+- hosts: all
+  connection: local
+  vars:
+    vpc_name: "Cloudify_virtual_machine_example_vpc_{{ resource_suffix }}"
+    subnet_name: "Cloudify_virtual_machine_example_subnet_{{ resource_suffix }}"
+    security_group_name: "Cloudify_virtual_machine_example_sg_{{ resource_suffix }}"
+    igw_name: "Cloudify_virtual_machine_example_igw_{{ resource_suffix }}"
+    eip_name: "Cloudify_virtual_machine_example_eip_{{ resource_suffix }}"
+    vm_name: "Cloudify_virtual_machine_example_instance_{{ resource_suffix }}"
+    count: 1
+ 
+  tasks:
+    # If vpc with same tag exist we fail.
+    - name: Check if vpc exists
+      ec2_vpc_net_info:
+        filters:
+          "tag:Name": "{{ vpc_name }}"
+      register: describe_vpc
+      failed_when: describe_vpc.vpcs != []
+
+    - name: Create VPC
+      ec2_vpc_net:
+        name: "{{ vpc_name }}"
+        cidr_block: 10.10.0.0/16
+        multi_ok: no
+      register: create_vpc
+
+    - name: "set fact: VPC ID"
+      set_fact:
+        vpc_id: "{{ create_vpc.vpc.id }}"
+
+    - name: Create VPC subnet
+      ec2_vpc_subnet:
+        vpc_id: "{{ vpc_id }}"
+        cidr: 10.10.4.0/24
+        az: "{{ availability_zone }}"
+        tags:
+          Name: "{{ subnet_name }}"
+      register: create_vpc_subnet
+
+    - name: "set fact: VPC subnet ID"
+      set_fact:
+        vpc_subnet_id:  "{{ create_vpc_subnet.subnet.id }}"
+
+    - name: Create a security group
+      ec2_group:
+        name: "{{ security_group_name }}"
+        description: Cloudify virtual machine example sg
+        vpc_id: "{{ vpc_id }}"
+        tags:
+          Name: "{{ security_group_name }}"
+        rules:
+          - proto: tcp
+            from_port: 22
+            to_port: 22
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 8080
+            to_port: 8080
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 9990
+            to_port: 9990
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 2375
+            to_port: 2375
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+      register: create_sg
+
+    - name: "Set fact: Gateway IDs and IP"
+      set_fact:
+        security_group_id: "{{ create_sg.group_id }}"
+
+    - name: create internet gateway
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+        tags:
+          Name: "{{ igw_name }}"
+      register: create_gateway
+
+    - name: "Set fact: Gateway ID"
+      set_fact:
+        internet_gateway_id: "{{ create_gateway.gateway_id }}"
+
+    # public route table that routes through the internet gateway - attach it to public subnet
+    - name: Create route table
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        tags:
+          Name: "{{ vpc_name }}_public"
+        subnets:
+          - "{{ vpc_subnet_id }}"
+        routes:
+          - dest: 0.0.0.0/0
+            gateway_id: "{{ internet_gateway_id }}"
+      register: create_route_table
+
+    - name: "Set fact: route_table_id"
+      set_fact:
+        route_table_id: "{{ create_route_table.route_table.id }}"
+
+#    - name: Create elastic network interface
+#      ec2_eni:
+#        subnet_id: "{{ vpc_subnet_id }}"
+#        security_groups:
+#          - "{{ security_group_id }}"
+#      register: create_eni
+#
+#    - name: "Set fact: eni_id"
+#      set_fact:
+#        eni_id: "{{ create_eni.interface.id }}"
+#
+#    - name: Find ami instance-id for centos 7.7
+#      ec2_ami_info:
+#        filters:
+#          name: "{{ami_name_filter}}"
+#          owner-id: "{{ ami_owner_filter }}"
+#      register: AMIs
+#
+#    - name: "Set fact: ami_id"
+#      set_fact:
+#        ami_id:  "{{ AMIs.images[0]['image_id']}}"
+#
+#    - name: Create elastic ip
+#      ec2_eip:
+#        device_id: "{{ eni_id }}"
+#        in_vpc: yes
+#        public_ipv4_pool: yes
+#        tag_name: Name
+#        tag_value: "{{ eip_name }}"
+#        release_on_disassociation: yes
+#      register: eip
+#
+#    - name: "Set fact: public ip"
+#      set_fact:
+#        public_ip:  "{{ eip.public_ip }}"
+#
+#    - name: Launch EC2 Instance
+#      ec2:
+#        instance_type: "{{ instance_type }}"
+#        image: "{{ ami_id }}"
+#        wait: true
+#        user_data: "{{ ec2_instance_user_data }}"
+#        count: "{{count}}"
+#        network_interfaces:
+#          - "{{ eni_id }}"
+#        instance_tags:
+#          Name: "{{ vm_name }}"
+#      register: ec2
+#
+#    - name: Sleep 90 seconds for initializing the vm.
+#      wait_for:
+#        timeout: 90
+#      delegate_to: localhost
+
+    - name: "Set fact: output dictionary"
+      set_fact:
+        output_dict:
+#          public_ip:  "{{ public_ip }}"
+#          ec2_instance_ids: "{{ ec2.instance_ids}}"
+          vpc_id: "{{ vpc_id }}"
+          vpc_name: "{{ vpc_name }}"
+          subnet_id: "{{ vpc_subnet_id }}"
+          security_group_id: "{{ security_group_id }}"
+          internet_gateway_id: "{{internet_gateway_id}}"
+#          eni_id: "{{ eni_id }}"
+          route_table_id: "{{route_table_id}}"
+
+    - name: Create /tmp/virtual-machine-example-vars.json
+      file:
+        name: '/tmp/virtual-machine-example-vars.json'
+        state: touch
+
+    - name: Write variables to /tmp/virtual-machine-example-vars.json
+      copy:
+        content: "{{ output_dict | to_nice_json }}"
+        dest: "/tmp/virtual-machine-example-vars.json"
