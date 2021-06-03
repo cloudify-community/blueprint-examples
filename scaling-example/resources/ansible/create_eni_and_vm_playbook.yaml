@@ -13,7 +13,7 @@
 
     - name: Create elastic network interface
       ec2_eni:
-        subnet_id: "{{ vpc_subnet_id }}"
+        subnet_id: "{{ subnet_id }}"
         security_groups:
           - "{{ security_group_id }}"
       register: create_eni
@@ -71,20 +71,14 @@
         output_dict:
           public_ip:  "{{ public_ip }}"
           ec2_instance_ids: "{{ ec2.instance_ids}}"
-#          vpc_id: "{{ vpc_id }}"
-#          vpc_name: "{{ vpc_name }}"
-#          subnet_id: "{{ vpc_subnet_id }}"
-#          security_group_id: "{{ security_group_id }}"
-#          internet_gateway_id: "{{internet_gateway_id}}"
           eni_id: "{{ eni_id }}"
-#          route_table_id: "{{route_table_id}}"
 
 #    - name: Create /tmp/virtual-machine-example-vars.json
 #      file:
 #        name: '/tmp/virtual-machine-example-varss.json'
 #        state: touch
-#
-#    - name: Write variables to /tmp/virtual-machine-example-vars.json
-#      copy:
-#        content: "{{ output_dict | to_nice_json }}"
-#        dest: "/tmp/virtual-machine-example-varss.json"
+
+    - name: Write variables to infra info file
+      copy:
+        content: "{{ output_dict | to_nice_json }}"
+        dest: "{{ infra_info_file }}"

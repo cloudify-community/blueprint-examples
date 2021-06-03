@@ -58,10 +58,6 @@ node_templates:
       sources: resources/ansible/inventory.yaml
       ansible_become: true
       run_data:
-#        instance_type: { get_input: instance_type }
-#        ami_owner_filter: { get_input: ami_owner_filter  }
-#        ami_name_filter: { get_input: ami_name_filter }
-#        ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
         availability_zone: { get_input: availability_zone }
         resource_suffix: { get_input: resource_suffix }
       ansible_env_vars: &env_vars
@@ -86,13 +82,10 @@ node_templates:
           implementation: ansible.cloudify_ansible.tasks.run
           inputs:
             playbook_path: resources/ansible/uninstall-playbook.yaml
-            start_at_task: "Terminate vm"
+            start_at_task: "Delete route table"
             sources: resources/ansible/inventory.yaml
             run_data:
-#              ec2_instance_ids: { get_attribute: [aws_infra_info, ec2_instance_ids] }
-#              eni_id: { get_attribute: [aws_infra_info, eni_id] }
               internet_gateway_id: { get_attribute: [aws_infra_info, internet_gateway_id] }
-#              public_ip: { get_attribute: [aws_infra_info, public_ip] }
               route_table_id: { get_attribute: [aws_infra_info, route_table_id] }
               security_group_id: { get_attribute: [aws_infra_info, security_group_id] }
               subnet_id: { get_attribute: [aws_infra_info, subnet_id] }
@@ -111,71 +104,91 @@ node_templates:
         create:
           implementation: scripts/ansible/store_deployment_info.py
           executor: central_deployment_agent
+          inputs:
+            infra_info_file: "/tmp/virtual-machine-example-vars.json"
     relationships:
       - type: cloudify.relationships.depends_on
         target: install-infra-playbook
 
-#  # create temporary file for saving eni, ip and vm info
-#  temp_file_generator:
-#    type: cloudify.nodes.Root
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        create:
-#          implementation: scripts/ansible/create_temp_file.py
-#          executor: central_deployment_agent
-#        delete:
-#          implementation: scripts/ansible/delete_temp_file.py
-#          executor: central_deployment_agent
-#    relationships:
-#      - type: cloudify.relationships.depends_on
-#        target: aws_infra_info
-#
-#  install_eni_vm-playbook:
-#    type: cloudify.nodes.ansible.Executor
-#    properties:
-#      playbook_path: resources/ansible/create_eni_and_vm_playbook.yaml
-#      start_at_task: "Create elastic network interface"
-#      sources: resources/ansible/inventory.yaml
-#      ansible_become: true
-#      run_data:
-#        security_group_id: { get_attribute: [ aws_infra_info, security_group_id ] }
-#        subnet_id: { get_attribute: [ aws_infra_info, subnet_id ] }
-#        instance_type: { get_input: instance_type }
-#        ami_owner_filter: { get_input: ami_owner_filter  }
-#        ami_name_filter: { get_input: ami_name_filter }
-#        ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
-#        resource_suffix: { get_input: resource_suffix }
-#      ansible_env_vars: *env_vars
-#      extra_packages: *extra_packages
-#    relationships:
-#      - type: cloudify.relationships.depends_on
-#        target: cloud_init
-#      - type: cloudify.relationships.depends_on
-#        target: aws_infra_info
-#      - type: cloudify.relationships.depends_on
-#        target: temp_file_generator
-#
-#  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
-#  # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
-#  uninstall_eni_and_vm_playbook:
-#    type: cloudify.nodes.Root
-#    interfaces:
-#      cloudify.interfaces.lifecycle:
-#        stop:
-#          implementation: ansible.cloudify_ansible.tasks.run
-#          inputs:
-#            playbook_path: resources/ansible/delete_eni_and_vm_playbook.yaml
-#            start_at_task: "Terminate vm"
-#            sources: resources/ansible/inventory.yaml
-#            run_data:
-#              ec2_instance_ids: { get_attribute: [aws_infra_info, ec2_instance_ids] }
-#              eni_id: { get_attribute: [aws_infra_info, eni_id] }
-#              public_ip: { get_attribute: [aws_infra_info, public_ip] }
-#            ansible_env_vars: *env_vars
-#            extra_packages: *extra_packages
-#    relationships:
-#      - type: cloudify.relationships.depends_on
-#        target: temp_file_generator
+  # create temporary file for saving eni, ip and vm info
+  temp_file_generator:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/ansible/create_temp_file.py
+          executor: central_deployment_agent
+        delete:
+          implementation: scripts/ansible/delete_temp_file.py
+          executor: central_deployment_agent
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: aws_infra_info
+
+  install_eni_vm-playbook:
+    type: cloudify.nodes.ansible.Executor
+    properties:
+      playbook_path: resources/ansible/create_eni_and_vm_playbook.yaml
+      start_at_task: "Create elastic network interface"
+      sources: resources/ansible/inventory.yaml
+      ansible_become: true
+      run_data:
+        security_group_id: { get_attribute: [ aws_infra_info, security_group_id ] }
+        subnet_id: { get_attribute: [ aws_infra_info, subnet_id ] }
+        instance_type: { get_input: instance_type }
+        ami_owner_filter: { get_input: ami_owner_filter  }
+        ami_name_filter: { get_input: ami_name_filter }
+        ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
+        resource_suffix: { get_input: resource_suffix }
+        infra_info_file: { get_attribute: [ temp_file_generator, ansible_infra_info_file ] }
+      ansible_env_vars: *env_vars
+      extra_packages: *extra_packages
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+      - type: cloudify.relationships.depends_on
+        target: aws_infra_info
+      - type: cloudify.relationships.depends_on
+        target: temp_file_generator
+
+  store_vm_eni_infra_info:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/ansible/store_deployment_info.py
+          executor: central_deployment_agent
+          inputs:
+            infra_info_file: { get_attribute: [ temp_file_generator, ansible_infra_info_file ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: install_eni_vm-playbook
+      - type: cloudify.relationships.depends_on
+        target: temp_file_generator
+
+  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
+  # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
+  uninstall_eni_and_vm_playbook:
+    type: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop:
+          implementation: ansible.cloudify_ansible.tasks.run
+          inputs:
+            playbook_path: resources/ansible/delete_eni_and_vm_playbook.yaml
+            start_at_task: "Terminate vm"
+            sources: resources/ansible/inventory.yaml
+            run_data:
+              ec2_instance_ids: { get_attribute: [store_vm_eni_infra_info, ec2_instance_ids] }
+              eni_id: { get_attribute: [store_vm_eni_infra_info, eni_id] }
+              public_ip: { get_attribute: [store_vm_eni_infra_info, public_ip] }
+            ansible_env_vars: *env_vars
+            extra_packages: *extra_packages
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: store_vm_eni_infra_info
+      - type: cloudify.relationships.depends_on
+        target: uninstall-infra-playbook
 
   cloud_init:
     type: cloudify.nodes.CloudInit.CloudConfig
@@ -205,6 +218,23 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
+
+groups:
+
+  vm-group:
+    members:
+    - temp_file_generator
+    - install_eni_vm-playbook
+    - store_vm_eni_infra_info
+    - uninstall_eni_and_vm_playbook
+
+policies:
+
+  vm-group-policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [vm-group]
 
 capabilities:
 
