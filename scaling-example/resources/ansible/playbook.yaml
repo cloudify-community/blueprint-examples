@@ -174,12 +174,7 @@
 #          eni_id: "{{ eni_id }}"
           route_table_id: "{{route_table_id}}"
 
-    - name: Create /tmp/virtual-machine-example-vars.json
-      file:
-        name: '/tmp/virtual-machine-example-vars.json'
-        state: touch
-
-    - name: Write variables to /tmp/virtual-machine-example-vars.json
+    - name: Write variables to infra info file
       copy:
         content: "{{ output_dict | to_nice_json }}"
-        dest: "/tmp/virtual-machine-example-vars.json"
+        dest: "{{ infra_info_file }}"
