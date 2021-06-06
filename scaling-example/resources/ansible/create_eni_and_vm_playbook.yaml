@@ -1,10 +1,6 @@
 - hosts: all
   connection: local
   vars:
-#    vpc_name: "Cloudify_virtual_machine_example_vpc_{{ resource_suffix }}"
-#    subnet_name: "Cloudify_virtual_machine_example_subnet_{{ resource_suffix }}"
-#    security_group_name: "Cloudify_virtual_machine_example_sg_{{ resource_suffix }}"
-#    igw_name: "Cloudify_virtual_machine_example_igw_{{ resource_suffix }}"
     eip_name: "Cloudify_virtual_machine_example_eip_{{ resource_suffix }}"
     vm_name: "Cloudify_virtual_machine_example_instance_{{ resource_suffix }}"
     count: 1
@@ -72,11 +68,6 @@
           public_ip:  "{{ public_ip }}"
           ec2_instance_ids: "{{ ec2.instance_ids}}"
           eni_id: "{{ eni_id }}"
-
-#    - name: Create /tmp/virtual-machine-example-vars.json
-#      file:
-#        name: '/tmp/virtual-machine-example-varss.json'
-#        state: touch
 
     - name: Write variables to infra info file
       copy:
