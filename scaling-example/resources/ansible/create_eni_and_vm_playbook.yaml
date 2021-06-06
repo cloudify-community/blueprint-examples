@@ -34,7 +34,6 @@
         device_id: "{{ eni_id }}"
         in_vpc: yes
         public_ipv4_pool: yes
-#        TODO:genrate it randomally  or check if we can create 2 ips with same tag name
         tag_name: Name
         tag_value: "{{ eip_name }}"
         release_on_disassociation: yes

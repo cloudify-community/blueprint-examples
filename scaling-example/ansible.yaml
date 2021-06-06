@@ -203,10 +203,6 @@ policies:
 
 capabilities:
 
-#  endpoint:
-#    description: The external endpoint of the application.
-#    value:  { get_attribute: [aws_infra_info, public_ip] }
-
   user:
     description: user ID.
     value: { get_input: agent_user }

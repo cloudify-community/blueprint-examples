@@ -2,17 +2,6 @@
   connection: local
   tasks:
 
-#    - name: Terminate vm
-#      ec2:
-#        instance_ids: '{{ ec2_instance_ids }}'
-#        state: absent
-#        wait: True
-#
-#    - name: Delete elastic network interface
-#      ec2_eni:
-#        eni_id: "{{ eni_id }}"
-#        state: absent
-
     - name: Delete route table
       ec2_vpc_route_table:
         vpc_id: "{{ vpc_id }}"
@@ -42,8 +31,3 @@
         name: "{{ vpc_name }}"
         cidr_block: 10.10.0.0/16
         state: absent
-
-#    - name: Release elastic IP
-#      ec2_eip:
-#        public_ip: "{{ public_ip }}"
-#        state: absent
