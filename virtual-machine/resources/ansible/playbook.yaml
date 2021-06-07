@@ -8,7 +8,7 @@
     eip_name: "Cloudify_virtual_machine_example_eip_{{ resource_suffix }}"
     vm_name: "Cloudify_virtual_machine_example_instance_{{ resource_suffix }}"
     count: 1
- 
+
   tasks:
     # If vpc with same tag exist we fail.
     - name: Check if vpc exists
@@ -16,7 +16,6 @@
         filters:
           "tag:Name": "{{ vpc_name }}"
       register: describe_vpc
-      failed_when: describe_vpc.vpcs != []
 
     - name: Create VPC
       ec2_vpc_net:
@@ -24,10 +23,26 @@
         cidr_block: 10.10.0.0/16
         multi_ok: no
       register: create_vpc
+      when: describe_vpc["vpcs"] == []
 
     - name: "set fact: VPC ID"
       set_fact:
         vpc_id: "{{ create_vpc.vpc.id }}"
+      when: describe_vpc["vpcs"] == []
+
+    - name: "set fact: VPC ID"
+      set_fact:
+        vpc_id: "{{ describe_vpc.vpcs[0].id }}"
+      when: describe_vpc["vpcs"] != []
+
+    # If subnet with same tag exist we fail.
+    - name: Check if vpc subnet exists
+      ec2_vpc_subnet_info:
+        filters:
+          "vpc-id": "{{ vpc_id }}"
+          "cidr-block": 10.10.4.0/24
+          "availability-zone": "{{ availability_zone }}"
+      register: describe_subnet
 
     - name: Create VPC subnet
       ec2_vpc_subnet:
@@ -37,10 +52,17 @@
         tags:
           Name: "{{ subnet_name }}"
       register: create_vpc_subnet
+      when: describe_subnet["subnets"] == []
 
     - name: "set fact: VPC subnet ID"
       set_fact:
         vpc_subnet_id:  "{{ create_vpc_subnet.subnet.id }}"
+      when: describe_subnet["subnets"] == []
+
+    - name: "set fact: VPC subnet ID"
+      set_fact:
+        vpc_subnet_id:  "{{ describe_subnet.subnets[0].id }}"
+      when: describe_subnet["subnets"] != []
 
     - name: Create a security group
       ec2_group:
@@ -79,16 +101,30 @@
       set_fact:
         security_group_id: "{{ create_sg.group_id }}"
 
+    # If internet gateway with same tag exist we fail.
+    - name: Check if internet gateway exists
+      ec2_vpc_igw_info:
+        filters:
+          "attachment.vpc-id": "{{ vpc_id }}"
+      register: describe_internet_gateway
+
     - name: create internet gateway
       ec2_vpc_igw:
         vpc_id: "{{ vpc_id }}"
         tags:
           Name: "{{ igw_name }}"
       register: create_gateway
+      when: describe_internet_gateway["internet_gateways"] == []
 
     - name: "Set fact: Gateway ID"
       set_fact:
         internet_gateway_id: "{{ create_gateway.gateway_id }}"
+      when: describe_internet_gateway["internet_gateways"] == []
+
+    - name: "Set fact: Gateway ID"
+      set_fact:
+        internet_gateway_id:  "{{ describe_internet_gateway.internet_gateways[0].internet_gateway_id }}"
+      when: describe_internet_gateway["internet_gateways"] != []
 
     # public route table that routes through the internet gateway - attach it to public subnet
     - name: Create route table
