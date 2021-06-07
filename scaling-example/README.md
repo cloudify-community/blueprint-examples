@@ -22,9 +22,9 @@ Cloudify allows for multiple user interfaces. Some users find the Cloudify Manag
 * [Using the Cloudify Management Console](#cloudify-management-console)
 * [Using the Cloudify CLI](#cloudify-cli)
 
-{{% note %}}
+**Note:**
 Community version - Some of the options described in the guide are not available in the community version management console (web UI). An example would be setting up secrets. You can still perform all of the functionality using the Cloudify CLI.
-{{% /note %}}
+
 
 ## Cloudify Management Console
 
@@ -215,6 +215,7 @@ we will go to the Cloudify examples repository in Github and examine it there: [
 ### Scale
 
 In order to scale the infrastructure, means to create more VM's, the scale workflow is being used.
+
 execute:
 `cfy executions start scale -d scaling-example -p scalable_entity_name=vm-group -p delta=1`
 
