@@ -50,7 +50,7 @@ To store the access keys as secrets in the Cloudify Manager, login to the Cloudi
 ### Upload Plugins
 
 Plugins are Cloudify's extendable interfaces to services, cloud providers, and automation tools.
-I.e., running playbooks requires the Ansible plugin.
+I.e. running playbooks requires the Ansible plugin.
 
 To upload the required plugins to your manager, select the **Cloudify Catalog** page, scroll to the **Plugins Catalog** widget and select the plugins you wish to upload.
 
@@ -73,16 +73,13 @@ The flow required to setup a service consists of:
 1. Create a deployment from the uploaded blueprint. This generates a model of the service topology in the Cloudify database and provides the "context" needed for running workflows.
 1. Run the **install** workflow for the created deployment to apply the model to the infrastructure.
 
-Let's run these one by one.
 
 To upload a blueprint to the Cloudify Manager, select the **Blueprints** page, and use the **Upload blueprint** button, select ansible.yaml file.
 
 
-
-
 ### Deploy & Install
 
-Once the blueprint is uploaded, it will be displayed in the Blueprints widget. to deploy the blueprint click the **Create deployment** button next to the blueprint you wish to deploy. Specify a deployment name, update any inputs (such as the AWS region), and click **Deploy & Install**. Changing inputs is completely optional and the defaults are safe to use.
+Once the blueprint is uploaded, it will be displayed in the Blueprints widget. Click the **Create deployment** button next to the blueprint you wish to deploy. Specify a deployment name, update any inputs (such as the AWS region), and click **Deploy & Install**. Changing inputs is completely optional and the defaults are safe to use.
 
 You will be directed to the **Deployment** page and will be able to track the progress of the execution.
 
@@ -90,7 +87,7 @@ The deployment you have created should be displayed in the deployments list in t
 
 ### Validate
 
-In this example we have setup a simple infrastructure. A virtual instance (VM) was created in the region specified in the Deployment inputs alongside a new network and various other resources.
+In this example we have setup a simple infrastructure. A virtual instance (VM) was created in the region specified in the _deployment inputs_ alongside a new network and various other resources.
 This is done by executing two Ansible playbooks:
 1. [playbook.yaml](https://github.com/cloudify-community/blueprint-examples/blob/master/scaling-example/resources/ansible/playbook.yaml) which creates All the networking infrastructure.
 2. [create_eni_and_vm_playbook.yaml](https://github.com/cloudify-community/blueprint-examples/blob/master/scaling-example/resources/ansible/create_eni_and_vm_playbook.yaml) which creates eni and VM.
