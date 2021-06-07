@@ -54,7 +54,6 @@ node_templates:
     type: cloudify.nodes.ansible.Executor
     properties:
       playbook_path: resources/ansible/playbook.yaml
-      start_at_task: "Check if vpc exists"
       sources: resources/ansible/inventory.yaml
       ansible_become: true
       run_data:
@@ -72,6 +71,10 @@ node_templates:
         - boto3==1.16.26
         - boto==2.49.0
         - selinux
+        - ndg-httpsclient
+        - pyopenssl
+        - pyasn1
+        - urllib3
     relationships:
       - type: cloudify.relationships.depends_on
         target: cloud_init

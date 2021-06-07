@@ -172,5 +172,8 @@
   "utilities-examples/cloudify_terminal": [
     "linux-ssh.yaml",
     "fortigate.yaml"
+  ],
+    "scaling-example": [
+    "ansible.yaml"
   ]
 }

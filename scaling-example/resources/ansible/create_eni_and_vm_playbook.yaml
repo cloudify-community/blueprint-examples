@@ -1,0 +1,74 @@
+- hosts: all
+  connection: local
+  vars:
+    eip_name: "Cloudify_virtual_machine_example_eip_{{ resource_suffix }}"
+    vm_name: "Cloudify_virtual_machine_example_instance_{{ resource_suffix }}"
+    count: 1
+
+  tasks:
+
+    - name: Create elastic network interface
+      ec2_eni:
+        subnet_id: "{{ subnet_id }}"
+        security_groups:
+          - "{{ security_group_id }}"
+      register: create_eni
+
+    - name: "Set fact: eni_id"
+      set_fact:
+        eni_id: "{{ create_eni.interface.id }}"
+
+    - name: Find ami instance-id for centos 7.7
+      ec2_ami_info:
+        filters:
+          name: "{{ami_name_filter}}"
+          owner-id: "{{ ami_owner_filter }}"
+      register: AMIs
+
+    - name: "Set fact: ami_id"
+      set_fact:
+        ami_id:  "{{ AMIs.images[0]['image_id']}}"
+
+    - name: Create elastic ip
+      ec2_eip:
+        device_id: "{{ eni_id }}"
+        in_vpc: yes
+        public_ipv4_pool: yes
+        tag_name: Name
+        tag_value: "{{ eip_name }}"
+        release_on_disassociation: yes
+      register: eip
+
+    - name: "Set fact: public ip"
+      set_fact:
+        public_ip:  "{{ eip.public_ip }}"
+
+    - name: Launch EC2 Instance
+      ec2:
+        instance_type: "{{ instance_type }}"
+        image: "{{ ami_id }}"
+        wait: true
+        user_data: "{{ ec2_instance_user_data }}"
+        count: "{{count}}"
+        network_interfaces:
+          - "{{ eni_id }}"
+        instance_tags:
+          Name: "{{ vm_name }}"
+      register: ec2
+
+    - name: Sleep 90 seconds for initializing the vm.
+      wait_for:
+        timeout: 90
+      delegate_to: localhost
+
+    - name: "Set fact: output dictionary"
+      set_fact:
+        output_dict:
+          public_ip:  "{{ public_ip }}"
+          ec2_instance_ids: "{{ ec2.instance_ids}}"
+          eni_id: "{{ eni_id }}"
+
+    - name: Write variables to infra info file
+      copy:
+        content: "{{ output_dict | to_nice_json }}"
+        dest: "{{ infra_info_file }}"

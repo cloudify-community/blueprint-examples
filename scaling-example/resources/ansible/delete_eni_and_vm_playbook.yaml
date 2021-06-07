@@ -1,0 +1,19 @@
+- hosts: all
+  connection: local
+  tasks:
+
+    - name: Terminate vm
+      ec2:
+        instance_ids: '{{ ec2_instance_ids }}'
+        state: absent
+        wait: True
+
+    - name: Delete elastic network interface
+      ec2_eni:
+        eni_id: "{{ eni_id }}"
+        state: absent
+
+    - name: Release elastic IP
+      ec2_eip:
+        public_ip: "{{ public_ip }}"
+        state: absent
