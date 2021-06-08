@@ -7,7 +7,7 @@ description: >
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-ansible-plugin
+  - plugin:cloudify-ansible-plugin= >=2.12.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
@@ -68,6 +68,7 @@ node_templates:
             start_at_task: "Check if vpc exists"
             sources: resources/ansible/inventory.yaml
             ansible_become: true
+            number_of_attempts: 1
             run_data:
               availability_zone: { get_input: availability_zone }
               resource_suffix: { get_input: resource_suffix }
@@ -92,6 +93,7 @@ node_templates:
             playbook_path: resources/ansible/uninstall-playbook.yaml
             start_at_task: "Delete route table"
             sources: resources/ansible/inventory.yaml
+            number_of_attempts: 1
             run_data:
               internet_gateway_id: { get_attribute: [ SELF, internet_gateway_id ] }
               route_table_id: { get_attribute: [ SELF, route_table_id ] }
@@ -127,6 +129,7 @@ node_templates:
             start_at_task: "Create elastic network interface"
             sources: resources/ansible/inventory.yaml
             ansible_become: true
+            number_of_attempts: 1
             run_data:
               security_group_id: { get_attribute: [ install_infra_playbook, security_group_id ] }
               subnet_id: { get_attribute: [ install_infra_playbook, subnet_id ] }
@@ -144,6 +147,7 @@ node_templates:
             playbook_path: resources/ansible/delete_eni_and_vm_playbook.yaml
             start_at_task: "Terminate vm"
             sources: resources/ansible/inventory.yaml
+            number_of_attempts: 1
             run_data:
               ec2_instance_ids: { get_attribute: [ SELF, ec2_instance_ids ] }
               eni_id: { get_attribute: [ SELF, eni_id ] }
