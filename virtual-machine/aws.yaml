@@ -13,25 +13,43 @@ inputs:
   aws_region_name:
       type: string
       default: 'us-east-1'
-
-  availability_zone:
-    type: string
-    description: The availability zone in the AWS Region.
-    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
-
-  ami_owner_filter:
-    type: string
-    description: The AWS AMI owner number.
-    default: '057448758665'
-
-  ami_name_filter:
-    type: string
-    description: The name of the AWS AMI in the AWS region.
-    default: 'CentOS 7.7.1908 x86_64 with cloud-init (HVM)'
+      constraints:
+        - valid_values:
+            - us-east-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - eu-central-1
+            - eu-west-1
+            - eu-west-2
+            - eu-south-1
+            - eu-west-3
+            - eu-north-1
+            - af-south-1
+            - ap-east-1
+            - ap-south-1
+            - ap-northeast-3
+            - ap-northeast-2
+            - ap-southeast-1
+            - ap-southeast-2
+            - ap-northeast-1
+            - ca-central-1
+            - cn-north-1
+            - cn-northwest-1
+            - me-south-1
+            - sa-east-1
 
   instance_type:
     type: string
     default: t2.micro
+    constraints:
+      - valid_values:
+          - t2.micro
+          - t2.small
+          - t2.medium
+          - t2.large
+          - t2.xlarge
+          - t2.2xlarge
 
   agent_user:
     description: >
@@ -83,10 +101,10 @@ node_templates:
           Filters:
           - Name: name
             Values:
-            - { get_input: ami_name_filter }
+            - CentOS 7.7.1908 x86_64 with cloud-init (HVM)
           - Name: owner-id
             Values:
-            - { get_input: ami_owner_filter }
+            - 057448758665
       client_config: *client_config
 
   ip:
@@ -192,7 +210,7 @@ node_templates:
       client_config: *client_config
       resource_config:
         CidrBlock: 10.10.4.0/24
-        AvailabilityZone: { get_input: availability_zone }
+        AvailabilityZone: { concat: [ { get_input: aws_region_name }, 'b' ] }
     relationships:
     - type: cloudify.relationships.depends_on
       target: vpc
