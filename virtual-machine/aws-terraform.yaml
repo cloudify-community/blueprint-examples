@@ -19,10 +19,31 @@ inputs:
   aws_region_name:
     type: string
     default: 'us-east-1'
-
-  aws_zone_name:
-    type: string
-    default: { concat: [ { get_input: aws_region_name }, 'd' ] }
+    constraints:
+      - valid_values:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - eu-central-1
+          - eu-west-1
+          - eu-west-2
+          - eu-south-1
+          - eu-west-3
+          - eu-north-1
+          - af-south-1
+          - ap-east-1
+          - ap-south-1
+          - ap-northeast-3
+          - ap-northeast-2
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-northeast-1
+          - ca-central-1
+          - cn-north-1
+          - cn-northwest-1
+          - me-south-1
+          - sa-east-1
 
   agent_key_name:
     type: string
@@ -44,7 +65,7 @@ node_templates:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }
-          aws_zone: { get_input: aws_zone_name }
+          aws_zone: { concat: [ { get_input: aws_region_name }, 'a' ] }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
     relationships:
