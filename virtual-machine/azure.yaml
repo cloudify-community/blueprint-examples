@@ -13,25 +13,52 @@ inputs:
   resource_suffix:
     default: '0'
 
-  resource_group_name:
-    type: string
-    description: Your Azure Resource Group.
-    default: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
-
-  network_name:
-    type: string
-    description: Your Azure Virtual Network.
-    default: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
-
-  subnet_name:
-    type: string
-    description: Your Azure Virtual Network Subnet.
-    default: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
-
   location:
     type: string
     description: Your Azure Region.
     default: eastus2
+    constraints:
+      - valid_values:
+          - centralus
+          - eastus
+          - eastus2
+          - westus
+          - northcentralus
+          - southcentralus
+          - westcentralus
+          - westus2
+          - northeurope
+          - westeurope
+          - uksouth
+          - ukwest
+          - francecentral
+          - francesouth
+          - switzerlandnorth
+          - switzerlandwest
+          - germanynorth
+          - germanywestcentral
+          - norwaywest
+          - norwayeast
+          - canadacentral
+          - canadaeast
+          - brazilsouth
+          - southafricanorth
+          - southafricawest
+          - eastasia
+          - southeastasia
+          - japanwest
+          - japaneast
+          - southindia
+          - centralindia
+          - westindia
+          - koreacentral
+          - koreasouth
+          - uaecentral
+          - uaenorth
+          - australiaeast
+          - australiasoutheast
+          - australiacentral
+          - australiacentral2
 
   image:
     description: >
@@ -47,6 +74,17 @@ inputs:
        Name of Virtual Machine Size in Azure.
     type: string
     default: Standard_B1s
+    constraints:
+      - valid_values:
+          - Standard_B1s
+          - Standard_B1ms
+          - Standard_B2s
+          - Standard_B2ms
+          - Standard_B4ms
+          - Standard_B8ms
+          - Standard_B12ms
+          - Standard_B16ms
+          - Standard_B20ms
 
   retry_after:
     type: integer
@@ -242,8 +280,8 @@ node_templates:
   subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
-      resource_group_name: { get_input: resource_group_name }
-      name: { get_input: subnet_name }
+      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
       azure_config: *azure_config
       location: { get_input: location }
       resource_config:
@@ -255,8 +293,8 @@ node_templates:
   network:
     type: cloudify.azure.nodes.network.VirtualNetwork
     properties:
-      resource_group_name: { get_input: resource_group_name }
-      name: { get_input: network_name }
+      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
+      name: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
       azure_config: *azure_config
       location: { get_input: location }
     relationships:
@@ -266,7 +304,7 @@ node_templates:
   resource_group:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
-      name: { get_input: resource_group_name }
+      name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       location: { get_input: location }
       azure_config: *azure_config
 
