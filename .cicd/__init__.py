@@ -59,7 +59,7 @@ AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/'
            'releases/download/{v}/cloudify_ansible_plugin-{v}-'
            'centos-Core-py36-none-linux_x86_64.wgn'.format(v=AN_VERSION)
 AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/'
-           'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
+            'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 VC_WAGON = 'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/' \
            'cloudify/wagons/cloudify-vcloud-plugin/{0}/' \
            'cloudify_vcloud_plugin-{0}-' \
