@@ -55,10 +55,10 @@ DK_WAGON = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
            'linux_x86_64-centos-Core.wgn'.format(v=DK_VERSION)
 DK_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-docker-plugin/' \
             'releases/download/{v}/plugin.yaml'.format(v=DK_VERSION)
-AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/'
-           'releases/download/{v}/cloudify_ansible_plugin-{v}-'
+AN_WAGON = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
+           'releases/download/{v}/cloudify_ansible_plugin-{v}-' \
            'centos-Core-py36-none-linux_x86_64.wgn'.format(v=AN_VERSION)
-AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/'
+AN_PLUGIN = 'https://github.com/cloudify-cosmo/cloudify-ansible-plugin/' \
             'releases/download/{v}/plugin.yaml'.format(v=AN_VERSION)
 VC_WAGON = 'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/' \
            'cloudify/wagons/cloudify-vcloud-plugin/{0}/' \
