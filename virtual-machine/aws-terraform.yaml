@@ -38,8 +38,8 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
-        source_path: virtual-machine/resources/terraform/template
+          location: https://github.com/cloudposse/terraform-example-module/archive/refs/heads/master.zip
+        source_path: examples/complete
         variables:
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
