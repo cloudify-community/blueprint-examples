@@ -7,7 +7,7 @@ description: >
 
 imports:
   - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
-  - plugin:cloudify-ansible-plugin= >=2.12.0
+  - plugin:cloudify-ansible-plugin?version= >=2.12.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
