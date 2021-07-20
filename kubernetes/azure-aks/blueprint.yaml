@@ -276,6 +276,9 @@ capabilities:
   endpoint:
     value: { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
 
+  connection_details:
+    value: *kubernetes_master_configuration
+
 outputs:
 
   endpoint:
