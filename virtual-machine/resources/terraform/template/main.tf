@@ -60,3 +60,7 @@ resource "aws_eip" "eip" {
   instance = aws_instance.example_vm.id
   vpc      = true
 }
+
+output "instance_ip_addr" {
+  value = aws_instance.server.private_ip
+}
