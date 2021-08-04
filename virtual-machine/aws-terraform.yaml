@@ -30,11 +30,11 @@ inputs:
 
   location:
     type: string
-    default: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
+    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
 
   source_path:
     type: string
-    default: virtual-machine/resources/terraform/template
+    default: template/modules/public_vm
 
 node_templates:
 
