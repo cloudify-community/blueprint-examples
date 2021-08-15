@@ -49,7 +49,7 @@
   ],
   "kubernetes/discovery": [
     "account.yaml",
-    "existing-eks",
+    "existing-eks.yaml",
     "workload.yaml"
   ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
