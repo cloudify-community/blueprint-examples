@@ -38,6 +38,6 @@ node_templates:
   azure_account:
     type: cloudify.azure.nodes.resources.Azure
     properties:
-      client_config: *client_config
+      client_config: *azure_config
 
 capabilities: {}
