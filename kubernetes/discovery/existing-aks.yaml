@@ -26,10 +26,10 @@ inputs:
     required: false
     default: azure_client_secret
 
-  location:
+  location-secret:
     type: string
     required: true
-    default: eastus2
+    default: azure_location
 
   resource_group_name:
     type: string
@@ -53,6 +53,7 @@ node_templates:
       use_external_resource: true
       resource_group: { get_input: resource_group_name }
       name: { get_input: managed_cluster_name }
+      location: { get_secret: { get_input: location-secret } }
       azure_config: *azure_config
       store_kube_config_in_runtime: true
 
