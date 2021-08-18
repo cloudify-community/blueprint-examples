@@ -1,5 +1,5 @@
 [submodule "kubernetes/kubespray"]
-    branch = release-2.16
+	branch = release-2.16
 	path = kubernetes/kubespray/kubespray
     url = https://github.com/kubernetes-sigs/kubespray.git
 [submodule "db-lb-app/db/mariadb"]
