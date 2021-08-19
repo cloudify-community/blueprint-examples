@@ -334,13 +334,13 @@ workflows:
           filters:
             branches:
               only: master
-      - getting-started-ansible:
-          requires:
-            - blueprints-validation
-            - getting-started-aws-cloudformation
-          filters:
-            branches:
-              only: master
+#      - getting-started-ansible:
+#          requires:
+#            - blueprints-validation
+#            - getting-started-aws-cloudformation
+#          filters:
+#            branches:
+#              only: master
       - release:
           requires:
             - blueprints-validation
@@ -350,7 +350,7 @@ workflows:
             - getting-started-azure
             - getting-started-azure-arm
             - getting-started-gcp
-            - getting-started-ansible
+            # - getting-started-ansible
           filters:
             branches:
               only: master
@@ -382,12 +382,12 @@ workflows:
           filters:
             branches:
               only: master
-      - getting-started-ansible:
-          requires:
-            - getting-started-aws-cloudformation
-          filters:
-            branches:
-              only: master
+#      - getting-started-ansible:
+#          requires:
+#            - getting-started-aws-cloudformation
+#          filters:
+#            branches:
+#              only: master
       - getting-started-azure:
           requires:
             - blueprints-validation-nightlies
