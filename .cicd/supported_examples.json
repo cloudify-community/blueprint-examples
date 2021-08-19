@@ -48,8 +48,10 @@
     "vcloud.yaml"
   ],
   "kubernetes/discovery": [
-    "account.yaml",
+    "aws-account.yaml",
+    "azure-account.yaml",
     "existing-eks.yaml",
+    "existing-aks.yaml",
     "workload.yaml"
   ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
