@@ -65,6 +65,7 @@ node_templates:
         kwargs:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
       use_public_ip: true
+      cloudify_tagging: true
     relationships:
     - type: cloudify.relationships.depends_on
       target: ami

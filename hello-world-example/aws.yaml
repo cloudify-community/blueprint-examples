@@ -8,7 +8,6 @@ imports:
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-ansible-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
-  - includes/hello-world-ansible.yaml
 
 inputs:
 
