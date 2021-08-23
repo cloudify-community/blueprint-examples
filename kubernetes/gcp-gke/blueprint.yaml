@@ -26,12 +26,6 @@ dsl_definitions:
   gcp_config: &gcp_config
     auth: { get_input: gcp_credentials }
     zone: { get_input: zone }
-  kubernetes-cluster-attributes:
-    type: cloudify.gcp.nodes.KubernetesCluster
-    properties:
-      use_external_resource: true
-      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
-      gcp_config: *gcp_config
 
 node_templates:
 
@@ -41,6 +35,12 @@ node_templates:
       name: { concat: [ { get_input: resource_prefix }, '-cluster']}
       gcp_config: *gcp_config
 
+  kubernetes-cluster-attributes:
+    type: cloudify.gcp.nodes.KubernetesCluster
+    properties:
+      use_external_resource: true
+      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
+      gcp_config: *gcp_config
     relationships:
       - type: cloudify.relationships.depends_on
         target: kubernetes-cluster
