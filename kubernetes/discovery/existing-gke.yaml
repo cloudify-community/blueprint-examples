@@ -37,13 +37,13 @@ capabilities:
   kubernetes_configuration:
     description: The EKS cluster Kube Config.
     value: &kubernetes_master_configuration
-        authentication:
-          gcp_service_account: { get_secret: { get_input: gcp-credentials-secret } }
-        configuration:
-          api_options:
-            host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
-            verify_ssl: false
-            debug: false
+      authentication:
+        gcp_service_account: { get_secret: { get_input: gcp-credentials-secret } }
+      configuration:
+        api_options:
+          host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+          verify_ssl: false
+          debug: false
 
   endpoint:
     value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
