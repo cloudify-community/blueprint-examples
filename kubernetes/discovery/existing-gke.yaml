@@ -19,7 +19,7 @@ inputs:
 
 dsl_definitions:
 
-  gcp_config: &gcp_config
+  client_config: &client_config
     auth: { get_secret: { get_input: gcp-credentials-secret } }
     zone: { get_input: zone }
 
@@ -30,7 +30,7 @@ node_templates:
     properties:
       use_external_resource: true
       name: { get_input: kubernetes_cluster_name }
-      gcp_config: *gcp_config
+      client_config: *client_config
 
 capabilities:
 
