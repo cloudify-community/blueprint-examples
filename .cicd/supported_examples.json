@@ -52,7 +52,7 @@
     "azure-account.yaml",
     "existing-eks.yaml",
     "existing-aks.yaml",
-    "workload.yaml"
+    "kubernetes-workload.yaml"
   ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
   "kubernetes/azure-aks": ["blueprint.yaml"],
