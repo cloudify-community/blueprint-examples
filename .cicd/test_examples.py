@@ -83,8 +83,10 @@ def basic_blueprint_test_with_getting_started_filter(request):
             basic_blueprint_test(
                 blueprint_path,
                 blueprint_id,
-                inputs='infra_name={0} -i infra_exists=true'.format(
-                    infra_name),
+                inputs='infra_name={0} '
+                       '-i infra_exists=true '
+                       '-i env_name={1}'.format(infra_name,
+                                                os.environ['CIRCLE_BUILD_NUM']),
                 timeout=timeout,
                 use_vpn='vsphere' in infra_name)
         except:
