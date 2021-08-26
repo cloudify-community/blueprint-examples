@@ -7,8 +7,13 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: 'cfyinfra'
+
   resource_prefix:
-    default: cfyinfra
+    default: {  get_input: env_name }
 
   resource_suffix:
     default: '0'

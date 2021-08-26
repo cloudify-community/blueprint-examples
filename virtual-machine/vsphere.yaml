@@ -18,9 +18,14 @@ inputs:
     type: boolean
     default: false
 
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: '1'
+
   resource_suffix:
     type: string
-    default: '1'
+    default: { get_input: env_name }
 
   server_name:
     type: string
