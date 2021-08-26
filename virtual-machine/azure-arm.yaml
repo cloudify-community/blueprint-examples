@@ -6,8 +6,14 @@ imports:
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
+
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: 'cfyinfraarm'
+
   resource_prefix:
-    default: cfyinfraarm
+    default: {  get_input: env_name }
 
   resource_suffix:
     default: '0'

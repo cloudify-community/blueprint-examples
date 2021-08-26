@@ -42,6 +42,11 @@ inputs:
     type: string
     default: agent_key
 
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: 'example'
+
 dsl_definitions:
 
   client_config: &client_config
@@ -64,6 +69,10 @@ node_templates:
         InstanceType: { get_input: instance_type }
         kwargs:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
+          TagSpecifications:
+            - Tags:
+                - Key: Name
+                  Value: { get_input: env_name }
       use_public_ip: true
     relationships:
     - type: cloudify.relationships.depends_on
