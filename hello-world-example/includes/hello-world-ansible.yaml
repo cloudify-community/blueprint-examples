@@ -10,6 +10,11 @@ node_templates:
       playbook_path: apache2/playbook.yaml
       start_at_task: "install apache2"
       # save_playbook: true
+      ansible_env_vars:
+        ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
+        ANSIBLE_HOST_KEY_CHECKING: "False"
+        ANSIBLE_STDOUT_CALLBACK: dense
+      store_facts: false
     interfaces:
       cloudify.interfaces.lifecycle:
         create: {}
@@ -22,6 +27,8 @@ node_templates:
           cloudify.interfaces.relationship_lifecycle:
             establish:
               inputs:
+                log_stdout: false
+                store_facts: false
                 sources:
                   vms:
                     hosts:
