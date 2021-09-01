@@ -38,7 +38,7 @@ dsl_definitions:
 node_templates:
 
   azure_account:
-    type: cloudify.azure.nodes.resources.Azure
+    type: cloudify.nodes.azure.resources.Azure
     properties:
       client_config: *azure_config
 

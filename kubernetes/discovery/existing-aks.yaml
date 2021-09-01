@@ -56,7 +56,8 @@ capabilities:
   kubernetes_configuration:
     description: The EKS cluster Kube Config.
     value: &kubernetes_master_configuration
-      file_content: { get_attribute: [ managed_cluster, kubeconf ] }
+      configuration:
+        file_content: { get_attribute: [ managed_cluster, kubeconf ] }
 
   endpoint:
     value: { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
