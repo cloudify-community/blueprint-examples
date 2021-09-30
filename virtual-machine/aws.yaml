@@ -70,7 +70,8 @@ node_templates:
         kwargs:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
           TagSpecifications:
-            - Tags:
+            - ResourceType: instance
+              Tags:
                 - Key: Name
                   Value: { get_input: env_name }
       use_public_ip: true
