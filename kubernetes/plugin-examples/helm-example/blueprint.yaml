@@ -32,6 +32,10 @@ inputs:
     type: string
     default: https://charts.bitnami.com/bitnami
 
+  cluster_deployment:
+    type: string
+    description: The name of the deployment that exposes the connection details to a cluster.
+
 node_templates:
 
   helm_install:
@@ -65,6 +69,4 @@ node_templates:
       - target: helm_install
         type: cloudify.helm.relationships.run_on_host
       - target: repo
-        type: cloudify.relationships.depends_on
-      - target: eks_cluster
         type: cloudify.relationships.depends_on
