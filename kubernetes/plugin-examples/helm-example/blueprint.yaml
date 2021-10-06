@@ -60,8 +60,8 @@ node_templates:
       client_config:
         configuration:
           file_content: { get_capaibility: { get_input: cluster_deployment }, connection_details, file_content }
-          api_options:
-            api_key: { get_secret: kubernetes_token }
+          # api_options:
+          #   api_key: { get_secret: kubernetes_token }
       resource_config:
         name: "examplerelease"
         chart: { concat: [ { get_input: repo_name },'/', { get_input: chart_name } ] }
