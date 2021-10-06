@@ -58,10 +58,7 @@ node_templates:
     type: cloudify.nodes.helm.Release
     properties:
       client_config:
-        configuration:
-          file_content: { get_capaibility: { get_input: cluster_deployment }, connection_details, file_content }
-          # api_options:
-          #   api_key: { get_secret: kubernetes_token }
+        configuration: { get_capaibility: { get_input: cluster_deployment }, connection_details }
       resource_config:
         name: "examplerelease"
         chart: { concat: [ { get_input: repo_name },'/', { get_input: chart_name } ] }
