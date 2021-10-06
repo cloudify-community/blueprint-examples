@@ -47,17 +47,26 @@ commands:
           name: install cloudify
           command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
       - run:
+          name: get wget
+          command: sudo apt-get install -y wget
+      - run:
           name: download manager docker image
-          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
+      - run:
+          name: download manager docker image
+          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
       - run:
           name: show images
           command: docker images
       - run:
           name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
       - run:
           name: wait for starter
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -88,17 +97,26 @@ commands:
           name: install cloudify
           command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
       - run:
+          name: get wget
+          command: sudo apt-get install -y wget
+      - run:
           name: download manager docker image
-          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
+      - run:
+          name: download manager docker image
+          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
       - run:
           name: show images
           command: docker images
       - run:
           name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
       - run:
           name: wait for starter
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
+      - run:
+          name: install local project
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -119,20 +137,26 @@ commands:
           name: install cloudify
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
       - run:
+          name: get wget
+          command: sudo apt-get install -y wget
+      - run:
           name: download manager docker image
-          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
+      - run:
+          name: download manager docker image
+          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
       - run:
           name: show images
           command: docker images
       - run:
           name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
       - run:
           name: wait for starter
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
 
   test_examples:
@@ -150,20 +174,26 @@ commands:
           name: install cloudify
           command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
       - run:
+          name: get wget
+          command: sudo apt-get install -y wget
+      - run:
           name: download manager docker image
-          command:  docker pull cloudifyplatform/premium-cloudify-manager-aio:latest
+          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
+      - run:
+          name: download manager docker image
+          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
       - run:
           name: show images
           command: docker images
       - run:
           name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudifyplatform/premium-cloudify-manager-aio
+          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
       - run:
           name: wait for starter
           command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
+          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
 
   release_examples:
