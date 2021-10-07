@@ -60,6 +60,10 @@ inputs:
   resource_suffix:
     default: { get_input: env_name }
 
+  agent_user:
+    type: string
+    default: ec2-user
+
 dsl_definitions:
 
   client_config: &client_config
