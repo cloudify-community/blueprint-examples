@@ -35,6 +35,13 @@ inputs:
     default:
       ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
       ANSIBLE_HOST_KEY_CHECKING: "False"
+      ANSIBLE_STDOUT_CALLBACK: dense
+
+  log_stdout:
+    default: false
+
+  store_facts:
+    default: false
 
 relationships:
 
@@ -95,6 +102,10 @@ relationships:
                 ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
             ansible_env_vars:
               default: { get_input: ansible_env_vars }
+            log_stdout:
+              default: { get_input: log_stdout }
+            store_facts:
+              default: { get_input: store_facts }
         unlink:
           implementation: ansible.cloudify_ansible.tasks.ansible_remove_host
           inputs:
@@ -137,6 +148,8 @@ node_templates:
                 - bastion
               ssh_common_args: { get_input: kubespray_ansible_ssh_common_args }
             ansible_env_vars: { get_input: ansible_env_vars }
+            log_stdout: { get_input: log_stdout }
+            store_facts: false
     relationships:
       # master can't be scalled
       - type: cloudify.ansible.relationships.connected_to_host

@@ -232,3 +232,20 @@ outputs:
   application_endpoint:
     description: The external endpoint of the application.
     value: { concat: [ 'http://', { get_attribute: [ ip, aws_resource_id ] }, ':80' ] }
+
+
+groups:
+
+  scalable_compute:
+    members:
+      - vm
+      - nic
+
+policies:
+
+  scalable_compute_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [scalable_compute]
+
