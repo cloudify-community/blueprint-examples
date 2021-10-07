@@ -47,6 +47,13 @@
     "vsphere.yaml",
     "vcloud.yaml"
   ],
+  "kubernetes/discovery": [
+    "aws-account.yaml",
+    "azure-account.yaml",
+    "existing-eks.yaml",
+    "existing-aks.yaml",
+    "kubernetes-workload.yaml"
+  ],
   "kubernetes/aws-eks": ["blueprint.yaml"],
   "kubernetes/azure-aks": ["blueprint.yaml"],
   "kubernetes/gcp-gke": ["blueprint.yaml"],

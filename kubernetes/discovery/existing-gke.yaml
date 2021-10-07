@@ -1,0 +1,52 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-gcp-plugin
+
+inputs:
+
+  gcp-credentials-secret:
+    type: string
+    required: false
+    default: gcp_credentials
+
+  zone:
+    type: string
+
+  kubernetes_cluster_name:
+    type: string
+
+dsl_definitions:
+
+  client_config: &client_config
+    auth: { get_secret: { get_input: gcp-credentials-secret } }
+    zone: { get_input: zone }
+
+node_templates:
+
+  kubernetes-cluster-attributes:
+    type: cloudify.gcp.nodes.KubernetesCluster
+    properties:
+      use_external_resource: true
+      name: { get_input: kubernetes_cluster_name }
+      client_config: *client_config
+
+capabilities:
+
+  kubernetes_configuration:
+    description: The EKS cluster Kube Config.
+    value: &kubernetes_master_configuration
+      authentication:
+        gcp_service_account: { get_secret: { get_input: gcp-credentials-secret } }
+      configuration:
+        api_options:
+          host: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+          verify_ssl: false
+          debug: false
+
+  endpoint:
+    value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
+
+  connection_details:
+    value: *kubernetes_master_configuration

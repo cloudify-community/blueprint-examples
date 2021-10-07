@@ -1,0 +1,55 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-aws-plugin
+
+inputs:
+
+  aws-access-key-id-secret:
+    type: string
+    default: aws_access_key_id
+
+  aws-secret-access-key-secret:
+    type: string
+    default: aws_secret_access_key
+
+  aws_region_name:
+    type: string
+    default: { get_secret: aws_region_name }
+
+  resource_name:
+    type: string
+    default: eks_cluster
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_secret: { get_input: aws-access-key-id-secret } }
+    aws_secret_access_key: { get_secret: { get_input: aws-secret-access-key-secret } }
+    region_name: { get_input: aws_region_name }
+
+node_templates:
+
+  eks_cluster:
+    type: cloudify.nodes.aws.eks.Cluster
+    properties:
+      client_config: *client_config
+      use_external_resource: true
+      resource_id: { get_input: resource_name }
+      store_kube_config_in_runtime: True
+
+capabilities:
+
+  # Remove this.
+  kubernetes_configuration:
+    description: The EKS cluster Kube Config.
+    value:
+      configuration: { get_attribute: [ eks_cluster, kubeconf ] }
+
+  endpoint:
+    value: { get_attribute: [ eks_cluster, kubeconf, clusters, 0, cluster, server ] }
+
+  connection_details:
+    value:
+      file_content: { get_attribute: [ eks_cluster, kubeconf ] }

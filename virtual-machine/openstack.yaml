@@ -22,9 +22,14 @@ inputs:
     description: The UUID of small flavor in your Openstack account.
     default: { get_secret: base_flavor_id }
 
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: '4'
+
   resource_suffix:
     type: string
-    default: '4'
+    default: { get_input: env_name }
 
   network_id:
     type: string

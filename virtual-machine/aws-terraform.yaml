@@ -28,6 +28,18 @@ inputs:
     type: string
     default: agent_key
 
+  location:
+    type: string
+    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+
+  source_path:
+    type: string
+    default: template/modules/public_vm
+
+  env_name:
+    type: string
+    default: 'example'
+
 node_templates:
 
   terraform:
@@ -38,9 +50,10 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: https://github.com/cloudify-community/blueprint-examples/archive/master.zip
-        source_path: virtual-machine/resources/terraform/template
+          location: { get_input: location }
+        source_path: { get_input: source_path }
         variables:
+          env_name: { get_input: env_name }
           access_key: { get_secret: aws_access_key_id }
           secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }

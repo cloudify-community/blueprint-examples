@@ -1,0 +1,32 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-gcp-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.25.0
+
+inputs:
+
+  gcp-credentials-secret:
+    type: string
+    required: false
+    default: gcp_credentials
+
+  zone:
+    type: string
+    default: 'us-west1-a'
+
+dsl_definitions:
+
+  gcp_config: &gcp_config
+    auth: { get_secret: { get_input: gcp-credentials-secret } }
+    zone: { get_input: zone }
+
+node_templates:
+
+  gcp_account:
+    type: cloudify.nodes.gcp.Gcp
+    properties:
+      client_config: *gcp_config
+
+capabilities: {}

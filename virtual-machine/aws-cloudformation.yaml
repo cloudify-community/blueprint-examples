@@ -44,9 +44,6 @@ inputs:
     type: string
     default: 172.30.0.0/24
 
-  resource_suffix:
-    default: '-a'
-
   agent_key_name:
     type: string
     default: agent_key
@@ -55,6 +52,13 @@ inputs:
     type: string
     default: https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/blueprints/5.0.5/cloudformation/template.yaml
 
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: '-a'
+
+  resource_suffix:
+    default: { get_input: env_name }
 
 dsl_definitions:
 

@@ -44,7 +44,12 @@ inputs:
     default: agent_key
 
   resource_suffix:
-    default: '0'
+    default: { get_input: env_name }
+
+  env_name:
+    type: string
+    description: Control parameters for names in resources.
+    default: 'example'
 
 node_templates:
 

@@ -1,0 +1,45 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-azure-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.25.0
+
+inputs:
+
+  subscription-id-secret:
+    type: string
+    required: false
+    default: azure_subscription_id
+
+  tenant-id-secret:
+    type: string
+    required: false
+    default: azure_tenant_id
+
+  client-id-secret:
+    type: string
+    required: false
+    default: azure_client_id
+
+  client-secret-secret:
+    type: string
+    required: false
+    default: azure_client_secret
+
+dsl_definitions:
+
+  azure_config: &azure_config
+    subscription_id:  { get_secret: { get_input: subscription-id-secret } }
+    tenant_id: { get_secret: { get_input: tenant-id-secret } }
+    client_id: { get_secret: { get_input: client-id-secret } }
+    client_secret: { get_secret: { get_input: client-secret-secret } }
+
+node_templates:
+
+  azure_account:
+    type: cloudify.nodes.azure.resources.Azure
+    properties:
+      client_config: *azure_config
+
+capabilities: {}
