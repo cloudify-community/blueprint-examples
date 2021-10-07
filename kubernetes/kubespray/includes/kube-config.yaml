@@ -86,6 +86,9 @@ node_templates:
     type: cloudify.nodes.ansible.Executor
     properties:
       site_yaml_path: { get_input: kubernetes_helm_ansible_playbook_path }
+      ansible_env_vars: { get_input: ansible_env_vars }
+      log_stdout: { get_input: log_stdout }
+      store_facts: false
     relationships:
       - type: cloudify.relationships.depends_on
         target: kube-config

@@ -1,0 +1,69 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Cloudify Helm-eks blueprint. Creates EKS cluster and installs helm chart on top of it.
+
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-helm-plugin
+
+inputs:
+
+  repo_name:
+    description: >
+      Name of the repo to add.
+    type: string
+    default: bitnami
+
+  chart_name:
+    description: >
+      Chart package name to deploy from repo.
+    default: postgresql
+
+  helm_installation_source:
+    description: >
+      Helm download link.
+    type: string
+    default: 'https://get.helm.sh/helm-v3.3.1-linux-amd64.tar.gz'
+
+  repo_url:
+    description: >
+      URL of the repo to add. For example:
+      https://kubernetes-charts.storage.googleapis.com/
+    type: string
+    default: https://charts.bitnami.com/bitnami
+
+  cluster_deployment:
+    type: string
+    description: The name of the deployment that exposes the connection details to a cluster.
+
+node_templates:
+
+  helm_install:
+    type: cloudify.nodes.helm.Binary
+    properties:
+      use_existing_resource: false
+      installation_source: { get_input: helm_installation_source }
+
+  repo:
+    type: cloudify.nodes.helm.Repo
+    properties:
+      resource_config:
+        name: { get_input: repo_name }
+        repo_url: { get_input: repo_url }
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+
+  release:
+    type: cloudify.nodes.helm.Release
+    properties:
+      client_config:
+        configuration: { get_capability: [ { get_input: cluster_deployment }, connection_details ] }
+      resource_config:
+        name: "examplerelease"
+        chart: { concat: [ { get_input: repo_name },'/', { get_input: chart_name } ] }
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+      - target: repo
+        type: cloudify.relationships.depends_on

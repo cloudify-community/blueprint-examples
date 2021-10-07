@@ -43,3 +43,7 @@ if __name__ == '__main__':
         key_user_string = get_key_user_string(_user, _key)
         instance_keys.append(key_user_string)
     ctx.instance.runtime_properties[SSH_KEYS] = instance_keys
+
+    with open('/boot/firmware/cmdline.txt', 'w') as outfile:
+        outfile.write(
+            'cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory')
