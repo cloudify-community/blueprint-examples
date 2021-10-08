@@ -240,6 +240,7 @@ groups:
     members:
       - vm
       - nic
+      - hello-world
 
 policies:
 
