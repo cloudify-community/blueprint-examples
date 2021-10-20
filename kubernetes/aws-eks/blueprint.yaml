@@ -28,9 +28,6 @@ inputs:
     type: string
     default: { concat: [ { get_input: aws_region_name}, 'e' ] }
 
-  resource_suffix:
-    default: '-1'
-
   eks_cluster_name:
     type: string
 
