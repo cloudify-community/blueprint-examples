@@ -1,0 +1,143 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates infrastructure on GCP using Terraform.
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-terraform-plugin?version= >=0.15.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  auth_url:
+    type: string
+    description: |
+      OpenStack authentication URL (Keystone v3 endpoint).
+      Example: https://example.com:13000/v3/
+    default: { get_secret: openstack_auth_url }
+
+  application_credential_id:
+    type: string
+    description: >-
+      OpenStack application credential ID (v3).
+      See https://docs.openstack.org/keystone/latest/user/application_credentials.html
+    default: { get_secret: openstack_application_credential_id }
+  
+  application_credential_secret:
+    type: string
+    description: >-
+      OpenStack application credential secret (v3).
+      See https://docs.openstack.org/keystone/latest/user/application_credentials.html
+    default: { get_secret: openstack_application_credential_secret }
+
+  region:
+    description: OpenStack region name.
+    type: string
+    default: { get_secret: openstack_region_name }
+
+  external_network_name:
+    description: External OpenStack network (floating IP pool) to use.
+    type: string
+    default: { get_secret: openstack_external_network_name }
+
+  flavor:
+    description: |
+      Compute flavor name to use.
+      Example: t1.small
+      Command: `openstack flavor list`
+    type: string
+
+  image:
+    description: |
+      Glance image name to use.
+      Command: `openstack image list`
+    type: string
+
+  insecure:
+    description: Skip TLS validation on the authentication endpoint.
+    type: boolean
+    default: false
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'ubuntu'
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+  location:
+    type: string
+    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+
+  source_path:
+    type: string
+    default: template/modules/openstack/public_vm
+
+  prefix:
+    type: string
+    default: cfy
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+
+  cloud_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: { get_input: location }
+        source_path: { get_input: source_path }
+        variables:
+          auth_url: { get_input: auth_url }
+          credentials:
+            application_id: { get_input: application_credential_id }
+            application_secret: { get_input: application_credential_secret }
+          region: { get_input: region }
+          external_network_name: { get_input: external_network_name }
+          flavor: { get_input: flavor }
+          image: { get_input: image }
+          auth_url_insecure: { get_input: insecure }
+          admin_user: { get_input: agent_user }
+          admin_key_public: { get_attribute: [agent_key, public_key_export] }
+          prefix: { get_input: prefix }
+    relationships:
+      - target: terraform
+        type: cloudify.terraform.relationships.run_on_host
+      - target: agent_key
+        type: cloudify.relationships.depends_on
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
+capabilities:
+  name:
+    value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, name ] }
+
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ cloud_resources, outputs, public_ip, value ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_attribute: [agent_key, private_key_export] }
