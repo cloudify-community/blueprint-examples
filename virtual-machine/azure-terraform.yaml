@@ -1,0 +1,104 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates infrastructure on Azure using Terraform.
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-terraform-plugin?version= >=0.15.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'ubuntu'
+
+  region_name:
+    type: string
+    default: 'eastus'
+    constraints:
+    - valid_values: [westus,westus2,eastus,centralus,centraluseuap,southcentralus,northcentralus,westcentralus,eastus2,eastus2euap,brazilsouth,brazilus,northeurope,westeurope,eastasia,southeastasia,japanwest,japaneast,koreacentral,koreasouth,southindia,westindia,centralindia,australiaeast,australiasoutheast,canadacentral,canadaeast,uksouth,ukwest,francecentral,francesouth,australiacentral,australiacentral2,uaecentral,uaenorth,southafricanorth,southafricawest,switzerlandnorth,switzerlandwest,germanynorth,germanywestcentral,norwayeast,norwaywest,brazilsoutheast,westus3,swedencentral,swedensouth]
+
+  image:
+    description: Azure Image reference
+    default: 
+      publisher: Canonical
+      offer: UbuntuServer
+      sku: 18.04-LTS
+      version: latest
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+  location:
+    type: string
+    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+
+  source_path:
+    type: string
+    default: template/modules/azure/public_vm
+
+  prefix:
+    type: string
+    default: cfy
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+
+  cloud_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: { get_input: location }
+        source_path: { get_input: source_path }
+        variables:
+          subscription_id: { get_secret: azure_subscription_id }
+          tenant_id: { get_secret: azure_tenant_id }
+          client_id: { get_secret: azure_client_id }
+          client_secret: { get_secret: azure_client_secret }
+          region: { get_input: region_name }
+          admin_user: { get_input: agent_user }
+          admin_key_public: { get_attribute: [agent_key, public_key_export] }
+          prefix: { get_input: prefix }
+    relationships:
+      - target: terraform
+        type: cloudify.terraform.relationships.run_on_host
+      - target: agent_key
+        type: cloudify.relationships.depends_on
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
+capabilities:
+  name:
+    value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, id ] }
+
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ cloud_resources, resources, fip, instances, 0, attributes, ip_address ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_attribute: [agent_key, private_key_export] }
