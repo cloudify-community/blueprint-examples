@@ -1,0 +1,108 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  This blueprint creates infrastructure on GCP using Terraform.
+imports:
+  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - plugin:cloudify-terraform-plugin?version= >=0.15.0
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  credentials_json:
+    description: Contents of a GCP JSON credentials file
+    type: string
+    default: { get_secret: gcp_credentials }
+
+  project_id:
+    description: GCP project ID
+    type: string
+    default: { get_secret: gcp_project_id }
+
+  agent_user:
+    description: >
+      The username of the agent running on the instance created from the image.
+    type: string
+    default: 'ubuntu'
+
+  zone_name:
+    type: string
+    default: { get_secret: gcp_zone }
+
+  image:
+    description: GCP Image reference
+    default: 
+      project: ubuntu-os-cloud
+      family: ubuntu-1804-lts
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+  location:
+    type: string
+    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+
+  source_path:
+    type: string
+    default: template/modules/gcp/public_vm
+
+  prefix:
+    type: string
+    default: cfy
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+
+  cloud_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: { get_input: location }
+        source_path: { get_input: source_path }
+        variables:
+          credentials_json: { get_input: credentials_json }
+          project: { get_input: project_id }
+          zone: { get_input: zone_name }
+          admin_user: { get_input: agent_user }
+          admin_key_public: { get_attribute: [agent_key, public_key_export] }
+          prefix: { get_input: prefix }
+    relationships:
+      - target: terraform
+        type: cloudify.terraform.relationships.run_on_host
+      - target: agent_key
+        type: cloudify.relationships.depends_on
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+
+capabilities:
+  name:
+    value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, name ] }
+
+  endpoint:
+    description: The external endpoint of the application.
+    value: { get_attribute: [ cloud_resources, outputs, public_ip, value ] }
+
+  user:
+    description: user ID.
+    value: { get_input: agent_user }
+
+  key_content:
+    description: Private agent key
+    value: { get_attribute: [agent_key, private_key_export] }
