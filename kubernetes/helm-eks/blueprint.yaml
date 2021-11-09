@@ -27,10 +27,12 @@ inputs:
     description: >
       Name of the repo to add.
     type: string
+    default: bitnami
 
   chart_name:
     description: >
       Chart package name to deploy from repo.
+      default: chart_name
 
   helm_installation_source:
     description: >
@@ -43,6 +45,7 @@ inputs:
       URL of the repo to add. For example:
       https://kubernetes-charts.storage.googleapis.com/
     type: string
+    default: https://charts.bitnami.com/bitnami
 
 node_templates:
 
