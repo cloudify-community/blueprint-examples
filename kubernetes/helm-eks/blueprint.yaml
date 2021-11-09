@@ -23,6 +23,9 @@ inputs:
     description: The blueprint name, the deployment name.
     default: 'aws-eks'
 
+  eks_cluster_name:
+    type: string
+
   repo_name:
     description: >
       Name of the repo to add.
@@ -32,7 +35,7 @@ inputs:
   chart_name:
     description: >
       Chart package name to deploy from repo.
-      default: chart_name
+    default: postgresql
 
   helm_installation_source:
     description: >
@@ -60,7 +63,8 @@ node_templates:
           external_resource: { get_input: infra_exists }
         deployment:
           id: { get_input: infra_deployment_id }
-
+          inputs:
+            eks_cluster_name: { get_input: eks_cluster_name }
 
   helm_install:
     type: cloudify.nodes.helm.Binary
