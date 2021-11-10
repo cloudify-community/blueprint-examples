@@ -29,7 +29,7 @@ inputs:
 
   subnet_name:
     type: string
-    description: The name of your GCP Virtual Netwozrk.
+    description: The name of your GCP Virtual Network.
     default: hellosubnet
 
   image:
