@@ -4,7 +4,7 @@ description: >
   This blueprint creates an AWS infrastructure environment.
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - plugin:cloudify-aws-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
@@ -283,3 +283,20 @@ capabilities:
   key_content:
     description: Private agent key
     value: { get_attribute: [agent_key, private_key_export] }
+
+groups:
+
+  scalable_compute:
+    members:
+      - vm
+      - nic
+      - ip
+
+policies:
+
+  scalable_compute_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [scalable_compute]
+

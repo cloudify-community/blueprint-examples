@@ -4,7 +4,7 @@ description: >
   Deploys Nodejs.
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-utilities-plugin
 
@@ -31,7 +31,7 @@ inputs:
       URL of infra zip file.
     type: string
     # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.
-    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-10/virtual-machine.zip'
+    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/virtual-machine.zip'
 
   infra_exists:
     description: >

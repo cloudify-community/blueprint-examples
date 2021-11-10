@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Cloudify Helm-eks blueprint. Creates EKS cluster and installs helm chart on top of it.
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - plugin:cloudify-helm-plugin
 
 inputs:
@@ -21,7 +21,10 @@ inputs:
 
   infra_deployment_id:
     description: The blueprint name, the deployment name.
-    default: 'aws-eks'
+    default: { get_input: eks_cluster_name }
+
+  eks_cluster_name:
+    type: string
 
   eks_cluster_name:
     type: string
