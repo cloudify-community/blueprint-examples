@@ -33,7 +33,7 @@ node_templates:
                   vms:
                     hosts:
                       vm:
-                        ansible_host: { get_attribute: [ vm, ip ] }
+                        ansible_host: { get_input: vm_ip }
                         ansible_user: { get_input: agent_user }
                         ansible_ssh_private_key_file: { get_attribute: [agent_key, private_key_export] }
                         ansible_become: True

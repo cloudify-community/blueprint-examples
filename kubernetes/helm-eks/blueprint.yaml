@@ -21,7 +21,7 @@ inputs:
 
   infra_deployment_id:
     description: The blueprint name, the deployment name.
-    default: 'aws-eks'
+    default: { get_input: eks_cluster_name }
 
   eks_cluster_name:
     type: string

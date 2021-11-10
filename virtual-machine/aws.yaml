@@ -283,3 +283,20 @@ capabilities:
   key_content:
     description: Private agent key
     value: { get_attribute: [agent_key, private_key_export] }
+
+groups:
+
+  scalable_compute:
+    members:
+      - vm
+      - nic
+      - ip
+
+policies:
+
+  scalable_compute_policy:
+    type: cloudify.policies.scaling
+    properties:
+      default_instances: 1
+    targets: [scalable_compute]
+
