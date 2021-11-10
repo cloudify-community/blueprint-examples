@@ -26,6 +26,9 @@ inputs:
   eks_cluster_name:
     type: string
 
+  eks_cluster_name:
+    type: string
+
   repo_name:
     description: >
       Name of the repo to add.
