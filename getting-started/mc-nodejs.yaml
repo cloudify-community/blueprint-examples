@@ -4,7 +4,7 @@ description: >
   Deploys Nodejs.
 
 imports:
-  - https://cloudify.co/spec/cloudify/5.1.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-utilities-plugin
 
