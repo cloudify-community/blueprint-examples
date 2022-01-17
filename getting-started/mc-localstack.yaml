@@ -27,12 +27,8 @@ inputs:
           - vsphere
 
   infra_archive:
-    description: >
-      URL of infra zip file.
-    type: string
-    # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.
-    default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/virtual-machine.zip'
-
+     # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.
+     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/virtual-machine.zip'
   infra_exists:
     description: >
       Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
@@ -46,7 +42,7 @@ inputs:
     type: string
     description: Control parameters for names in resources.
     default: mc-localstack
-
+  
 node_templates:
 
   infrastructure:
@@ -71,16 +67,11 @@ node_templates:
         create:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
-            script_path: scripts/jboss/create.sh
+            script_path: scripts/localstack/create_localstack.sh
             fabric_env: &fabric_env
               host_string: { get_capability: [ { get_input: infra_deployment_id } , endpoint ] }
               user: { get_capability: [ { get_input: infra_deployment_id }, user ] }
               key: { get_capability: [ { get_input: infra_deployment_id }, key_content ] }
-        configure:
-          implementation: fabric.fabric_plugin.tasks.run_script
-          inputs:
-            script_path: scripts/localstack/configure_localstack.sh
-            fabric_env: *fabric_env
         start:
           implementation: fabric.fabric_plugin.tasks.run_script
           inputs:
@@ -100,11 +91,4 @@ outputs:
   localstack_endpoint:
     description: endpoint of the localstack application
     value: { concat: [ 'http://', { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ] }, ':4566' ] }
-
-
-
-
-
-
-
 

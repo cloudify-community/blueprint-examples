@@ -251,7 +251,7 @@ node_templates:
             destinationPortRange: 4566
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
-            priority: 104
+            priority: 105
             access: 'Allow'
             direction: Inbound 
         - name: localstack_intenal_api_port
@@ -262,7 +262,7 @@ node_templates:
             destinationPortRange: 4571
             sourceAddressPrefix: '*'
             destinationAddressPrefix: '*'
-            priority: 104
+            priority: 106
             access: 'Allow'
             direction: Inbound       
     relationships:

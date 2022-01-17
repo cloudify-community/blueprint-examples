@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # This script is designed to deploy all required prerequisites for localstack docker container.
-logfile="/tmp/create_localstack_$(date +'%m-%d-%Y_%H%M%S').log"
 
+logfile="/tmp/create_localstack_$(date +'%m-%d-%Y_%H%M%S').log"
 
 install_localstack_ubuntu()
 {
