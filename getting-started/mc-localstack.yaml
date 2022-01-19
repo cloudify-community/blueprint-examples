@@ -16,15 +16,11 @@ inputs:
     constraints:
       - valid_values:
           - openstack
-          - openstack-v2
           - azure
-          - azure-arm
           - aws
           - aws-terraform
           - aws-cloudformation
           - gcp
-          - ansible
-          - vsphere
 
   infra_archive:
      # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.

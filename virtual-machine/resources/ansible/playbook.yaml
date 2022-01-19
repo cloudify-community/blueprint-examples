@@ -92,6 +92,14 @@
             from_port: 2375
             to_port: 2375
             cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 4566
+            to_port: 4566
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 4571
+            to_port: 4571
+            cidr_ip: 0.0.0.0/0
         rules_egress:
           - proto: all
             cidr_ip: 0.0.0.0/0
