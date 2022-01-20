@@ -1,0 +1,23 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Activate the epel-release repository
+      ansible.builtin.yum:
+        name: epel-release
+        state: present
+
+    - name: Install NGINX
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+
+    - name: Add home page with message
+      ansible.builtin.template:
+        src: templates/index.html.j2
+        dest: /usr/share/nginx/html/index.html
+
+    - name: Ensure NGINX is started
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
