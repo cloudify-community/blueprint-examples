@@ -105,7 +105,7 @@ node_templates:
             subnet_1_tags: { get_attribute: [ terraform_module, subnet_1_tags ] }
             subnet_2_tags: { get_attribute: [ terraform_module, subnet_2_tags ] }
           source:
-            location: templates/tf-vpc-master.zip
+            location: templates/tf-aws-vpc-master.zip
       relationships:
         - target: terraform
           type: cloudify.terraform.relationships.run_on_host
