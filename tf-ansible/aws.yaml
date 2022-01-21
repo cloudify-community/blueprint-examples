@@ -6,18 +6,6 @@ imports:
   - plugin:cloudify-terraform-plugin
   - plugin:cloudify-ansible-plugin
 
-data_types:
-  resource_config:
-    properties:
-      vpc_cidr:
-        type: string
-      subnet_cidr:
-        type: string
-      aws_region_name:
-        type: string
-      instance_type:
-        type: string
-
 inputs:
   aws_region_name:
     type: string
@@ -50,6 +38,9 @@ node_templates:
 
   terraform:
     type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
   
   shared_resources:
     type: cloudify.nodes.terraform.Module
@@ -111,11 +102,16 @@ node_templates:
                         ansible_become: true
                         ansible_ssh_common_args: -o StrictHostKeyChecking=no
                 run_data:
-                  message: { get_input: website_message}
+                  message: { get_input: website_message }
 
 groups:
   server_and_app:
     members: [instance, app]
+
+policies:
+  scaling_policy:
+    type: cloudify.policies.scaling
+    targets: [server_and_app]
 
 outputs:
   instance_ips:
