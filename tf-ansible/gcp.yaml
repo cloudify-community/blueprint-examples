@@ -1,0 +1,124 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - plugin:cloudify-terraform-plugin
+  - plugin:cloudify-ansible-plugin
+
+inputs:
+  gcp_region_name:
+    type: string
+    description: GCP Region to deploy instances into
+    default: us-west2
+
+  prefix:
+    type: string
+    description: A prefix to add to names of deployed resources
+    default: cfy
+
+  project:
+    type: string
+    description: Name of the GCP project to deploy resources into
+
+  instance_type:
+    type: string
+    description: GCP instance type to deploy (e.g., e2-small)
+    default: e2-small
+
+  public_key_content:
+    type: string
+    description: Contents of a public key. The corresponding private key must be in the secret store.
+
+  admin_user:
+    type: string
+    description: User created on GCP instance
+    default: centos
+
+  website_message:
+    type: string
+    description: A message to display on the home page of the deployed web server
+    default: Welcome to NGINX, deployed by Cloudify
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
+  
+  shared_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: gcp/shared_resources.zip
+        variables:
+          credentials_json: { get_secret: gcp_credentials_json }
+          project: { get_input: project }
+          prefix: { get_input: prefix }
+          region: { get_input: gcp_region_name }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+
+  instance:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: gcp/instance.zip
+        variables:
+          credentials_json: { get_secret: gcp_credentials_json }
+          project: { get_input: project }
+          admin_user: { get_input: admin_user }
+          admin_key_public: { get_input: public_key_content }
+          instance_type: { get_input: instance_type }
+          prefix: { get_input: prefix }
+          region: { get_input: gcp_region_name }
+          network: { get_attribute: [shared_resources, outputs, network, value] }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+      - type: cloudify.relationships.connected_to
+        target: shared_resources
+
+  app:
+    type: cloudify.nodes.ansible.Playbook
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        poststart: {}
+    relationships:
+      - type: cloudify.ansible.relationships.run_on_host
+        target: instance
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            establish:
+              inputs:
+                playbook_path: playbooks/install_nginx.yaml
+                sources:
+                  instances:
+                    hosts:
+                      instance:
+                        ansible_host: { get_attribute: [ TARGET, outputs, ip, value ] }
+                        ansible_user: centos
+                        ansible_ssh_private_key_file: { get_secret: private_key_content }
+                        ansible_become: true
+                        ansible_ssh_common_args: -o StrictHostKeyChecking=no
+                run_data:
+                  message: { get_input: website_message }
+
+groups:
+  server_and_app:
+    members: [instance, app]
+
+policies:
+  scaling_policy:
+    type: cloudify.policies.scaling
+    targets: [server_and_app]
+
+outputs:
+  instance_ips:
+    description: IP addresses of any deployed instances
+    value: { get_attributes_list: [instance, outputs, ip, value] }
