@@ -14,13 +14,13 @@ variable "aws_region" {
 }
 
 variable "vpc_cidr" {
-    type        = string
-    description = "CIDR block for AWS VPC"
+  type        = string
+  description = "CIDR block for AWS VPC"
 }
 
 variable "subnet_cidr" {
-    type        = string
-    description = "CIDR block for AWS Subnet"
+  type        = string
+  description = "CIDR block for AWS Subnet"
 }
 
 variable "public_key" {
