@@ -1,0 +1,134 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - plugin:cloudify-terraform-plugin
+  - plugin:cloudify-ansible-plugin
+
+inputs:
+  azure_region_name:
+    type: string
+    description: Azure Region to deploy resources into
+    default: westus2
+
+  instance_type:
+    type: string
+    description: Azure instance type to deploy (e.g., Standard_B1s)
+    default: Standard_B1s
+
+  network_cidr:
+    type: list
+    description: A list of CIDR networks for the deployed Azure network
+    default:
+      - "10.0.0.0/16"
+
+  subnet_cidr:
+    type: list
+    description: A list of CIDR subnets for the deployed Azure subnet. Must fall within the network CIDR.
+    default:
+      - "10.0.1.0/24"
+
+  prefix:
+    type: string
+    description: A prefix to add to names of deployed resources
+    default: cfy
+
+  public_key_content:
+    type: string
+    description: Contents of a public key. The corresponding private key must be in the secret store.
+
+  website_message:
+    type: string
+    description: A message to display on the home page of the deployed web server
+    default: Welcome to NGINX, deployed by Cloudify
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
+  
+  shared_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: azure/shared_resources.zip
+        variables:
+          region: { get_input: azure_region_name }
+          prefix: { get_input: prefix }
+          network_cidr: { get_input: network_cidr }
+          subnet_cidr: { get_input: subnet_cidr }
+          client_id: { get_secret: azure_client_id }
+          client_secret: { get_secret: azure_client_secret }
+          subscription_id: { get_secret: azure_subscription_id }
+          tenant_id: { get_secret: azure_tenant_id }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+
+  vm:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: azure/vm.zip
+        variables:
+          resource_group_name: { get_attribute: [shared_resources, outputs, resource_group_name, value] }
+          location: { get_attribute: [shared_resources, outputs, location, value] }
+          subnet: { get_attribute: [shared_resources, outputs, subnet, value] }
+          prefix: { get_input: prefix }
+          admin_user: centos
+          admin_key_public: { get_input: public_key_content }
+          instance_type: { get_input: instance_type }
+          client_id: { get_secret: azure_client_id }
+          client_secret: { get_secret: azure_client_secret }
+          subscription_id: { get_secret: azure_subscription_id }
+          tenant_id: { get_secret: azure_tenant_id }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+      - type: cloudify.relationships.connected_to
+        target: shared_resources
+
+  app:
+    type: cloudify.nodes.ansible.Playbook
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        poststart: {}
+    relationships:
+      - type: cloudify.ansible.relationships.run_on_host
+        target: vm
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            establish:
+              inputs:
+                playbook_path: playbooks/install_nginx.yaml
+                sources:
+                  instances:
+                    hosts:
+                      instance:
+                        ansible_host: { get_attribute: [ TARGET, outputs, ip, value ] }
+                        ansible_user: centos
+                        ansible_ssh_private_key_file: { get_secret: private_key_content }
+                        ansible_become: true
+                        ansible_ssh_common_args: -o StrictHostKeyChecking=no
+                run_data:
+                  message: { get_input: website_message }
+
+groups:
+  server_and_app:
+    members: [vm, app]
+
+policies:
+  scaling_policy:
+    type: cloudify.policies.scaling
+    targets: [server_and_app]
+
+outputs:
+  instance_ips:
+    description: IP addresses of any deployed instances
+    value: { get_attributes_list: [vm, outputs, ip, value] }
