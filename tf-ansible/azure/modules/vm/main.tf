@@ -1,5 +1,10 @@
+# Generate a random suffix to suffix resources with
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 resource "azurerm_public_ip" "example_ip" {
-  name                    = "${var.prefix}-public-ip"
+  name                    = "${var.prefix}-public-ip-${random_id.suffix.hex}"
   location                = var.location
   resource_group_name     = var.resource_group_name
   allocation_method       = "Dynamic"
@@ -7,12 +12,12 @@ resource "azurerm_public_ip" "example_ip" {
 }
 
 resource "azurerm_network_interface" "example_interface" {
-  name                = "${var.prefix}-nic"
+  name                = "${var.prefix}-nic-${random_id.suffix.hex}"
   location            = var.location
   resource_group_name = var.resource_group_name
 
   ip_configuration {
-    name                          = "${var.prefix}-internal-ip"
+    name                          = "${var.prefix}-internal-ip-${random_id.suffix.hex}"
     subnet_id                     = var.subnet
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.example_ip.id
@@ -21,7 +26,7 @@ resource "azurerm_network_interface" "example_interface" {
 }
 
 resource "azurerm_linux_virtual_machine" "example" {
-  name                = "${var.prefix}-vm"
+  name                = "${var.prefix}-vm-${random_id.suffix.hex}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.instance_type
