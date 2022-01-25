@@ -34,3 +34,23 @@ variable "instance_type" {
   description = "Instance type/size to deploy"
   default     = "Standard_B1s"
 }
+
+variable "client_id" {
+  type        = string
+  description = "Azure Client ID used for authentication"
+}
+
+variable "client_secret" {
+  type        = string
+  description = "Azure Client Secret used for authentication"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID used for authentication"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure Tenant ID used for authentication"
+}

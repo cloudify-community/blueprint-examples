@@ -21,3 +21,23 @@ variable "subnet_cidr" {
   description = "CIDR for deployed Azure subnet"
   default     = ["10.0.1.0/24"]
 }
+
+variable "client_id" {
+  type        = string
+  description = "Azure Client ID used for authentication"
+}
+
+variable "client_secret" {
+  type        = string
+  description = "Azure Client Secret used for authentication"
+}
+
+variable "subscription_id" {
+  type        = string
+  description = "Azure Subscription ID used for authentication"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure Tenant ID used for authentication"
+}
