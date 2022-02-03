@@ -81,6 +81,11 @@ node_templates:
           aws_zone: { concat: [ { get_input: aws_region_name }, 'a' ] }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
+      tflint_config:
+        config:
+          - type_name: config
+            option_value:
+              module: 'true'
     relationships:
       - target: terraform
         type: cloudify.terraform.relationships.run_on_host
