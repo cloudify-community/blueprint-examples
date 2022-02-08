@@ -42,6 +42,11 @@ inputs:
         - us-west2
         - us-west3
         - us-west4
+  
+  zone:
+    type: string
+    description: The GCP zone to deploy the instance into
+    default: { concat: [ { get_input: gcp_region_name }, "-b" ] }
 
   prefix:
     type: string
@@ -110,6 +115,7 @@ node_templates:
           instance_type: { get_input: instance_type }
           prefix: { get_input: prefix }
           region: { get_input: gcp_region_name }
+          zone: { get_input: zone }
           network: { get_attribute: [shared_resources, outputs, network, value] }
     relationships:
       - type: cloudify.terraform.relationships.run_on_host
