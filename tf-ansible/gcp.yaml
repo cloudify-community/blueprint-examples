@@ -10,7 +10,7 @@ inputs:
   gcp_region_name:
     type: string
     description: GCP Region to deploy instances into
-    default: europe-west1
+    default: us-east1
     constraints:
       - valid_values:
         - asia-east1
@@ -84,7 +84,8 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: gcp/shared_resources.zip
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: gcp/modules/shared_resources
         variables:
           credentials_json: { get_secret: gcp_credentials }
           project: { get_input: project }
@@ -99,7 +100,8 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: gcp/instance.zip
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: gcp/modules/instance
         variables:
           credentials_json: { get_secret: gcp_credentials }
           project: { get_input: project }

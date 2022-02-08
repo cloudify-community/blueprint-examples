@@ -72,7 +72,8 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: aws/shared_resources.zip
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: aws/modules/shared_resources
         variables:
           aws_access_key: { get_secret: aws_access_key_id }
           aws_secret_key: { get_secret: aws_secret_access_key }
@@ -89,7 +90,8 @@ node_templates:
     properties:
       resource_config:
         source:
-          location: aws/instance.zip
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: aws/modules/instance
         variables:
           aws_access_key: { get_secret: aws_access_key_id }
           aws_secret_key: { get_secret: aws_secret_access_key }
