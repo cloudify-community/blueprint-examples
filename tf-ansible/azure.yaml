@@ -10,7 +10,49 @@ inputs:
   azure_region_name:
     type: string
     description: Azure Region to deploy resources into
-    default: westus2
+    default: eastus2
+    constraints:
+      - valid_values:
+          - centralus
+          - eastus
+          - eastus2
+          - westus
+          - northcentralus
+          - southcentralus
+          - westcentralus
+          - westus2
+          - northeurope
+          - westeurope
+          - uksouth
+          - ukwest
+          - francecentral
+          - francesouth
+          - switzerlandnorth
+          - switzerlandwest
+          - germanynorth
+          - germanywestcentral
+          - norwaywest
+          - norwayeast
+          - canadacentral
+          - canadaeast
+          - brazilsouth
+          - southafricanorth
+          - southafricawest
+          - eastasia
+          - southeastasia
+          - japanwest
+          - japaneast
+          - southindia
+          - centralindia
+          - westindia
+          - koreacentral
+          - koreasouth
+          - uaecentral
+          - uaenorth
+          - australiaeast
+          - australiasoutheast
+          - australiacentral
+          - australiacentral2
 
   instance_type:
     type: string

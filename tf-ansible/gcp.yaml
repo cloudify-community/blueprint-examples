@@ -10,7 +10,38 @@ inputs:
   gcp_region_name:
     type: string
     description: GCP Region to deploy instances into
-    default: us-west2
+    default: europe-west1
+    constraints:
+      - valid_values:
+        - asia-east1
+        - asia-east2
+        - asia-northeast1
+        - asia-northeast2
+        - asia-northeast3
+        - asia-south1
+        - asia-south2
+        - asia-southeast1
+        - asia-southeast2
+        - australia-southeast1
+        - australia-southeast2
+        - europe-central2
+        - europe-north1
+        - europe-west1
+        - europe-west2
+        - europe-west3
+        - europe-west4
+        - europe-west6
+        - northamerica-northeast1
+        - northamerica-northeast2
+        - southamerica-east1
+        - southamerica-west1
+        - us-central1
+        - us-east1
+        - us-east4
+        - us-west1
+        - us-west2
+        - us-west3
+        - us-west4
 
   prefix:
     type: string
@@ -55,7 +86,7 @@ node_templates:
         source:
           location: gcp/shared_resources.zip
         variables:
-          credentials_json: { get_secret: gcp_credentials_json }
+          credentials_json: { get_secret: gcp_credentials }
           project: { get_input: project }
           prefix: { get_input: prefix }
           region: { get_input: gcp_region_name }
@@ -70,7 +101,7 @@ node_templates:
         source:
           location: gcp/instance.zip
         variables:
-          credentials_json: { get_secret: gcp_credentials_json }
+          credentials_json: { get_secret: gcp_credentials }
           project: { get_input: project }
           admin_user: { get_input: admin_user }
           admin_key_public: { get_input: public_key_content }
