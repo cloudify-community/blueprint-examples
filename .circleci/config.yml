@@ -1,5 +1,11 @@
 version: 2.1
 
+orbs:
+  node: cloudify/public-unittest-orb@1 #orb version
+  wagonorb: cloudify/wagon-bulder-orb@1 #orb version
+  releaseorb: cloudify/release-orb@1 #orb version
+  managerorb: cloudify/manager-orb@1
+
 checkout:
   post:
     - >
@@ -15,58 +21,14 @@ executors:
     docker:
       - image: circleci/python:3.6
 
-  cloudify-machine:
+  cloudify-machine-py3:
     machine:
       image: ubuntu-1604:201903-01
-
 
 commands:
 
   validate_examples:
     steps:
-      - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule update --init --recursive
-      - attach_workspace:
-          at: workspace
-      - run:
-          name: Set Python
-          command: |
-            if ! pyenv -v COMMAND &> /dev/null
-            then
-                echo "pyenv could not be found"
-                exit
-            else
-                pyenv global 3.6.5
-            fi
-      - run:
-          name: update pip
-          command: pip install -U pip===20.3.3
-      - run:
-          name: install cloudify
-          command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
-      - run:
-          name: get wget
-          command: sudo apt-get install -y wget
-      - run:
-          name: download manager docker image
-          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: download manager docker image
-          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: show images
-          command: docker images
-      - run:
-          name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
-      - run:
-          name: wait for starter
-          command: docker exec -it cfy_manager cfy_manager wait-for-starter
-      - run:
-          name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
@@ -75,49 +37,6 @@ commands:
   validate_examples_nightlies:
     steps:
       - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule update --init --recursive
-      - attach_workspace:
-          at: workspace
-      - run:
-          name: Set Python
-          command: |
-            if ! pyenv -v COMMAND &> /dev/null
-            then
-                echo "pyenv could not be found"
-                exit
-            else
-                pyenv global 3.6.5
-            fi
-      - run:
-          name: update pip
-          command: pip install -U pip===20.3.3
-      - run:
-          name: install cloudify
-          command: pip install -U pytest==4.6.3 pyyaml==4.2b4 cryptography==3.2.1
-      - run:
-          name: get wget
-          command: sudo apt-get install -y wget
-      - run:
-          name: download manager docker image
-          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: download manager docker image
-          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: show images
-          command: docker images
-      - run:
-          name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
-      - run:
-          name: wait for starter
-          command: docker exec -it cfy_manager cfy_manager wait-for-starter
-      - run:
-          name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
-      - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
       - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation_nightlies or test_versions'
@@ -125,72 +44,12 @@ commands:
   test_openshift:
     steps:
       - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule update --init --recursive
-      - attach_workspace:
-          at: workspace
-      - run:
-          name: update pip
-          command: pip install -U pip===20.3.3
-      - run:
-          name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
-      - run:
-          name: get wget
-          command: sudo apt-get install -y wget
-      - run:
-          name: download manager docker image
-          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: download manager docker image
-          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: show images
-          command: docker images
-      - run:
-          name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
-      - run:
-          name: wait for starter
-          command: docker exec -it cfy_manager cfy_manager wait-for-starter
-      - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
 
   test_examples:
     steps:
-      - run:
-          name: "Pull Submodules"
-          command: |
-            git submodule update --init --recursive
-      - attach_workspace:
-          at: workspace
-      - run:
-          name: update pip
-          command: pip install -U pip===20.3.3
-      - run:
-          name: install cloudify
-          command: pip install -U cloudify==5.1 pytest==4.6.3 pyyaml==4.2b4
-      - run:
-          name: get wget
-          command: sudo apt-get install -y wget
-      - run:
-          name: download manager docker image
-          command:  wget http://repository.cloudifysource.org/cloudify/6.1.0/ga-release/cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: download manager docker image
-          command:  docker load -i cloudify-manager-aio-docker-6.1.0-ga.tar
-      - run:
-          name: show images
-          command: docker images
-      - run:
-          name: start docker container
-          command: docker run --name cfy_manager -d --restart unless-stopped -v /sys/fs/cgroup:/sys/fs/cgroup:ro --tmpfs /run --tmpfs /run/lock --security-opt seccomp:unconfined --cap-add SYS_ADMIN --network host cloudify-manager-aio:latest
-      - run:
-          name: wait for starter
-          command: docker exec -it cfy_manager cfy_manager wait-for-starter
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
@@ -218,99 +77,110 @@ commands:
 jobs:
 
   blueprints-validation:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - validate_examples
 
   blueprints-validation-nightlies:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - validate_examples_nightlies
 
   getting-started-aws:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-aws-terraform:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-aws-cloudformation:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: aws
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-openstack:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: openstack
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-azure:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-azure-arm:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: azure
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-gcp:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: gcp
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   getting-started-ansible:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
       IAAS: ansible
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_examples
 
   openshift:
-    executor: cloudify-machine
+    executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
     steps:
       - checkout
+      - managerorb/create_manager_container_latest
       - test_openshift
 
   release:
