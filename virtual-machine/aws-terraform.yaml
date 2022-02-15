@@ -49,9 +49,13 @@ inputs:
     type: string
     default: agent_key
 
+  module_version:
+    type: string
+    default: main
+
   location:
     type: string
-    default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
+    default: { concat: [ 'https://github.com/cloudify-community/tf-source/archive/refs/heads/', { get_input: module_version }, '.zip' ] }
 
   source_path:
     type: string
@@ -73,14 +77,29 @@ node_templates:
         source:
           location: { get_input: location }
         source_path: { get_input: source_path }
+        environment_variables:
+          AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
+          AWS_SECRET_ACCESS_KEY: { get_secret: aws_secret_access_key }
         variables:
           env_name: { get_input: env_name }
-          access_key: { get_secret: aws_access_key_id }
-          secret_key: { get_secret: aws_secret_access_key }
           aws_region: { get_input: aws_region_name }
           aws_zone: { concat: [ { get_input: aws_region_name }, 'a' ] }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
+      tflint_config:
+        installation_source: https://github.com/terraform-linters/tflint/releases/download/v0.34.1/tflint_linux_amd64.zip
+        config:
+          - type_name: config
+            option_value:
+              module: "true"
+          - type_name: plugin
+            option_name: aws
+            option_value:
+              enabled: "true"
+          - type_name: rule
+            option_name: terraform_unused_declarations
+            option_value:
+              enabled: "true"
     relationships:
       - target: terraform
         type: cloudify.terraform.relationships.run_on_host
