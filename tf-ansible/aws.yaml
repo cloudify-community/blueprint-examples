@@ -1,0 +1,146 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - plugin:cloudify-terraform-plugin
+  - plugin:cloudify-ansible-plugin
+
+inputs:
+  aws_region_name:
+    type: string
+    description: AWS Region to deploy resources into
+    default: us-east-1
+    constraints:
+      - valid_values:
+        - us-east-1
+        - us-east-2
+        - us-west-1
+        - us-west-2
+        - eu-central-1
+        - eu-west-1
+        - eu-west-2
+        - eu-south-1
+        - eu-west-3
+        - eu-north-1
+        - af-south-1
+        - ap-east-1
+        - ap-south-1
+        - ap-northeast-3
+        - ap-northeast-2
+        - ap-southeast-1
+        - ap-southeast-2
+        - ap-northeast-1
+        - ca-central-1
+        - cn-north-1
+        - cn-northwest-1
+        - me-south-1
+        - sa-east-1
+
+  instance_type:
+    type: string
+    description: EC2 instance type to deploy (e.g., t2.small)
+    default: t2.small
+
+  public_key_content:
+    type: string
+    description: Contents of a public key. The corresponding private key must be in the secret store.
+
+  vpc_cidr:
+    type: string
+    description: CIDR network for the deployed VPC
+
+  subnet_cidr:
+    type: string
+    description: CIDR network for the deployed subnet. Must fall within the VPC CIDR.
+
+  website_message:
+    type: string
+    description: A message to display on the home page of the deployed web server
+    default: Welcome to NGINX, deployed by Cloudify
+
+node_templates:
+
+  terraform:
+    type: cloudify.nodes.terraform
+    properties:
+      resource_config:
+        installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
+  
+  shared_resources:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: aws/modules/shared_resources
+        variables:
+          aws_access_key: { get_secret: aws_access_key_id }
+          aws_secret_key: { get_secret: aws_secret_access_key }
+          aws_region: { get_input: aws_region_name }
+          public_key: { get_secret: public_key_content }
+          vpc_cidr: { get_input: vpc_cidr }
+          subnet_cidr: { get_input: subnet_cidr }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+
+  instance:
+    type: cloudify.nodes.terraform.Module
+    properties:
+      resource_config:
+        source:
+          location: https://github.com/cloudify-community/tf-ansible-source/archive/refs/heads/master.zip
+        source_path: aws/modules/instance
+        variables:
+          aws_access_key: { get_secret: aws_access_key_id }
+          aws_secret_key: { get_secret: aws_secret_access_key }
+          aws_region: { get_input: aws_region_name }
+          instance_type: { get_input: instance_type }
+          key_name: { get_attribute: [shared_resources, outputs, key_name, value] }
+          security_group_id: { get_attribute: [shared_resources, outputs, security_group_id, value] }
+          subnet_id: { get_attribute: [shared_resources, outputs, subnet_id, value] }
+    relationships:
+      - type: cloudify.terraform.relationships.run_on_host
+        target: terraform
+      - type: cloudify.relationships.connected_to
+        target: shared_resources
+
+  app:
+    type: cloudify.nodes.ansible.Playbook
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        poststart: {}
+    relationships:
+      - type: cloudify.ansible.relationships.run_on_host
+        target: instance
+        source_interfaces:
+          cloudify.interfaces.relationship_lifecycle:
+            establish:
+              inputs:
+                playbook_path: playbooks/install_nginx.yaml
+                sources:
+                  instances:
+                    hosts:
+                      instance:
+                        ansible_host: { get_attribute: [ TARGET, outputs, ip, value ] }
+                        ansible_user: centos
+                        ansible_ssh_private_key_file: { get_secret: private_key_content }
+                        ansible_become: true
+                        ansible_ssh_common_args: -o StrictHostKeyChecking=no
+                run_data:
+                  message: { get_input: website_message }
+
+groups:
+  server_and_app:
+    members: [instance, app]
+
+policies:
+  scaling_policy:
+    type: cloudify.policies.scaling
+    targets: [server_and_app]
+
+outputs:
+  instance_ips:
+    description: IP addresses of any deployed instances
+    value: { get_attributes_list: [instance, outputs, ip, value] }
