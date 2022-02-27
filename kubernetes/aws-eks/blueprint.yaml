@@ -165,7 +165,7 @@ node_templates:
           Value: shared
     interfaces:
       cloudify.interfaces.lifecycle:
-        configure:
+        create:
           implementation: aws.cloudify_aws.ec2.resources.vpc.create
           inputs:
             modify_vpc_attribute_args:
