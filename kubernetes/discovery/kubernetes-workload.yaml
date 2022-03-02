@@ -27,7 +27,8 @@ node_templates:
   kubernetes_deployment:
     type: cloudify.kubernetes.resources.SharedCluster
     properties:
-      client_config: { get_capability: [ { get_input: deployment }, connection_details ] }
+      client_config:
+        configuration: { get_capability: [ { get_input: deployment }, connection_details ] }
       resource_config:
         deployment:
           id: { get_input: deployment }
