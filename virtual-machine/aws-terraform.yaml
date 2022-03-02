@@ -84,6 +84,18 @@ node_templates:
       tfsec_config:
         flags_override:
           - soft_fail
+      tflint_config:
+        config:
+        - type_name: config
+          option_value:
+            module: 'true'
+        - type_name: plugin
+          option_name: aws
+          option_value:
+            enabled: 'false'
+        flags_override:
+          - loglevel: info
+
 
     relationships:
       - target: terraform
