@@ -68,6 +68,12 @@ node_templates:
           id: { get_input: infra_deployment_id }
           inputs:
             eks_cluster_name: { get_input: eks_cluster_name }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: cfy_extensions.cloudify_types.component.execute_start
+          inputs:
+            timeout: 1800
 
   helm_install:
     type: cloudify.nodes.helm.Binary
