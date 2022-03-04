@@ -73,7 +73,7 @@ node_templates:
         start:
           implementation: cfy_extensions.cloudify_types.component.execute_start
           inputs:
-            timeout: 1800
+            timeout: 3600
 
   helm_install:
     type: cloudify.nodes.helm.Binary
