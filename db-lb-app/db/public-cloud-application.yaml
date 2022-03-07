@@ -3,7 +3,7 @@ tosca_definitions_version: cloudify_dsl_1_3
 description: Install MariaDB on infrastructure.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - infrastructure--blueprint:public-cloud-vm
   - plugin:cloudify-ansible-plugin
 
@@ -50,7 +50,7 @@ node_templates:
               new_database_user: { get_input: database_user }
               new_database_password: { get_input: database_password }
     relationships:
-      - type: cloudify.relationships.depends_on
+      - type: cloudify.relationships.contained_in
         target: infrastructure--host
         source_interfaces:
           cloudify.interfaces.relationship_lifecycle:
@@ -105,7 +105,6 @@ policies:
     properties:
       default_instances: 1
     targets: [scalable_cluster]
-
 
 capabilities:
 

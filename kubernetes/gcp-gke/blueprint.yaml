@@ -4,7 +4,7 @@ description: >
   This blueprint create a managed cluster.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-kubernetes-plugin?version= !=2.11.0
 
