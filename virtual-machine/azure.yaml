@@ -243,6 +243,28 @@ node_templates:
             priority: 104
             access: 'Allow'
             direction: Inbound
+        - name: localstack_endpoint_port
+          properties:
+            description: HTTP access
+            protocol: Tcp
+            sourcePortRange: '*'
+            destinationPortRange: 4566
+            sourceAddressPrefix: '*'
+            destinationAddressPrefix: '*'
+            priority: 105
+            access: 'Allow'
+            direction: Inbound 
+        - name: localstack_intenal_api_port
+          properties:
+            description: HTTP access
+            protocol: Tcp
+            sourcePortRange: '*'
+            destinationPortRange: 4571
+            sourceAddressPrefix: '*'
+            destinationAddressPrefix: '*'
+            priority: 106
+            access: 'Allow'
+            direction: Inbound       
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group

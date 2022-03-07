@@ -168,7 +168,10 @@ node_templates:
           remote_ip_prefix: 0.0.0.0/0
         - port: 2375
           remote_ip_prefix: 0.0.0.0/0
-
+        - port: 4566
+          remote_ip_prefix: 0.0.0.0/0
+        - port: 4571
+          remote_ip_prefix: 0.0.0.0/0
   ip:
     type: cloudify.openstack.nodes.FloatingIP
     properties:

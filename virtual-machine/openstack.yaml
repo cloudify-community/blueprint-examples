@@ -51,8 +51,9 @@ inputs:
     default: agent_key
 
   cidr:
-    type: string
-    default: { get_input: resource_suffix }
+#    type: string
+#    default: { get_input: resource_suffix }
+     default: 0
 
   user_domain_name:
     description: Openstack user domain name.
@@ -193,6 +194,14 @@ node_templates:
           protocol: tcp
           port_range_min: 2375
           port_range_max: 2375
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 4566
+          port_range_max: 4566
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 4571
+          port_range_max: 4571
 
   ip:
     type: cloudify.nodes.openstack.FloatingIP

@@ -209,6 +209,14 @@ Resources:
           FromPort: '2375'
           ToPort: '2375'
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '4566'
+          ToPort: '4566'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '4571'
+          ToPort: '4571'
+          CidrIp: 0.0.0.0/0    
   ServerInstance:
     Type: 'AWS::EC2::Instance'
     Properties:
