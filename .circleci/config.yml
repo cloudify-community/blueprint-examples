@@ -32,21 +32,26 @@ commands:
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
-      - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation or test_versions'
+      - run: |
+          for p in `git log -1 --name-only --oneline | grep yaml | grep -v .circleci`
+          do
+              ecosystem-test validate-blueprint -b $p
+          done
 
   validate_examples_nightlies:
     steps:
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip --user
-      - run: pytest -s .cicd/test_examples.py -k 'test_blueprint_validation_nightlies or test_versions'
+      - run: |
+          for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+          do
+              for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
+              do
+                  ecosystem-test validate-blueprint -b $d/$f
+              done
+          done
 
-  test_openshift:
-    steps:
-      - run:
-          name: install local project
-          command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
-      - run: pytest -s .cicd/test_examples.py -k 'test_openshift'
 
   test_examples:
     steps:
@@ -54,6 +59,11 @@ commands:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
       - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
+      - run: docker cp virtual-machine/. cfy_manager:/tmp/virtual-machine
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/virtual-machine/$IAAS.yaml -b infra-$IAAS
+      - run: ecosystem-test local-blueprint-test -b getting-started/mc-jboss.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-jboss-$IAAS-$CIRCLE_BUILD_NUM
+      - run: ecosystem-test local-blueprint-test -b getting-started/mc-nodejs.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-nodejs-$IAAS-$CIRCLE_BUILD_NUM
+      - run: ecosystem-test local-blueprint-test -b getting-started/mc-localstack.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-localstack-$IAAS-$CIRCLE_BUILD_NUM
 
   release_examples:
     steps:
@@ -108,7 +118,7 @@ jobs:
     executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
-      IAAS: aws
+      IAAS: aws-terraform
     steps:
       - checkout
       - managerorb/create_manager_container_latest
@@ -118,17 +128,7 @@ jobs:
     executor: cloudify-machine-py3
     environment:
       CLOUDIFY_SSL_TRUST_ALL: true
-      IAAS: aws
-    steps:
-      - checkout
-      - managerorb/create_manager_container_latest
-      - test_examples
-
-  getting-started-openstack:
-    executor: cloudify-machine-py3
-    environment:
-      CLOUDIFY_SSL_TRUST_ALL: true
-      IAAS: openstack
+      IAAS: aws-cloudformation
     steps:
       - checkout
       - managerorb/create_manager_container_latest
@@ -163,25 +163,6 @@ jobs:
       - checkout
       - managerorb/create_manager_container_latest
       - test_examples
-
-  getting-started-ansible:
-    executor: cloudify-machine-py3
-    environment:
-      CLOUDIFY_SSL_TRUST_ALL: true
-      IAAS: ansible
-    steps:
-      - checkout
-      - managerorb/create_manager_container_latest
-      - test_examples
-
-  openshift:
-    executor: cloudify-machine-py3
-    environment:
-      CLOUDIFY_SSL_TRUST_ALL: true
-    steps:
-      - checkout
-      - managerorb/create_manager_container_latest
-      - test_openshift
 
   release:
     executor: py36
@@ -234,13 +215,6 @@ workflows:
           filters:
             branches:
               only: master
-#      - getting-started-ansible:
-#          requires:
-#            - blueprints-validation
-#            - getting-started-aws-cloudformation
-#          filters:
-#            branches:
-#              only: master
       - release:
           requires:
             - blueprints-validation
@@ -250,7 +224,6 @@ workflows:
             - getting-started-azure
             - getting-started-azure-arm
             - getting-started-gcp
-            # - getting-started-ansible
           filters:
             branches:
               only: master
@@ -282,12 +255,6 @@ workflows:
           filters:
             branches:
               only: master
-#      - getting-started-ansible:
-#          requires:
-#            - getting-started-aws-cloudformation
-#          filters:
-#            branches:
-#              only: master
       - getting-started-azure:
           requires:
             - blueprints-validation-nightlies
