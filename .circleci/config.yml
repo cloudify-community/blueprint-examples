@@ -64,6 +64,13 @@ commands:
                 done
             done
           fi
+      - run: |
+          xblue () {
+              for blueprint in `cfy blueprints list --json | jqids`;
+                  do cfy blueprints delete $blueprint
+                  done
+          }
+          xblue
 
   validate_examples_nightlies:
     steps:
@@ -78,18 +85,31 @@ commands:
                   ecosystem-test validate-blueprint -b $d/$f
               done
           done
+      - run: |
+          xblue () {
+              for blueprint in `cfy blueprints list --json | jqids`;
+                  do cfy blueprints delete $blueprint
+                  done
+          }
+          xblue
 
   test_examples:
     steps:
       - run:
           name: install local project
           command: pip install https://github.com/cloudify-incubator/cloudify-ecosystem-test/archive/latest.zip
-      - run: pytest -s .cicd/test_examples.py -k 'test_getting_started'
       - run: docker cp virtual-machine/. cfy_manager:/tmp/virtual-machine
       - run: docker exec cfy_manager cfy blueprints upload /tmp/virtual-machine/$IAAS.yaml -b infra-$IAAS
       - run: ecosystem-test local-blueprint-test -b getting-started/mc-jboss.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-jboss-$IAAS-$CIRCLE_BUILD_NUM
       - run: ecosystem-test local-blueprint-test -b getting-started/mc-nodejs.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-nodejs-$IAAS-$CIRCLE_BUILD_NUM
       - run: ecosystem-test local-blueprint-test -b getting-started/mc-localstack.yaml -i infra_name=$IAAS -i infra_exists=true -i env_name=$CIRCLE_BUILD_NUM --test-id=bluex-gsmc-localstack-$IAAS-$CIRCLE_BUILD_NUM
+      - run: |
+          xblue () {
+              for blueprint in `cfy blueprints list --json | jqids`;
+                  do cfy blueprints delete $blueprint
+                  done
+          }
+          xblue
 
   release_examples:
     steps:
