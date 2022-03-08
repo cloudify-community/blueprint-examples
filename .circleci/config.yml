@@ -45,8 +45,18 @@ commands:
       - run: docker exec cfy_manager cfy blueprints upload /tmp/infrastructure/openstack.yaml -b private-cloud-vm
       - run: docker exec cfy_manager cfy blueprints upload /tmp/infrastructure/azure.yaml -b public-cloud-vm
       - run: |
-          args=`git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7} | xargs printf -- '-b %s '`
-          ecosystem-test validate-blueprint $args
+          if `git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7}`; then
+              args=`git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7} | xargs printf -- '-b %s '`
+              ecosystem-test validate-blueprint $args
+          else
+            for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+            do
+                for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
+                do
+                    ecosystem-test validate-blueprint -b $d/$f
+                done
+            done
+          fi
 
   validate_examples_nightlies:
     steps:
