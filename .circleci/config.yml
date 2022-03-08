@@ -44,6 +44,13 @@ commands:
       - run: docker exec cfy_manager cfy blueprints upload /tmp/infrastructure/aws.yaml -b infrastructure
       - run: docker exec cfy_manager cfy blueprints upload /tmp/infrastructure/openstack.yaml -b private-cloud-vm
       - run: docker exec cfy_manager cfy blueprints upload /tmp/infrastructure/azure.yaml -b public-cloud-vm
+      - run: docker cp open-source-vnf/. cfy_manager:/tmp/open-source-vnf
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/connected-host/openstack.yaml -b connected-host-openstack
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/network-topology/openstack.yaml -b network-topology-openstack
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/httpd/openstack.yaml -b httpd-openstack
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/haproxy/openstack.yaml -b haproxy-openstack
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/pfsense/openstack.yaml -b pfsense-openstack
+      - run: docker exec cfy_manager cfy blueprints upload /tmp/open-source-vnf/service/openstack.yaml -b service-openstack
       - run: |
           if `git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7}`; then
               args=`git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7} | xargs printf -- '-b %s '`
