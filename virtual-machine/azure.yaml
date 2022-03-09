@@ -106,10 +106,7 @@ inputs:
 dsl_definitions:
 
   azure_config: &azure_config
-    subscription_id: { get_secret: azure_subscription_id }
-    tenant_id: { get_secret: azure_tenant_id }
-    client_id: { get_secret: azure_client_id }
-    client_secret: { get_secret: azure_client_secret }
+    environment_variables: {'foo': 'bar'}
 
 node_templates:
 
