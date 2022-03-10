@@ -24,6 +24,8 @@ install_localstack_ubuntu()
 install_localstack_centos()
 {
    echo "this is centos" | tee -a $logfile
+   sudo rm -rf /etc/yum.repos.d/google-cloud.repo
+   sudo yum update -y
    sudo yum install -y wget curl \
         apt-transport-https ca-certificates \
         software-properties-common gnupg lsb-release \
