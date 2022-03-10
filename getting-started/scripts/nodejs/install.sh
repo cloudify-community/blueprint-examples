@@ -1,5 +1,5 @@
 #!/bin/bash -e
-curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
+curl -fsSL https://rpm.nodesource.com/setup_current.x | sudo bash -
 
 sudo setenforce 0
 cat << EOF | sudo tee /etc/selinux/config
