@@ -96,7 +96,7 @@ dsl_definitions:
       loadBalancerSku: "standard"
       outboundType: "loadBalancer"
       loadBalancerProfile:
-        ManagedOutboundIPs:
+        managedOutboundIPs:
           count: 2
     service_principal_profile:
       clientId: { get_input: client_id }
