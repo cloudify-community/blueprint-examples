@@ -120,9 +120,7 @@ node_templates:
       retry_after: { get_input: retry_after }
       os_family: linux
       client_config:
-        environment_variables:
-          AZURE_SUBSCRIPTION_ID: { get_secret: azure_subscription_id }
-      # client_config: *azure_config
+        subscription_id: { get_secret: azure_subscription_id }
       resource_config:
         hardwareProfile:
           vmSize: { get_input: size }
