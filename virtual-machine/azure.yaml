@@ -332,7 +332,8 @@ node_templates:
   resource_group:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
-      name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
+      name: asheville1
+      use_external_resource: true
       location: { get_input: location }
       client_config: *azure_config
 
