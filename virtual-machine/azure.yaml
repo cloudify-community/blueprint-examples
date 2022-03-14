@@ -308,7 +308,7 @@ node_templates:
   subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
-      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
+      resource_group_name: cfyinfrargasheville
       name: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
       client_config: *azure_config
       location: { get_input: location }
@@ -321,7 +321,7 @@ node_templates:
   network:
     type: cloudify.azure.nodes.network.VirtualNetwork
     properties:
-      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
+      resource_group_name: cfyinfrargasheville
       name: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
       client_config: *azure_config
       location: { get_input: location }
