@@ -119,8 +119,7 @@ node_templates:
       location: { get_input: location }
       retry_after: { get_input: retry_after }
       os_family: linux
-      client_config:
-        subscription_id: { get_secret: azure_subscription_id }
+      azure_config: *azure_config
       resource_config:
         hardwareProfile:
           vmSize: { get_input: size }
@@ -156,7 +155,7 @@ node_templates:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
     properties:
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
@@ -170,7 +169,7 @@ node_templates:
     type: cloudify.azure.nodes.network.IPConfiguration
     properties:
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
         privateIPAllocationMethod: Dynamic
@@ -185,7 +184,7 @@ node_templates:
     properties:
       name: {concat:[{get_input: resource_prefix},nsg,{get_input: resource_suffix}]}
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
         securityRules:
@@ -254,7 +253,7 @@ node_templates:
             destinationAddressPrefix: '*'
             priority: 105
             access: 'Allow'
-            direction: Inbound 
+            direction: Inbound
         - name: localstack_intenal_api_port
           properties:
             description: HTTP access
@@ -265,7 +264,7 @@ node_templates:
             destinationAddressPrefix: '*'
             priority: 106
             access: 'Allow'
-            direction: Inbound       
+            direction: Inbound
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
@@ -274,7 +273,7 @@ node_templates:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
         publicIPAllocationMethod: Static
@@ -287,7 +286,7 @@ node_templates:
     properties:
       name: {concat:[{get_input: resource_prefix},availset,{get_input: resource_suffix}]}
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
@@ -297,7 +296,7 @@ node_templates:
     type: cloudify.azure.nodes.storage.StorageAccount
     properties:
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
       retry_after: { get_input: retry_after }
       resource_config:
         accountType: Standard_LRS
@@ -308,9 +307,9 @@ node_templates:
   subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
-      resource_group_name: cfyinfrargasheville
+      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       name: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
-      client_config: *azure_config
+      azure_config: *azure_config
       location: { get_input: location }
       resource_config:
         addressPrefix: 10.10.0.0/24
@@ -321,9 +320,9 @@ node_templates:
   network:
     type: cloudify.azure.nodes.network.VirtualNetwork
     properties:
-      resource_group_name: cfyinfrargasheville
+      resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       name: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
-      client_config: *azure_config
+      azure_config: *azure_config
       location: { get_input: location }
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
@@ -332,10 +331,9 @@ node_templates:
   resource_group:
     type: cloudify.azure.nodes.ResourceGroup
     properties:
-      name: cfyinfrargasheville
-      use_external_resource: true
+      name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       location: { get_input: location }
-      client_config: *azure_config
+      azure_config: *azure_config
 
   agent_key:
     type: cloudify.keys.nodes.RSAKey
