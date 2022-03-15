@@ -109,7 +109,9 @@
     "vcloud.yaml"
   ],
   "getting-started": [
-    "mc-jboss.yaml"
+    "mc-jboss.yaml",
+    "mc-localstack.yaml",
+    "mc-nodejs.yaml"
   ],
   "docker/ansible": [
     "ansible-container-using-docker-ansible-playbook.yaml",
