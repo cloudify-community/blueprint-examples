@@ -253,7 +253,7 @@ node_templates:
             destinationAddressPrefix: '*'
             priority: 105
             access: 'Allow'
-            direction: Inbound 
+            direction: Inbound
         - name: localstack_intenal_api_port
           properties:
             description: HTTP access
@@ -264,7 +264,7 @@ node_templates:
             destinationAddressPrefix: '*'
             priority: 106
             access: 'Allow'
-            direction: Inbound       
+            direction: Inbound
     relationships:
     - type: cloudify.azure.relationships.contained_in_resource_group
       target: resource_group
