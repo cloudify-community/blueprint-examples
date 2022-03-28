@@ -1,0 +1,45 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: >
+  Node types  - describing how to map the lifecycle of simple resource.
+  In this specific example we use an http daemon as the resource.
+  The webserver/start.sh and stop.sh will be called to instantiate and decommission the service
+  The web server will run on the <manager host>:8000
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+
+inputs:
+  webserver_port:
+    description: The HTTP web server port
+    default: 8000
+
+node_templates:
+
+  # A node type referencing an http_web_server resource.
+  # Implementing the cloudify.interfaces.lifecycle interface as part of the node definition
+  # allows us to plug the specific business logic at each point of the lifecycle event.
+  # In this example the actual instantiation of the http server is handled by the webserver/start.sh app_script which is called at the [start] lifecycle event
+  http_web_server:
+    type: cloudify.nodes.WebServer
+    properties:
+      port: { get_input: webserver_port }
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: webserver/start.sh
+          executor: central_deployment_agent
+        stop:
+          implementation: webserver/stop.sh
+          executor: central_deployment_agent
+
+# The capabilities expose the relevant resource attributes that are needed by external users or applications
+# The local_url is used in the case that the manager runs as a local docker image
+# The remote_url refers to the a case in which the manager runs remotely
+capabilities:
+  local_url:
+    description: local endpoint of the application.
+    value: { concat: [ 'http://localhost:' , { get_input: webserver_port } ]  }
+  remote_url:
+    description: The external endpoint of the application.
+    value: { concat: [ 'Since this is an example, copy the manager ip/dns and append the following port ' , { get_input: webserver_port } ]  }
