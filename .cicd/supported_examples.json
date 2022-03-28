@@ -184,5 +184,11 @@
   ],
     "scaling-example": [
     "ansible.yaml"
-  ]
+  ],
+    "introduction-to-blueprints": [
+      "ex1-input-output-blueprint.yaml",
+      "ex2-node-type-blueprint.yaml",
+      "ex3-relationship-blueprint.yaml",
+      "ex4-nested-blueprint.yaml"
+    ]
 }
