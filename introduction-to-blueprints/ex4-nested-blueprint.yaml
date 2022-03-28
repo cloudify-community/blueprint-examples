@@ -1,0 +1,69 @@
+tosca_definitions_version: cloudify_dsl_1_3
+description: >
+  Service Composition- describing how to create relationship between independent services
+  In this case we run the same web server and application from ex3 as an independent deployment
+  and were adding an SSH certificate generator to that service.
+  The example will also demonstrate how we can upload and instantiate all nested services on demand.
+
+inputs:
+
+  # The blueprint archive is needed to enable on demand uploading and instantiation of a service component
+  # The archive usually points to a URL of an external (git) repository
+  # In this example we are using the PARENT deployment as the archive source.
+  # Note that in this case we assume that the parent was deployed using a tar archive.
+  # If your using a zip archive you should change the suffix of the archive from .tar to .zip
+  blueprint_archive:
+    description: zip/tar archive of the blueprint, By default pointing to the archive of the curent parent deployments
+    default: { concat : [ '../../../uploaded-blueprints/', { get_sys: [tenant, name] },  '/',  { get_sys: [deployment, blueprint] },  '/',  { get_sys: [deployment, blueprint] },  '.tar'  ] }
+    hidden: true
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+
+node_templates:
+
+  # Running the same WebServer from ex3 as a ServiceComponent.
+  # The ServiceComponent acts as a generic wrapper. Each service component map to an indepent deployment
+  # It can point to an already uploaded blueprint by providing the blueprint_id.
+  # It can also upload and install the service from scratch by pointing to the blueprint_archive and relevant blueprint name on that archive
+  # or it can also upload and install the service
+  WebServiceComponent:
+    type: cloudify.nodes.ServiceComponent
+    properties:
+      resource_config:
+        blueprint:
+          external_resource: False
+          id: ex3-relationship-blueprint
+          blueprint_archive: { get_input:  blueprint_archive }
+          main_file_name: ex3-relationship-blueprint.yaml
+        deployment:
+          id: ex3-relationship-blueprint
+
+  # Run the certificate generator as a service component
+  # The ServiceComponent apears as yet another node type by the parent deployment.
+  # We can therefore use the same features that are supported for andy node type such as relationship etc.
+  # In this case we will use the connected_to relationship to ensure that this component will be executed after the WebService Component has been deployed
+  Certificate:
+    type: cloudify.nodes.ServiceComponent
+    properties:
+      resource_config:
+        blueprint:
+          external_resource: False
+          id: gen-ssh-cert-service-component
+          blueprint_archive: { get_input:  blueprint_archive }
+          main_file_name: gen-ssh-cert-service-component/blueprint.yaml
+        deployment:
+          inputs:
+            key_name: { get_sys: [deployment, blueprint] }
+    relationships:
+      - type: cloudify.relationships.connected_to
+        target: WebServiceComponent
+
+# Even though the ServiceComponent runs as independent deployments we can export their capabilities as outputs of the parent deployment:
+# - public key as an output from the Certificate component
+# - web site URL as an output from the WebServiceComponent
+capabilities:
+  public_key:
+    value: { get_attribute : [Certificate , capabilities , public_key_content ] }
+  local_url:
+    value: { get_attribute : [WebServiceComponent , capabilities , local_url ] }
