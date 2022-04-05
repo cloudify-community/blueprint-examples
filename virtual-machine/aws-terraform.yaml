@@ -84,6 +84,7 @@ node_templates:
       tfsec_config:
         flags_override:
           - soft_fail
+        enable: True
       tflint_config:
         config:
         - type_name: config
@@ -95,7 +96,12 @@ node_templates:
             enabled: 'false'
         flags_override:
           - loglevel: info
-
+        enable: True
+      terratag_config:
+        tags: { 'some_tag': 'some_value' }
+        flags_override:
+          - verbose: True
+        enable: True
 
     relationships:
       - target: terraform
