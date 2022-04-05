@@ -1,4 +1,5 @@
 
+import os
 import re
 from cloudify import ctx, manager
 from cloudify.state import ctx_parameters as inputs
@@ -44,6 +45,6 @@ if __name__ == '__main__':
         instance_keys.append(key_user_string)
     ctx.instance.runtime_properties[SSH_KEYS] = instance_keys
 
-    with open('/boot/firmware/cmdline.txt', 'w') as outfile:
-        outfile.write(
-            'cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory')
+    os.system('sudo mkdir -p /boot/firmware')
+    os.system('sudo chmod 0777 /boot/firmware')
+    os.system('sudo echo "cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory" >> /boot/cmdline.txt')
