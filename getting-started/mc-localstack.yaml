@@ -4,7 +4,7 @@ description: >
   Cloudify Getting Started blueprint for localstack deployment. Localstack is a cloud service emulator that runs in a single container on your local environment
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-utilities-plugin
 
