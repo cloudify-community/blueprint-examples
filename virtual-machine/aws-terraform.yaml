@@ -4,7 +4,7 @@ description: >
   This blueprint creates infrastructure on AWS using Terraform.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
   - plugin:cloudify-terraform-plugin?version= >=0.15.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
@@ -84,6 +84,7 @@ node_templates:
       tfsec_config:
         flags_override:
           - soft_fail
+        enable: True
       tflint_config:
         config:
         - type_name: config
@@ -95,7 +96,12 @@ node_templates:
             enabled: 'false'
         flags_override:
           - loglevel: info
-
+        enable: True
+      terratag_config:
+        tags: { 'some_tag': 'some_value' }
+        flags_override:
+          - verbose: True
+        enable: True
 
     relationships:
       - target: terraform

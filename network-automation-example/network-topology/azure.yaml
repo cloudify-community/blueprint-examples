@@ -12,7 +12,7 @@ dsl_definitions:
     client_secret: { get_secret: azure_client_secret }
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
   - plugin:cloudify-azure-plugin
 
 inputs:
