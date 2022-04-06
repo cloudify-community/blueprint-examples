@@ -81,28 +81,6 @@ node_templates:
           aws_zone: { concat: [ { get_input: aws_region_name }, 'a' ] }
           admin_user: { get_input: agent_user }
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
-      tfsec_config:
-        flags_override:
-          - soft_fail
-        enable: True
-      tflint_config:
-        config:
-        - type_name: config
-          option_value:
-            module: 'true'
-        - type_name: plugin
-          option_name: aws
-          option_value:
-            enabled: 'false'
-        flags_override:
-          - loglevel: info
-        enable: True
-      terratag_config:
-        tags: { 'some_tag': 'some_value' }
-        flags_override:
-          - verbose: True
-        enable: True
-
     relationships:
       - target: terraform
         type: cloudify.terraform.relationships.run_on_host
