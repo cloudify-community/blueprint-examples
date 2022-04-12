@@ -148,44 +148,44 @@ node_templates:
       client_config: *client_config
       resource_config:
         IpPermissions:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 8080
-          ToPort: 8080
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 9990
-          ToPort: 9990
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 2375
-          ToPort: 2375
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 4566
-          ToPort: 4566
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 4571
-          ToPort: 4571
-          IpRanges:
-          - CidrIp: 0.0.0.0/0    
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 8080
+            ToPort: 8080
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 9990
+            ToPort: 9990
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 2375
+            ToPort: 2375
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 4566
+            ToPort: 4566
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 4571
+            ToPort: 4571
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: security_group
+      - type: cloudify.relationships.contained_in
+        target: security_group
 
   security_group:
     type: cloudify.nodes.aws.ec2.SecurityGroup
@@ -196,8 +196,8 @@ node_templates:
         Description: Created by cloudify-getting-started-example.
         VpcId: { get_attribute: [ vpc, aws_resource_id ] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: vpc
+      - type: cloudify.relationships.depends_on
+        target: vpc
 
   route_public_subnet_internet_gateway:
     type: cloudify.nodes.aws.ec2.Route
@@ -207,10 +207,10 @@ node_templates:
           DestinationCidrBlock: '0.0.0.0/0'
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: routetable
-    - type: cloudify.relationships.connected_to
-      target: internet_gateway
+      - type: cloudify.relationships.contained_in
+        target: routetable
+      - type: cloudify.relationships.connected_to
+        target: internet_gateway
     interfaces:
       cloudify.interfaces.lifecycle:
         stop: {}
@@ -220,10 +220,10 @@ node_templates:
     properties:
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: vpc
-    - type: cloudify.relationships.connected_to
-      target: subnet
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: subnet
 
   subnet:
     type: cloudify.nodes.aws.ec2.Subnet
@@ -233,16 +233,16 @@ node_templates:
         CidrBlock: 10.10.4.0/24
         AvailabilityZone: { concat: [ { get_input: aws_region_name }, 'b' ] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: vpc
+      - type: cloudify.relationships.depends_on
+        target: vpc
 
   internet_gateway:
     type: cloudify.nodes.aws.ec2.InternetGateway
     properties:
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.connected_to
-      target: vpc
+      - type: cloudify.relationships.connected_to
+        target: vpc
 
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
