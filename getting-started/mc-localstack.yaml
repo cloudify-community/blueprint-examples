@@ -37,7 +37,7 @@ inputs:
   env_name:
     type: string
     description: Control parameters for names in resources.
-    default: mc-localstack
+    default: mclocalstack
   
 node_templates:
 
