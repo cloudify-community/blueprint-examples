@@ -17,3 +17,6 @@
 [submodule "prometheus/includes/prometheus/ansible-prometheus"]
 	path = prometheus/includes/prometheus/ansible-prometheus
 	url = https://github.com/EarthmanT/ansible-prometheus.git
+[submodule "kubernetes/kubespray/kubespray"]
+	path = kubernetes/kubespray/kubespray
+	url = https://github.com/kubernetes-sigs/kubespray.git
