@@ -1,7 +1,3 @@
-[submodule "kubernetes/kubespray"]
-	branch = release-2.16
-	path = kubernetes/kubespray/kubespray
-    url = https://github.com/kubernetes-sigs/kubespray.git
 [submodule "db-lb-app/db/mariadb"]
 	path = db-lb-app/db/mariadb
 	url = https://github.com/EarthmanT/mariadb-ansible-galera-cluster.git
@@ -17,3 +13,6 @@
 [submodule "prometheus/includes/prometheus/ansible-prometheus"]
 	path = prometheus/includes/prometheus/ansible-prometheus
 	url = https://github.com/EarthmanT/ansible-prometheus.git
+[submodule "kubernetes/kubespray/kubespray"]
+	path = kubernetes/kubespray/kubespray
+	url = https://github.com/kubernetes-sigs/kubespray.git
