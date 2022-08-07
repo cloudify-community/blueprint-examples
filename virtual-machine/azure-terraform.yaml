@@ -19,9 +19,56 @@ inputs:
     type: string
     default: 'eastus'
     constraints:
-    - valid_values: [westus,westus2,eastus,centralus,centraluseuap,southcentralus,northcentralus,westcentralus,eastus2,eastus2euap,brazilsouth,brazilus,northeurope,westeurope,eastasia,southeastasia,japanwest,japaneast,koreacentral,koreasouth,southindia,westindia,centralindia,australiaeast,australiasoutheast,canadacentral,canadaeast,uksouth,ukwest,francecentral,francesouth,australiacentral,australiacentral2,uaecentral,uaenorth,southafricanorth,southafricawest,switzerlandnorth,switzerlandwest,germanynorth,germanywestcentral,norwayeast,norwaywest,brazilsoutheast,westus3,swedencentral,swedensouth]
+      - valid_values: [ westus,
+                        westus2,
+                        eastus,
+                        centralus,
+                        centraluseuap,
+                        southcentralus,
+                        northcentralus,
+                        westcentralus,
+                        eastus2,
+                        eastus2euap,
+                        brazilsouth,
+                        brazilus,
+                        northeurope,
+                        westeurope,
+                        eastasia,
+                        southeastasia,
+                        japanwest,
+                        japaneast,
+                        koreacentral,
+                        koreasouth,
+                        southindia,
+                        westindia,
+                        centralindia,
+                        australiaeast,
+                        australiasoutheast,
+                        canadacentral,
+                        canadaeast,
+                        uksouth,
+                        ukwest,
+                        francecentral,
+                        francesouth,
+                        australiacentral,
+                        australiacentral2,
+                        uaecentral,
+                        uaenorth,
+                        southafricanorth,
+                        southafricawest,
+                        switzerlandnorth,
+                        switzerlandwest,
+                        germanynorth,
+                        germanywestcentral,
+                        norwayeast,
+                        norwaywest,
+                        brazilsoutheast,
+                        westus3,
+                        swedencentral,
+                        swedensouth ]
 
   image:
+    type: list
     description: Azure Image reference
     default: 
       publisher: Canonical
@@ -68,7 +115,7 @@ node_templates:
           prefix: { get_input: prefix }
     relationships:
       - target: terraform
-        type: cloudify.terraform.relationships.run_on_host
+        type: cloudify.relationships.terraform.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
 
