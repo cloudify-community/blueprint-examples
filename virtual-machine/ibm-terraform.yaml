@@ -13,9 +13,10 @@ inputs:
     type: string
     default: "eu-de"
     constraints:
-    - valid_values: ["us-south", "br-sao", "ca-tor", "us-east", "eu-de", "eu-gb", "jp-osa", "au-syd", "jp-tok"]
+      - valid_values: ["us-south", "br-sao", "ca-tor", "us-east", "eu-de", "eu-gb", "jp-osa", "au-syd", "jp-tok"]
 
   image:
+    type: string
     description: IMB Cloud Image name
     default: "ibm-centos-7-6-minimal-amd64-2"
 
@@ -89,4 +90,3 @@ capabilities:
   key_content:
     description: Private agent key
     value: { get_attribute: [agent_key, private_key_export] }
-
