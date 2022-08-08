@@ -55,8 +55,10 @@ inputs:
 
 node_templates:
 
-  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml during install workflow.
-  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml for more information about the properties provided.
+  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml
+  # during install workflow.
+  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml
+  # for more information about the properties provided.
   install-infra-playbook:
     type: cloudify.nodes.ansible.Executor
     properties:
@@ -87,7 +89,8 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: cloud_init
 
-  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
+  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml
+  # playbook during uninstall workflow.
   # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
   uninstall-infra-playbook:
     type: cloudify.nodes.Root

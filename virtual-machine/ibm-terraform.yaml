@@ -60,7 +60,7 @@ node_templates:
           image: { get_input: image }
     relationships:
       - target: terraform
-        type: cloudify.terraform.relationships.run_on_host
+        type: cloudify.relationships.terraform.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
 
@@ -81,6 +81,7 @@ node_templates:
 
 capabilities:
   name:
+    description: name
     value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, id ] }
 
   user:

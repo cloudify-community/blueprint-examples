@@ -84,7 +84,7 @@ node_templates:
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
     relationships:
       - target: terraform
-        type: cloudify.terraform.relationships.run_on_host
+        type: cloudify.relationships.terraform.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
 
@@ -105,6 +105,7 @@ node_templates:
 
 capabilities:
   name:
+    description: 'name'
     value: { get_attribute: [ cloud_resources, resources, example_vm, instances, 0, attributes, tags, Name ] }
 
   endpoint:

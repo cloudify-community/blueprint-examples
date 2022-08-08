@@ -10,6 +10,7 @@ inputs:
     type: string
 
   kubernetes_client_config:
+    type: dict
     default:
       configuration:
         api_options:
@@ -19,6 +20,7 @@ inputs:
           verify_ssl: false
 
   app_name:
+    type: string
     description: Prefix to use for application service / deployment names
     default: cloudify-hello-world
 
@@ -33,6 +35,7 @@ inputs:
     default: 8080
 
   validate_status:
+    type: string
     default: true
 
 node_templates:

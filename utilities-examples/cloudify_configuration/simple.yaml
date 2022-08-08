@@ -37,6 +37,7 @@ inputs:
     default: 22
 
   parameters_json:
+    type: dict
     default:
       RoutePublic: Public
       RouteVoice: true
@@ -71,8 +72,8 @@ node_templates:
         - RoutePublic
         - RouteNat
       params:
-        JpPrimary: True
-        JpSecondary: False
+        JpPrimary: true
+        JpSecondary: false
       terminal_auth:
         user: { get_input: terminal_user }
         password: { get_input: terminal_password }
@@ -108,8 +109,3 @@ node_templates:
     relationships:
       - type: load_from_config
         target: configuration
-
-
-
-
-

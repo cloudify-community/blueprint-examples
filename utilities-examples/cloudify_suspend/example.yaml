@@ -5,7 +5,7 @@ imports:
   - plugin:cloudify-utilities-plugin?version= >=1.18.0
 
 node_types:
-  server_type:
+  cloudify.nodes.ServerType:
     derived_from: cloudify.nodes.ApplicationModule
     properties:
       resource_id:
@@ -22,6 +22,6 @@ node_types:
 node_templates:
 
   server:
-    type: server_type
+    type: cloudify.nodes.ServerType
     properties:
       resource_id: Server!

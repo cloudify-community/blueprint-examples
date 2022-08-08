@@ -72,6 +72,20 @@ commands:
           }
           xblue
 
+  lint-examples:
+    steps:
+      - run: |
+          pip install cfy-lint
+            for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+            do
+                for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
+                do
+                    echo "Testing $d/$f"
+                    cfy-lint -b $d/$f
+                done
+            done
+          fi
+
   validate_examples_nightlies:
     steps:
       - run:
@@ -159,6 +173,7 @@ jobs:
     steps:
       - checkout
       - managerorb/create_manager_container_latest
+      - lint-examples
       - validate_examples
 
   blueprints-validation-nightlies:
@@ -243,6 +258,35 @@ workflows:
   tests:
     jobs:
       - blueprints-validation
+      - getting-started-aws:
+          requires:
+            - blueprints-validation
+      - getting-started-aws-terraform:
+          requires:
+            - getting-started-aws
+          filters:
+            branches:
+              only: master
+      - getting-started-aws-cloudformation:
+          requires:
+            - getting-started-aws-terraform
+          filters:
+            branches:
+              only: master
+      - getting-started-azure:
+          requires:
+            - getting-started-gcp
+            - blueprints-validation
+          filters:
+            branches:
+              only: master
+      - getting-started-azure-arm:
+          requires:
+            - getting-started-azure
+            - blueprints-validation
+          filters:
+            branches:
+              only: master
       - getting-started-gcp:
           requires:
             - blueprints-validation

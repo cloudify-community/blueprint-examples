@@ -135,7 +135,6 @@ node_templates:
             store_public_key_material: true
             store_private_key_material: true
 
-
 capabilities:
 
   application_endpoint:
