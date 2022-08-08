@@ -5,13 +5,15 @@ imports:
 
 inputs:
 
-   raise_failure_first:
-     description: do we raise exeption on action
-     default: cloudify.interfaces.lifecycle.start
+  raise_failure_first:
+    type: string
+    description: do we raise exeption on action
+    default: cloudify.interfaces.lifecycle.start
 
-   autouninstall:
-     description: run uninstall after failure
-     default: "yes"
+  autouninstall:
+    type: string
+    description: run uninstall after failure
+    default: "yes"
 
 node_types:
 
@@ -23,24 +25,23 @@ node_types:
           implementation: scripts/failure.py
           executor: central_deployment_agent
           inputs:
-             failure:
-               description: do we raise exeption
-               default: false
+            failure:
+              description: do we raise exeption
+              default: false
         configure:
           implementation: scripts/failure.py
           executor: central_deployment_agent
           inputs:
-             failure:
-               description: do we raise exeption
-               default: false
+            failure:
+              description: do we raise exeption
+              default: false
         start:
           implementation: scripts/failure.py
           executor: central_deployment_agent
           inputs:
-             failure:
-               description: do we raise exeption
-               default: false
-
+            failure:
+              description: do we raise exeption
+              default: false
 
 node_templates:
 
@@ -50,13 +51,13 @@ node_templates:
       cloudify.interfaces.lifecycle:
         create:
           inputs:
-             failure: { get_input: raise_failure_first }
+            failure: { get_input: raise_failure_first }
         configure:
           inputs:
-             failure: { get_input: raise_failure_first }
+            failure: { get_input: raise_failure_first }
         start:
           inputs:
-             failure: { get_input: raise_failure_first }
+            failure: { get_input: raise_failure_first }
 
 capabilities:
 

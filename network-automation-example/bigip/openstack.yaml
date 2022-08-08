@@ -10,10 +10,12 @@ imports:
 inputs:
 
   resource_prefix:
+    type: string
     description: Prefix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    type: string
     description: Suffix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_suffix }
 
@@ -32,7 +34,6 @@ inputs:
   vnf_vm_name:
     type: string
     default: bigip
-
 
 dsl_definitions:
 
@@ -107,7 +108,6 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: network_topology
 
-
   mgmt_floating_ip_address:
     type: cloudify.nodes.openstack.FloatingIP
     properties:
@@ -139,7 +139,7 @@ node_templates:
             - "_bigip_mgmt_port"
             - { get_input: resource_suffix }
     relationships:
-      - type: cloudify.relationships.connected_to
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
         target: network_security_group
       - type: cloudify.relationships.contained_in
         target: mgmt_network
@@ -155,7 +155,7 @@ node_templates:
             - "_bigip_public_port"
             - { get_input: resource_suffix }
     relationships:
-      - type: cloudify.relationships.connected_to
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
         target: network_security_group
       - type: cloudify.relationships.contained_in
         target: public_network
@@ -171,7 +171,7 @@ node_templates:
             - "_bigip_wan_port"
             - { get_input: resource_suffix }
     relationships:
-      - type: cloudify.relationships.connected_to
+      - type: cloudify.relationships.openstack.port_connected_to_security_group
         target: network_security_group
       - type: cloudify.relationships.contained_in
         target: wan_network
@@ -227,28 +227,31 @@ node_templates:
         kwargs:
           config_drive: true
     relationships:
-    - type: cloudify.relationships.openstack.server_connected_to_port
-      target: mgmt_port
-    - type: cloudify.relationships.openstack.server_connected_to_port
-      target: wan_port
-    - type: cloudify.relationships.openstack.server_connected_to_port
-      target: public_port
-    - type: cloudify.relationships.depends_on
-      target: image
-    - type: cloudify.relationships.depends_on
-      target: cloud_config
-
+      - type: cloudify.relationships.openstack.server_connected_to_port
+        target: mgmt_port
+      - type: cloudify.relationships.openstack.server_connected_to_port
+        target: wan_port
+      - type: cloudify.relationships.openstack.server_connected_to_port
+        target: public_port
+      - type: cloudify.relationships.depends_on
+        target: image
+      - type: cloudify.relationships.depends_on
+        target: cloud_config
 
 capabilities:
 
   mgmt_public_ip:
+    description: 'mgmt public ip'
     value: { get_attribute: [mgmt_floating_ip_address, floating_ip_address ] }
 
   public_public_ip:
+    description: 'public floating ip'
     value: { get_attribute: [public_floating_ip_address, floating_ip_address ] }
 
   wan_ip:
+    description: 'wan ip'
     value: { get_attribute: [wan_port, fixed_ips, 0, ip_address ] }
 
   public_ip:
+    description: 'public port ip'
     value: { get_attribute: [public_port, fixed_ips, 0, ip_address ] }

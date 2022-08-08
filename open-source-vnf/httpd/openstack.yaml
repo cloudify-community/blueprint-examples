@@ -6,15 +6,6 @@ description: >
   Install the blueprint in network_topology/openstack.yaml.
   Provide the name of that deployment in the network deployment name below.
 
-dsl_definitions:
-
-  client_config: &client_config
-    username: { get_secret: openstack_username }
-    password: { get_secret: openstack_password }
-    project_name: { get_secret: openstack_tenant_name }
-    auth_url: { get_secret: openstack_auth_url }
-    region_name: { get_input: region }
-
 imports:
 
   - httpd--blueprint:connected-host-openstack
@@ -23,11 +14,21 @@ imports:
 inputs:
 
   network_deployment_name:
+    type: string
     description: deployment name of the VNF network
 
   region:
     type: string
     default: ''
+
+dsl_definitions:
+
+  client_config: &client_config
+    username: { get_secret: openstack_username }
+    password: { get_secret: openstack_password }
+    project_name: { get_secret: openstack_tenant_name }
+    auth_url: { get_secret: openstack_auth_url }
+    region_name: { get_input: region }
 
 node_templates:
 
@@ -45,10 +46,10 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack , private_network ] }
+        id: { get_capability: [ openstack, private_network ] }
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: openstack
+      - type: cloudify.relationships.contained_in
+        target: openstack
 
   mgmt_network:
     type: cloudify.nodes.openstack.Network
@@ -56,10 +57,10 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ openstack , mgmt_network ] }
+        id: { get_capability: [ openstack, mgmt_network ] }
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: openstack
+      - type: cloudify.relationships.contained_in
+        target: openstack
 
   openstack:
     type: cloudify.nodes.Component

@@ -7,6 +7,7 @@ imports:
 inputs:
 
   rest_endpoint:
+    type: string
     description: >
       REST API endpoint
     default: "jsonplaceholder.typicode.com"
@@ -45,10 +46,10 @@ node_templates:
               WEBSITE: { get_attribute: [user-details, user, website] }
               POST_ID: "1"
         stop:
-            inputs:
-                template_file: templates/delete-user-post-template.yaml
-                params:
-                  POST_ID: "1"
+          inputs:
+            template_file: templates/delete-user-post-template.yaml
+            params:
+              POST_ID: "1"
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: user-details
+      - type: cloudify.relationships.depends_on
+        target: user-details

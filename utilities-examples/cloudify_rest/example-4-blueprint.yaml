@@ -7,6 +7,7 @@ imports:
 inputs:
 
   endpoint:
+    type: string
     default: api.github.com
 
   commit:

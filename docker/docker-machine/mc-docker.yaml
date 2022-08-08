@@ -25,15 +25,19 @@ inputs:
     description: >
       URL of infra zip file.
     type: string
-    # Don't update this line - it is being updated automatically during merging. The getting-started.zip will have the updated URL.
+    # Don't update this line -
+    # it is being updated automatically during merging.
+    # The getting-started.zip will have the updated URL.
     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-10/virtual-machine.zip'
 
   infra_exists:
+    type: string
     description: >
       Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
     default: false
 
   infra_deployment_id:
+    type: string
     description: The blueprint name, the deployment name.
     default: { concat: [ 'infra-', { get_input: infra_name } ] }
 
@@ -67,7 +71,7 @@ node_templates:
           inputs:
             script_path: scripts/install_docker.sh
             fabric_env: &fabric_env
-              host_string: { get_capability: [ { get_input: infra_deployment_id } , endpoint ] }
+              host_string: { get_capability: [ { get_input: infra_deployment_id }, endpoint ] }
               user: { get_capability: [ { get_input: infra_deployment_id }, user ] }
               key: { get_capability: [ { get_input: infra_deployment_id }, key_content ] }
             use_sudo: true

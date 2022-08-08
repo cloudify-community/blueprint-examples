@@ -10,6 +10,7 @@ imports:
 inputs:
 
   f5_vm_deployment_name:
+    type: string
     description: Name of BIG IP Provisioning deployment
     default: VNFM-F5-Prov-Openstack-vm
 
@@ -64,11 +65,12 @@ node_templates:
             calls:
               - template: Resources/templates/openstack/revoke_license.txt
                 responses:
-                  - question: 'Revoking the license will return this BIG-IP to an unlicensed state.  It will stop processing traffic. Are you sure? Y/N:'
+                  - question: 'Revoking the license will return this BIG-IP to an unlicensed state.
+                  It will stop processing traffic. Are you sure? Y/N:'
                     answer: 'Y'
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: check_mcpd_status
+      - type: cloudify.relationships.depends_on
+        target: check_mcpd_status
 
   vlan_configuration:
     type: cloudify.terminal.raw
@@ -91,9 +93,8 @@ node_templates:
                   IP_INSIDE: { get_capability: [ { get_attribute: [f5_vm_deployment, deployment, id] }, wan_ip ] }
                   IP_OUTSIDE: { get_capability: [ { get_attribute: [f5_vm_deployment, deployment, id] }, public_ip ] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: license
-
+      - type: cloudify.relationships.depends_on
+        target: license
 
 capabilities:
 

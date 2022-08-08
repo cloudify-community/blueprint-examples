@@ -102,13 +102,14 @@ node_templates:
         delete: {}
         postdelete: {}
 
-
 capabilities:
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
 
 outputs:
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}

@@ -55,7 +55,7 @@ node_templates:
           admin_key_public: { get_attribute: [agent_key, public_key_export] }
     relationships:
       - target: terraform
-        type: cloudify.terraform.relationships.run_on_host
+        type: cloudify.relationships.terraform.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
     interfaces:
@@ -84,7 +84,7 @@ node_templates:
 outputs:
 
   application_endpoint:
-   description: The external endpoint of the application.
-   value: { concat: [ 'http://', { get_attribute: [ vm, resources, eip, instances, 0, attributes, public_ip ] }, ':80' ] }
-
-
+    description: The external endpoint of the application.
+    value: { concat: [ 'http://',
+                       { get_attribute: [ vm, resources, eip, instances, 0, attributes, public_ip ] },
+                       ':80' ] }
