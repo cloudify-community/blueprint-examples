@@ -23,12 +23,15 @@ inputs:
     default: 'us-west1'
 
   subnet_cidr:
+    type: string
     default: 10.11.12.0/22
 
   resource_prefix:
+    type: string
     default: cfy
 
   resource_suffix:
+    type: string
     default: ex0
 
 dsl_definitions:
@@ -42,31 +45,35 @@ node_templates:
   network:
     type: cloudify.gcp.nodes.Network
     properties:
-      gcp_config: *client_config
+      client_config: *client_config
       name: { concat: [ { get_input: resource_prefix }, 'network', { get_input: resource_suffix } ] }
       auto_subnets: false
 
   subnet:
     type: cloudify.gcp.nodes.SubNetwork
     properties:
-      gcp_config: *client_config
+      client_config: *client_config
       name: { concat: [ { get_input: resource_prefix }, 'subnet', { get_input: resource_suffix } ] }
       subnet: { get_input: subnet_cidr }
       region: { get_input: region }
     relationships:
-    - type: cloudify.gcp.relationships.contained_in_network
-      target: network
+      - type: cloudify.gcp.relationships.contained_in_network
+        target: network
 
 capabilities:
 
   network:
+    description: 'network name'
     value: { get_property: [ network, name ] }
 
   subnet:
+    description: 'subnet name'
     value: { get_property: [ subnet, name ] }
 
   zone:
+    description: 'A GCP zone such as `us-west1-a`.'
     value: { get_input: zone }
 
   region:
+    description: 'A GCP region such as `us-west1`.'
     value: { get_input: region }

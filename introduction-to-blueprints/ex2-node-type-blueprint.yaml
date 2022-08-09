@@ -11,15 +11,18 @@ imports:
 
 inputs:
   webserver_port:
+    type: string
     description: The HTTP web server port
     default: 8000
 
 node_templates:
 
   # A node type referencing an http_web_server resource.
-  # Implementing the cloudify.interfaces.lifecycle interface as part of the node definition
+  # Implementing the cloudify.interfaces.
+  # lifecycle interface as part of the node definition
   # allows us to plug the specific business logic at each point of the lifecycle event.
-  # In this example the actual instantiation of the http server is handled by the webserver/start.sh app_script which is called at the [start] lifecycle event
+  # In this example the actual instantiation of the http server is handled by
+  # the webserver/start.sh app_script which is called at the [start] lifecycle event
   http_web_server:
     type: cloudify.nodes.WebServer
     properties:
@@ -39,7 +42,7 @@ node_templates:
 capabilities:
   local_url:
     description: local endpoint of the application.
-    value: { concat: [ 'http://localhost:' , { get_input: webserver_port } ]  }
+    value: { concat: [ 'http://localhost:', { get_input: webserver_port } ] }
   remote_url:
     description: The external endpoint of the application.
-    value: { concat: [ 'Since this is an example, copy the manager ip/dns and append the following port ' , { get_input: webserver_port } ]  }
+    value: { concat: [ 'Since this is an example, copy the manager ip/dns and append the following port ', { get_input: webserver_port } ] }

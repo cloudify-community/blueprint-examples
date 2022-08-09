@@ -46,7 +46,9 @@ capabilities:
           debug: false
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { concat: [ 'https://', { get_attribute: [kubernetes-cluster-attributes, endpoint] }]}
 
   connection_details:
+    description: 'connection details'
     value: *kubernetes_master_configuration

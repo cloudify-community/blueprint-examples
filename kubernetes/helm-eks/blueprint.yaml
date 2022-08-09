@@ -15,11 +15,13 @@ inputs:
     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/kubernetes-aws-eks.zip'
 
   infra_exists:
+    type: string
     description: >
       Whether a getting eks example blueprint has already been uploaded to the manager or not.
     default: false
 
   infra_deployment_id:
+    type: string
     description: The blueprint name, the deployment name.
     default: { get_input: eks_cluster_name }
 
@@ -33,6 +35,7 @@ inputs:
     default: bitnami
 
   chart_name:
+    type: string
     description: >
       Chart package name to deploy from repo.
     default: postgresql
@@ -98,7 +101,7 @@ node_templates:
             api_key: { get_secret: kubernetes_token }
       resource_config:
         name: "examplerelease"
-        chart: { concat: [ { get_input: repo_name },'/', { get_input: chart_name } ] }
+        chart: { concat: [ { get_input: repo_name }, '/', { get_input: chart_name } ] }
     relationships:
       - target: helm_install
         type: cloudify.helm.relationships.run_on_host

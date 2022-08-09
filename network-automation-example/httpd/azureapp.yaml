@@ -8,6 +8,7 @@ imports:
 
 inputs:
   webserver_vm_deployment_name:
+    type: string
     description: Name of webserver Provisioning deployment
     default: VNFM-webserver-Prov-Azure-vm
 

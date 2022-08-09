@@ -1,8 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
-  Deploys an simple, unprivileged OpenShift service. 
-  Designed for use with Red Hat's OpenShift Online PaaS. 
+  Deploys an simple, unprivileged OpenShift service.
+  Designed for use with Red Hat's OpenShift Online PaaS.
 
 imports:
 - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
@@ -11,6 +11,7 @@ imports:
 inputs:
 
   kubernetes_master_configuration:
+    type: list
     default:
       host: { get_secret: openshift_master_endpoint }
       api_key: { get_secret: openshift_secret_token }
@@ -18,15 +19,18 @@ inputs:
       verify_ssl: false
 
   kubernetes_api_options:
+    type: string
     description: >
       kubernetes api options
     default: { get_input: kubernetes_master_configuration }
 
   app_name:
+    type: string
     description: Prefix to use for application service / deployment names
     default: exampleapp
 
   namespace:
+    type: string
     description: OpenShift namespace to use
     default: { get_secret: openshift_namespace }
 

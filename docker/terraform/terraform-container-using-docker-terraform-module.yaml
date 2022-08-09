@@ -52,6 +52,7 @@ inputs:
     default: us-east-1
 
   public_key:
+    type: string
     default: { get_secret: agent_key_public }
 
 dsl_definitions:
@@ -116,7 +117,7 @@ node_templates:
             - { get_input: terraform_version }
         container_args:
           command: { get_attribute: [docker_terraform_container_files, terraform_container_command_arg] }
-          stdin_open: True
+          stdin_open: true
           working_dir: { get_attribute: [docker_terraform_container_files, storage_dir] }
           environment:
             AWS_ACCESS_KEY_ID: { get_input: aws_access_key_id }

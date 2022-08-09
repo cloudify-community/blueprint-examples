@@ -24,37 +24,46 @@ imports:
 # deployments which this blueprint will leverage.
 inputs:
   external_network_id:
+    type: string
     description: ID of the external network in OpenStack
 
   network_prov_name:
+    type: string
     description: Name of common resources provisioning blueprint/deployment
     default: VNFM-Networking-Prov-Openstack-networks
 
   f5_prov_name:
+    type: string
     description: Name of BIG IP Provisioning blueprint/deployment
     default: VNFM-F5-Prov-Openstack-vm
 
   f5_conf_name:
+    type: string
     description: Name of BIG IP Configuration blueprint/deployment
     default: VNFM-F5-Conf
 
   fg_prov_name:
+    type: string
     description: Name of Fortigate Provisioning blueprint/deployment
     default: VNFM-Fortigate-Prov-Openstack-vm
 
   fg_conf_name:
+    type: string
     description: Name of Fortigate Configuration blueprint/deployment
     default: VNFM-Fortigate-Conf
 
   webserver_prov_name:
+    type: string
     description: Name of webserver Provisioning blueprint/deployment
     default: VNFM-webserver-Prov-Openstack-vm
 
   webserver_conf_name:
+    type: string
     description: Name of webserver Configuration blueprint/deployment
     default: VNFM-webserver-Conf
 
   service_prov_name:
+    type: string
     description: Name of service chain Provisioning blueprint/deployment
     default: NS-LB-Firewall-F5-Fortigate-webserver
 
@@ -83,7 +92,6 @@ node_templates:
           id: { get_input: network_prov_name }
           inputs:
             external_network_id: { get_input: external_network_id }
-
 
   ### PROVISIONING ###
 

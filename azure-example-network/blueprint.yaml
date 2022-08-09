@@ -35,7 +35,7 @@ inputs:
 
   endpoint_verify:
     type: boolean
-    default: True
+    default: true
 
   endpoint_storage:
     type: string
@@ -126,13 +126,17 @@ node_templates:
 capabilities:
 
   resource_group:
+    description: 'resource group name'
     value: { get_attribute: [ resource_group, name ] }
 
   virtual_network:
+    description: 'virtual network name'
     value: { get_attribute: [ network, name ] }
 
   public_subnet:
+    description: 'public subnet name'
     value: { get_attribute: [ subnet, name ] }
 
   location:
+    description: 'Azure Region location'
     value: { get_input: location }

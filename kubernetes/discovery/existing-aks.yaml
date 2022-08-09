@@ -35,7 +35,7 @@ inputs:
 dsl_definitions:
 
   azure_config: &azure_config
-    subscription_id:  { get_secret: { get_input: subscription-id-secret } }
+    subscription_id: { get_secret: { get_input: subscription-id-secret } }
     tenant_id: { get_secret: { get_input: tenant-id-secret } }
     client_id: { get_secret: { get_input: client-id-secret } }
     client_secret: { get_secret: { get_input: client-secret-secret } }
@@ -60,7 +60,9 @@ capabilities:
         file_content: { get_attribute: [ managed_cluster, kubeconf ] }
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { get_attribute: [managed_cluster, kubeconf, clusters, 0, cluster, server ] }
 
   connection_details:
+    description: 'connection details'
     value: *kubernetes_master_configuration
