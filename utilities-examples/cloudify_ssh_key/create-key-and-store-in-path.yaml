@@ -7,16 +7,20 @@ imports:
 inputs:
 
   private_key_path:
+    type: string
     default: ~/.ssh/example-key.pem
 
   public_key_path:
+    type: string
     default: ~/.ssh/example-key.pem.pub
 
   use_secret_store:
+    type: string
     default: false
 
   openssh_format:
-    default: True
+    type: string
+    default: true
 
 dsl_definitions:
   resource_config: &RESOURCE_CONFIG

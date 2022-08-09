@@ -7,15 +7,19 @@ imports:
 inputs:
 
   user:
+    type: string
     default: centos
 
   group:
+    type: string
     default: wheel
 
   shell:
+    type: string
     default: /bin/bash
 
   sudo:
+    type: list
     default: ['ALL=(ALL) NOPASSWD:ALL']
 
 node_templates:

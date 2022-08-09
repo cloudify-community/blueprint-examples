@@ -7,6 +7,7 @@ imports:
 inputs:
 
   mgmt_ip:
+    type: string
     description: >
       Management IP address
     default: "10.239.1.112"
@@ -54,8 +55,8 @@ node_templates:
               PASSWORD: { get_input: password }
               TOKEN: { get_attribute: [token, result_properties, token-content, token] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: token
+      - type: cloudify.relationships.depends_on
+        target: token
 
   baseline_networking:
     type: cloudify.rest.Requests
@@ -81,5 +82,5 @@ node_templates:
               PASSWORD: { get_input: password }
               TOKEN: { get_attribute: [token, result_properties, token-content, token] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: baseline_config
+      - type: cloudify.relationships.depends_on
+        target: baseline_config
