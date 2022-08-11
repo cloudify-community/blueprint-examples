@@ -10,7 +10,7 @@ inputs:
     type: string
 
   kubernetes_client_config:
-    type: list
+    type: dict
     default:
       configuration:
         api_options:
