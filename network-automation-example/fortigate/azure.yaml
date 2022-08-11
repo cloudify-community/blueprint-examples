@@ -258,7 +258,7 @@ node_templates:
   cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
-      client_config:
+      resource_config:
         write_files:
           - path: { get_input: fortigate_license_filename }
             owner: root:root
