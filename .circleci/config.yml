@@ -72,6 +72,22 @@ commands:
           }
           xblue
 
+  lint-examples:
+    steps:
+      - run: |
+          if `git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7}`; then
+              args=`git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7} | xargs printf -- '-b %s '`
+              ecosystem-test validate-blueprint $args
+          else
+            for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+            do
+                for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
+                do
+                    cfy-lint -b $d/$f
+                done
+            done
+          fi
+
   validate_examples_nightlies:
     steps:
       - run:
@@ -160,6 +176,7 @@ jobs:
       - checkout
       - managerorb/create_manager_container_latest
       - validate_examples
+      - lint-examples
 
   blueprints-validation-nightlies:
     executor: cloudify-machine-py3

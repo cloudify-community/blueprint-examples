@@ -11,7 +11,6 @@ imports:
 inputs:
 
   kubernetes_master_configuration:
-    type: list
     default:
       host: { get_secret: openshift_master_endpoint }
       api_key: { get_secret: openshift_secret_token }
@@ -19,7 +18,6 @@ inputs:
       verify_ssl: false
 
   kubernetes_api_options:
-    type: string
     description: >
       kubernetes api options
     default: { get_input: kubernetes_master_configuration }

@@ -70,7 +70,7 @@ inputs:
   image:
     type: list
     description: Azure Image reference
-    default: 
+    default:
       publisher: Canonical
       offer: UbuntuServer
       sku: 18.04-LTS
@@ -136,6 +136,7 @@ node_templates:
 
 capabilities:
   name:
+    description: name
     value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, id ] }
 
   endpoint:
