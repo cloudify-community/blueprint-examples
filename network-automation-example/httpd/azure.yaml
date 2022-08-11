@@ -7,7 +7,7 @@ imports:
 
 inputs:
   image:
-    type: list
+    type: dict
     description: Image information
     default:
       publisher: Canonical
