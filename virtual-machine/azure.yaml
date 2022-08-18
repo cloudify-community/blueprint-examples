@@ -68,7 +68,7 @@ inputs:
           - australiacentral2
 
   image:
-    type: list
+    type: dict
     description: >
       Image to use.
     default:
