@@ -16,7 +16,6 @@ inputs:
     constraints:
       - valid_values:
           - openstack
-          - openstack-v2
           - azure
           - azure-arm
           - aws

@@ -79,8 +79,7 @@ node_templates:
           docker_ip: { get_input: docker_host }
           docker_user: { get_input: docker_user }
           docker_key: { get_secret: agent_key_private }
-        source: 'https://github.com/cloudify-community/blueprint-examples/
-        releases/download/5.0.5-28/hello-world-example.zip'
+        source: 'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip'
         destination: ""
         ansible_sources:
           container_volume: { get_input: container_volume }
