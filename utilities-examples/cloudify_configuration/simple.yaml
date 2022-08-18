@@ -37,7 +37,7 @@ inputs:
     default: 22
 
   parameters_json:
-    type: list
+    type: dict
     default:
       RoutePublic: Public
       RouteVoice: true
