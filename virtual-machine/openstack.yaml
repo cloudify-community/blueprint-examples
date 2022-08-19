@@ -105,7 +105,6 @@ node_templates:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloud_init, cloud_config ] }
-      use_external_resource: false
       use_public_ip: true
     relationships:
       - type: cloudify.relationships.openstack.server_connected_to_port
