@@ -96,7 +96,7 @@ node_templates:
         target: resource_group
 
   virtual_network:
-    type: cloudify.azure.nodes.network.VirtualNetwork
+    type: cloudify.nodes.azure.network.VirtualNetwork
     properties:
       client_config: *azure_config
       use_external_resource: true
@@ -106,7 +106,7 @@ node_templates:
         target: resource_group
 
   mgmt_subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
       client_config: *azure_config
       use_external_resource: true
@@ -116,7 +116,7 @@ node_templates:
         target: virtual_network
 
   wan_subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
       client_config: *azure_config
       use_external_resource: true
@@ -126,7 +126,7 @@ node_templates:
         target: virtual_network
 
   lan_subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
       client_config: *azure_config
       use_external_resource: true
@@ -136,7 +136,7 @@ node_templates:
         target: virtual_network
 
   network_security_group:
-    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    type: cloudify.nodes.azure.network.NetworkSecurityGroup
     properties:
       client_config: *azure_config
       use_external_resource: true
@@ -146,7 +146,7 @@ node_templates:
         target: resource_group
 
   mgmt_nic_ip_cfg:
-    type: cloudify.azure.nodes.network.IPConfiguration
+    type: cloudify.nodes.azure.network.IPConfiguration
     properties:
       client_config: *azure_config
       name: { concat: [ { get_input: resource_prefix }, 'fg_mgmt_ic', { get_input: resource_suffix } ] }
@@ -163,7 +163,7 @@ node_templates:
         target: mgmt_public_ip_address
 
   mgmt_public_ip_address:
-    type: cloudify.azure.nodes.network.PublicIPAddress
+    type: cloudify.nodes.azure.network.PublicIPAddress
     properties:
       client_config: *azure_config
       use_external_resource: false
@@ -177,7 +177,7 @@ node_templates:
         target: resource_group
 
   mgmt_nic:
-    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    type: cloudify.nodes.azure.network.NetworkInterfaceCard
     properties:
       client_config: *azure_config
       location: { get_secret: azure_location }
@@ -193,7 +193,7 @@ node_templates:
         target: network_security_group
 
   wan_nic_ip_cfg:
-    type: cloudify.azure.nodes.network.IPConfiguration
+    type: cloudify.nodes.azure.network.IPConfiguration
     properties:
       client_config: *azure_config
       location: { get_secret: azure_location }
@@ -208,7 +208,7 @@ node_templates:
         target: wan_subnet
 
   wan_nic:
-    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    type: cloudify.nodes.azure.network.NetworkInterfaceCard
     properties:
       client_config: *azure_config
       location: { get_secret: azure_location }
@@ -224,7 +224,7 @@ node_templates:
         target: network_security_group
 
   lan_nic_ip_cfg:
-    type: cloudify.azure.nodes.network.IPConfiguration
+    type: cloudify.nodes.azure.network.IPConfiguration
     properties:
       client_config: *azure_config
       location: { get_secret: azure_location }
@@ -239,7 +239,7 @@ node_templates:
         target: lan_subnet
 
   lan_nic:
-    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    type: cloudify.nodes.azure.network.NetworkInterfaceCard
     properties:
       client_config: *azure_config
       location: { get_secret: azure_location }
@@ -266,7 +266,7 @@ node_templates:
             content: { get_secret: fortigate_license }
 
   vnf_vm:
-    type: cloudify.azure.nodes.compute.VirtualMachine
+    type: cloudify.nodes.azure.compute.VirtualMachine
     properties:
       agent_config:
         install_method: none

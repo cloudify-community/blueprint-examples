@@ -10,14 +10,6 @@ imports:
   - plugin:cloudify-utilities-plugin
 
 inputs:
-#
-#  security_group_rules:
-#    type: list
-#    default:
-#      - direction: ingress
-#        protocol: tcp
-#        port_range_min: 22
-#        port_range_max: 22
 
   user_domain_name:
     description: Openstack user domain name.
