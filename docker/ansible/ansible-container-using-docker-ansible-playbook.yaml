@@ -83,8 +83,8 @@ node_templates:
         'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip'
       playbook_path: apache2/playbook.yaml
       ansible_env_vars:
-        ANSIBLE_HOST_KEY_CHECKING: false
-        ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: false
+        ANSIBLE_HOST_KEY_CHECKING: False
+        ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
       sources:
         vms:
           hosts:
