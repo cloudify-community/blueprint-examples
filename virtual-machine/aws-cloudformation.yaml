@@ -50,8 +50,8 @@ inputs:
 
   template_url:
     type: string
-    default: 'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/
-    cloudify/blueprints/5.0.5/cloudformation/template.yaml'
+    default:
+      'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/blueprints/5.0.5/cloudformation/template.yaml'
 
   env_name:
     type: string

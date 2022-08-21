@@ -79,8 +79,8 @@ node_templates:
         docker_ip: { get_input: docker_host }
         docker_user: { get_input: docker_user }
         docker_key: { get_secret: agent_key_private }
-      playbook_source_path: 'https://github.com/cloudify-community
-      /blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip'
+      playbook_source_path:
+        'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip'
       playbook_path: apache2/playbook.yaml
       ansible_env_vars:
         ANSIBLE_HOST_KEY_CHECKING: false
