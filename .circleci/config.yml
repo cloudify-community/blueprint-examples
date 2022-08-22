@@ -84,6 +84,7 @@ commands:
             do
                 for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
                 do
+                    echo "Testing $d/$f"
                     cfy-lint -b $d/$f
                 done
             done
