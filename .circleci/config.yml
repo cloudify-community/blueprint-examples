@@ -75,6 +75,7 @@ commands:
   lint-examples:
     steps:
       - run: |
+          pip install cfy-lint
           if `git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7}`; then
               args=`git log -1 --name-only --oneline | grep yaml | grep -v .circleci | grep -v ${CIRCLE_SHA1:0:7} | xargs printf -- '-b %s '`
               ecosystem-test validate-blueprint $args
