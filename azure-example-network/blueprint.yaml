@@ -98,7 +98,7 @@ node_templates:
       location: { get_input: location }
 
   network:
-    type: cloudify.azure.nodes.network.VirtualNetwork
+    type: cloudify.nodes.azure.network.VirtualNetwork
     properties:
       client_config: *client_config
       api_version: { get_input: network_api_version }
@@ -110,7 +110,7 @@ node_templates:
         target: resource_group
 
   subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
       client_config: *client_config
       api_version: { get_input: network_api_version }
