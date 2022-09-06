@@ -30,7 +30,7 @@ inputs:
   ami_name_filter:
     type: string
     description: The name of the AWS AMI in the AWS region.
-    default: 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727'
+    default: 'ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20210416'
 
   agent_user:
     description: >

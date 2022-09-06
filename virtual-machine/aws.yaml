@@ -112,7 +112,7 @@ node_templates:
           Filters:
           - Name: name
             Values:
-            - CentOS 7.7.1908 x86_64 with cloud-init (HVM)
+            - 'CentOS 7.9.2009 - HVM'
           - Name: owner-id
             Values:
             - 057448758665
