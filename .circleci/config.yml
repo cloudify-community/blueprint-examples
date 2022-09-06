@@ -243,24 +243,24 @@ workflows:
   tests:
     jobs:
       - blueprints-validation
-      - getting-started-aws:
-          requires:
-            - blueprints-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-terraform:
-          requires:
-            - getting-started-aws
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-cloudformation:
-          requires:
-            - getting-started-aws-terraform
-          filters:
-            branches:
-              only: master
+#      - getting-started-aws:
+#          requires:
+#            - blueprints-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-terraform:
+#          requires:
+#            - getting-started-aws
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-cloudformation:
+#          requires:
+#            - getting-started-aws-terraform
+#          filters:
+#            branches:
+#              only: master
       - getting-started-azure:
           requires:
             - getting-started-gcp
@@ -284,9 +284,9 @@ workflows:
       - release:
           requires:
             - blueprints-validation
-            - getting-started-aws
-            - getting-started-aws-cloudformation
-            - getting-started-aws-terraform
+#            - getting-started-aws
+#            - getting-started-aws-cloudformation
+#            - getting-started-aws-terraform
             - getting-started-azure
             - getting-started-azure-arm
             - getting-started-gcp
@@ -303,24 +303,24 @@ workflows:
               - master
     jobs:
       - blueprints-validation-nightlies
-      - getting-started-aws:
-          requires:
-            - blueprints-validation-nightlies
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-terraform:
-          requires:
-            - getting-started-aws
-          filters:
-            branches:
-              only: master
-      - getting-started-aws-cloudformation:
-          requires:
-            - getting-started-aws-terraform
-          filters:
-            branches:
-              only: master
+#      - getting-started-aws:
+#          requires:
+#            - blueprints-validation-nightlies
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-terraform:
+#          requires:
+#            - getting-started-aws
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-aws-cloudformation:
+#          requires:
+#            - getting-started-aws-terraform
+#          filters:
+#            branches:
+#              only: master
       - getting-started-azure:
           requires:
             - blueprints-validation-nightlies
