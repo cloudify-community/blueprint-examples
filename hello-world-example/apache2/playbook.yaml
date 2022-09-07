@@ -57,3 +57,10 @@
     - name: a2dissite
       command: a2ensite example.com.conf
       notify: restart apache2
+
+- hosts: localhost
+  tasks:
+    - name: simple runtime property
+      cloudify_runtime_property:
+        path: hello
+        value: world
