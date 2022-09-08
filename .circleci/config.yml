@@ -242,7 +242,8 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprints-validation
+      - release
+#      - blueprints-validation
 #      - getting-started-aws:
 #          requires:
 #            - blueprints-validation
@@ -261,48 +262,48 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - getting-started-azure:
-          requires:
-            - getting-started-gcp
-            - blueprints-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-azure-arm:
-          requires:
-            - getting-started-azure
-            - blueprints-validation
-          filters:
-            branches:
-              only: master
-      - getting-started-gcp:
-          requires:
-            - blueprints-validation
-          filters:
-            branches:
-              only: master
-      - release:
-          requires:
-            - blueprints-validation
+#      - getting-started-azure:
+#          requires:
+#            - getting-started-gcp
+#            - blueprints-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-azure-arm:
+#          requires:
+#            - getting-started-azure
+#            - blueprints-validation
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-gcp:
+#          requires:
+#            - blueprints-validation
+#          filters:
+#            branches:
+#              only: master
+#      - release:
+#          requires:
+#            - blueprints-validation
 #            - getting-started-aws
 #            - getting-started-aws-cloudformation
 #            - getting-started-aws-terraform
-            - getting-started-azure
-            - getting-started-azure-arm
-            - getting-started-gcp
-          filters:
-            branches:
-              only: master
-  nightly:
-    triggers:
-    - schedule:
-        cron: "0 0 * * *"
-        filters:
-          branches:
-            only:
-              - master
-    jobs:
-      - blueprints-validation-nightlies
+#            - getting-started-azure
+#            - getting-started-azure-arm
+#            - getting-started-gcp
+#          filters:
+#            branches:
+#              only: master
+#  nightly:
+#    triggers:
+#    - schedule:
+#        cron: "0 0 * * *"
+#        filters:
+#          branches:
+#            only:
+#              - master
+#    jobs:
+#      - blueprints-validation-nightlies
 #      - getting-started-aws:
 #          requires:
 #            - blueprints-validation-nightlies
@@ -321,22 +322,22 @@ workflows:
 #          filters:
 #            branches:
 #              only: master
-      - getting-started-azure:
-          requires:
-            - blueprints-validation-nightlies
-          filters:
-            branches:
-              only: master
-      - getting-started-azure-arm:
-          requires:
-            - getting-started-azure
-          filters:
-            branches:
-              only: master
-      - getting-started-gcp:
-          requires:
-            - blueprints-validation-nightlies
-          filters:
-            branches:
-              only: master
-
+#      - getting-started-azure:
+#          requires:
+#            - blueprints-validation-nightlies
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-azure-arm:
+#          requires:
+#            - getting-started-azure
+#          filters:
+#            branches:
+#              only: master
+#      - getting-started-gcp:
+#          requires:
+#            - blueprints-validation-nightlies
+#          filters:
+#            branches:
+#              only: master
+#
