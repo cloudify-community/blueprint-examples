@@ -71,6 +71,7 @@ node_templates:
       ansible_env_vars: &env_vars
         AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
         AWS_SECRET_ACCESS_KEY: {get_secret: aws_secret_access_key }
+        AWS_SESSION_TOKEN: { get_secret: aws_session_token }
         AWS_REGION: { get_input: aws_region_name}
       extra_packages: &extra_packages
         - boto3==1.16.26

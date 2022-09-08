@@ -3,9 +3,15 @@ variable "aws_region" {
   description = "AWS region to launch servers."
 }
 
+
 variable "aws_zone" {
   type = string
   description = "AWS zone to create subnet."
+}
+
+variable "aws_session_token" {
+  type = string
+  description = "session token for AWS."
 }
 
 variable "admin_user" {
