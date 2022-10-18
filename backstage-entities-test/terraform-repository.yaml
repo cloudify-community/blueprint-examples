@@ -1,0 +1,18 @@
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: terraform-repository
+  description: This blueprint creates Terraform repository from template.
+
+  tags:
+    - tosca
+    - cloudify
+  links:
+    - url: http://3.98.78.102/console/page/blueprints_blueprint/terraform-repository?c=%5B%7B%22context%22%3A%7B%7D%7D%2C%7B%22context%22%3A%7B%22blueprintId%22%3A%22terraform-repository%22%7D%2C%22pageName%22%3A%22terraform-repository%22%7D%5D#!
+      title: Deploy component
+      icon: user
+spec:
+  type: service
+  lifecycle: production
+  owner: team-a

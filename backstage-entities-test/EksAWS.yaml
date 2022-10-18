@@ -1,0 +1,17 @@
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: EksAWS
+  description: Cloudify blueprint
+  tags:
+    - tosca
+    - cloudify
+  links:
+    - url: http://3.98.78.102/console/page/blueprints_blueprint/EksAWS?c=%5B%7B%22context%22%3A%7B%7D%7D%2C%7B%22context%22%3A%7B%22blueprintId%22%3A%22EksAWS%22%7D%2C%22pageName%22%3A%22EksAWS%22%7D%5D#!
+      title: Deploy component
+      icon: user
+spec:
+  type: service
+  lifecycle: production
+  owner: team-a
