@@ -14,7 +14,7 @@ inputs:
   # If your using a zip archive you should change the suffix of the archive from .tar to .zip
   blueprint_archive:
     description: zip/tar archive of the blueprint, By default pointing to the archive of the curent parent deployments
-    default: { concat : [ '../../../uploaded-blueprints/', { get_sys: [tenant, name] },  '/',  { get_sys: [deployment, blueprint] },  '/',  { get_sys: [deployment, blueprint] },  '.tar'  ] }
+    default: { concat : [ '../../../uploaded-blueprints/', { get_sys: [tenant, name] },  '/',  { get_sys: [deployment, blueprint] },  '/',  { get_sys: [deployment, blueprint] },  '.tar.gz'  ] }
     hidden: true
 
 imports:
