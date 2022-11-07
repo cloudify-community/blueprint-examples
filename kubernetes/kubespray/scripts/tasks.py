@@ -89,7 +89,7 @@ def setup_kubectl(connection, username):
 def get_config_content(filename):
     with open(filename, 'r') as outfile:
         try:
-            return yaml.load(outfile)
+            return yaml.safe_load(outfile)
         except yaml.YAMLError as e:
             raise RecoverableError(
                 'Unable to read file: {0}: {1}'.format(filename, str(e)))
