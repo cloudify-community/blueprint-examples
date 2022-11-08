@@ -112,10 +112,10 @@ node_templates:
           Filters:
           - Name: name
             Values:
-            - 'CentOS 7.9.2009 - HVM'
+            - 'CentOS7-cloudify-examples-image'
           - Name: owner-id
             Values:
-            - 057448758665
+            - '263721492972'
       client_config: *client_config
 
   ip:
