@@ -58,6 +58,7 @@ dsl_definitions:
   client_config: &client_config
     aws_access_key_id: { get_input: aws_access_key_id }
     aws_secret_access_key: { get_input: aws_secret_access_key }
+    aws_session_token: { get_secret: aws_session_token }
     region_name: { get_input: aws_region_name }
 
 node_templates:
