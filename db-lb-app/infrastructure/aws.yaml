@@ -12,7 +12,7 @@ imports:
 
 inputs:
 
-  resource_name_prefix:
+  env_name:
     description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
@@ -151,7 +151,7 @@ node_templates:
     properties:
       client_config: *client_config
       resource_config:
-        GroupName: { concat: [ { get_input: resource_name_prefix }, '-infra-group' ] }
+        GroupName: { concat: [ { get_input: env_name }, '-infra-group' ] }
         Description: db lb app infra group
         VpcId: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
 

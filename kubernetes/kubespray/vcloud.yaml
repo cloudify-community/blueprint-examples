@@ -35,7 +35,7 @@ inputs:
     type: string
     default: { get_secret: vcloud_gateway }
 
-  resource_suffix:
+  env_name:
     type: string
     default: '1'
 

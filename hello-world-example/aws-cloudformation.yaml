@@ -12,6 +12,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'helloworldexampleawscf'
+
   aws_access_key_id:
     type: string
     default: { get_secret: aws_access_key_id }
@@ -36,16 +40,13 @@ inputs:
     type: string
     default: 172.30.0.0/24
 
-  resource_suffix:
-    default: '-a'
-
   key_pair_name:
     type: string
-    default: { concat: [ 'hello_world_key', { get_input: resource_suffix } ] }
+    default: { concat: [ 'hello_world_key', { get_input: env_name } ] }
 
   agent_key_name:
     type: string
-    default: agent_key
+    default: { concat: [ 'hello_world_key', { get_input: env_name } ] }
 
   agent_user:
     description: >

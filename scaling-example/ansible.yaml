@@ -44,7 +44,7 @@ inputs:
     type: string
     default: agent_key
 
-  resource_suffix:
+  env_name:
     default: '0'
 
 node_templates:
@@ -71,7 +71,7 @@ node_templates:
             number_of_attempts: 1
             run_data:
               availability_zone: { get_input: availability_zone }
-              resource_suffix: { get_input: resource_suffix }
+              env_name: { get_input: env_name }
               infra_info_file: { get_attribute: [ SELF, ansible_infra_info_file ] }
             ansible_env_vars: &env_vars
               AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
@@ -138,7 +138,7 @@ node_templates:
               ami_owner_filter: { get_input: ami_owner_filter }
               ami_name_filter: { get_input: ami_name_filter }
               ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
-              resource_suffix: { get_input: resource_suffix }
+              env_name: { get_input: env_name }
               infra_info_file: { get_attribute: [ SELF, ansible_infra_info_file ] }
             ansible_env_vars: *env_vars
             extra_packages: *extra_packages

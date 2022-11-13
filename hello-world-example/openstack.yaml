@@ -12,6 +12,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'cfyhwos'
+
   region:
     type: string
     description: The Openstack region.
@@ -142,8 +146,8 @@ node_templates:
     properties:
       client_config: *openstack_config
       resource_config:
-        name: hello-security-group
-        description: 'hello security group'
+        name: { concat: [ { get_input: env_name } , '-sg' ] }
+        description: { concat: [ { get_input: env_name } , ' sg' ] }
       security_group_rules:
         - direction: ingress
           protocol: tcp

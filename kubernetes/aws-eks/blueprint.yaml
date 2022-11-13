@@ -31,9 +31,13 @@ inputs:
   eks_cluster_name:
     type: string
 
+  env_name:
+    type: string
+    default: { get_input: eks_cluster_name }
+
   eks_nodegroup_name:
     type: string
-    default: { concat: [ 'eks_node_group', { get_input: eks_cluster_name } ] }
+    default: { concat: [ 'eks_node_group', { get_input: env_name } ] }
 
   kubernetes_version:
     type: string
@@ -49,7 +53,7 @@ inputs:
 
   ssh_keypair:
     type: string
-    default: { concat: [ 'eks_key', { get_input: eks_cluster_name } ] }
+    default: { concat: [ 'eks_key', { get_input: env_name } ] }
 
   agent_key_name:
     type: string
@@ -80,10 +84,10 @@ node_templates:
   eks_service_iam_role:
     type: cloudify.nodes.aws.iam.Role
     properties:
-      resource_id: { concat: [ 'eks_service_iam_role', { get_input: eks_cluster_name } ] }
+      resource_id: { concat: [ 'eks_service_iam_role', { get_input: env_name } ] }
       client_config: *client_config
       resource_config:
-        RoleName: { concat: [ 'eks_test_role', { get_input: eks_cluster_name } ] }
+        RoleName: { concat: [ 'eks_test_role', { get_input: env_name } ] }
         Path: !!str /
         AssumeRolePolicyDocument:
           Version: !!str 2012-10-17
@@ -104,10 +108,10 @@ node_templates:
   eks_nodegroup_iam_role:
     type: cloudify.nodes.aws.iam.Role
     properties:
-      resource_id: { concat: [ 'eks_nodegroup_iam_role', { get_input: eks_cluster_name } ] }
+      resource_id: { concat: [ 'eks_nodegroup_iam_role', { get_input: env_name } ] }
       client_config: *client_config
       resource_config:
-        RoleName: { concat: [ 'eks_nodegroup_test_role', { get_input: eks_cluster_name } ] }
+        RoleName: { concat: [ 'eks_nodegroup_test_role', { get_input: env_name } ] }
         Path: !!str /
         AssumeRolePolicyDocument:
           Version: !!str 2012-10-17
@@ -158,11 +162,11 @@ node_templates:
           Value:
             concat:
               - 'vpc-'
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: shared
     interfaces:
       cloudify.interfaces.lifecycle:
@@ -194,7 +198,7 @@ node_templates:
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: shared
         - Key: kubernetes.io/role/internal-elb
           Value: '1'
@@ -227,7 +231,7 @@ node_templates:
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: shared
         - Key: kubernetes.io/role/internal-elb
           Value: '1'
@@ -262,7 +266,7 @@ node_templates:
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: shared
         - Key: kubernetes.io/role/elb
           Value: '1'
@@ -293,7 +297,7 @@ node_templates:
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: shared
         - Key: kubernetes.io/role/elb
           Value: '1'
@@ -435,7 +439,7 @@ node_templates:
     type: cloudify.nodes.aws.ec2.SecurityGroup
     properties:
       resource_config:
-        GroupName: { concat: [ 'EKS_Test_Group', { get_input: eks_cluster_name } ] }
+        GroupName: { concat: [ 'EKS_Test_Group', { get_input: env_name } ] }
         Description: The group for EKS test.
         VpcId: { get_attribute: [ vpc, aws_resource_id ]}
       client_config: *client_config
@@ -443,7 +447,7 @@ node_templates:
         - Key:
             concat:
               - kubernetes.io/cluster/
-              - { get_input: eks_cluster_name }
+              - { get_input: env_name }
           Value: owned
     relationships:
       - type: cloudify.relationships.depends_on
@@ -471,7 +475,7 @@ node_templates:
     properties:
       resource_config:
         kwargs:
-          name: { get_input: eks_cluster_name }
+          name: { get_input: env_name }
           version: { get_input: kubernetes_version }
           roleArn: { get_attribute: [ eks_service_iam_role, aws_resource_arn ] }
           resourcesVpcConfig:
@@ -513,7 +517,7 @@ node_templates:
     properties:
       resource_config:
         kwargs:
-          clusterName: { get_input: eks_cluster_name }
+          clusterName: { get_input: env_name }
           nodegroupName: { get_input: eks_nodegroup_name }
           scalingConfig:
             minSize: 1

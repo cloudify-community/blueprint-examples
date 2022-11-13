@@ -20,15 +20,19 @@ inputs:
     description: The GCP zone to deploy the application in, such as europe-west1-b.
     default: 'europe-west1-b'
 
+  env_name:
+    type: string
+    default: 'kube'
+
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: kubevnet
+    default: { concat: [ { get_input: env_name } ,vnet ] }
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: kubevsubnet
+    default: { concat: [ { get_input: env_name } ,vsubnet ] }
 
   image:
     type: string

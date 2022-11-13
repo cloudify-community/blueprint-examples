@@ -12,8 +12,12 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'cfyhwazure'
+
   resource_prefix:
-    default: cfyhw
+    default: { get_input: env_name }
 
   resource_suffix:
     default: '0'

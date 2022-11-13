@@ -31,7 +31,6 @@ inputs:
     type: string
     default: agent_key
 
-
 node_templates:
 
   terraform:
