@@ -12,6 +12,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'cfyhwgcp'
+
   region:
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
@@ -25,12 +29,12 @@ inputs:
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellovnet
+    default: { concat: [ hellonet, { get_input: env_name } ] }
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: hellosubnet
+    default: { concat: [ hellosubnet, { get_input: env_name } ] }
 
   image:
     type: string
@@ -56,7 +60,6 @@ dsl_definitions:
   client_config: &gcp_config
     auth: { get_secret: gcp_credentials }
     zone: { get_input: zone }
-
 
 node_templates:
 

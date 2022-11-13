@@ -6,7 +6,7 @@ imports:
   - https://raw.githubusercontent.com/cloudify-community/eaas-example/master/utils/custom_types.yaml
 
 inputs:
-  resource_prefix:
+  env_name:
     type: string
     default: ''
     constraints:
@@ -63,7 +63,7 @@ node_templates:
     prefix:
       type: eaas.nodes.UniquePrefixGenerator
       properties:
-        predefined_value: { get_input: resource_prefix }
+        predefined_value: { get_input: env_name }
     
     terraform:
       type: cloudify.nodes.terraform

@@ -33,7 +33,7 @@ inputs:
     type: string
     default: { get_secret: vcloud_gateway }
 
-  resource_suffix:
+  env_name:
     type: string
     default: '1'
 
@@ -69,7 +69,7 @@ node_templates:
     type: cloudify.nodes.vcloud.VM
     properties:
       client_config: *client_config
-      resource_id: { concat: [ helloworld, vm, { get_input: resource_suffix } ] }
+      resource_id: { concat: [ helloworld, vm, { get_input: env_name } ] }
       resource_config:
         catalog: { get_input: catalog }
         template: { get_input: template }
@@ -106,7 +106,7 @@ node_templates:
     type: cloudify.nodes.vcloud.Media
     properties:
       client_config: *client_config
-      resource_id: { concat: [ helloworld, media, { get_input: resource_suffix } ] }
+      resource_id: { concat: [ helloworld, media, { get_input: env_name } ] }
       resource_config:
         catalog_name: { get_input: catalog }
       iso:
@@ -122,7 +122,7 @@ node_templates:
     type: cloudify.nodes.vcloud.VApp
     properties:
       client_config: *client_config
-      resource_id: { concat: [ helloworld, vapp, { get_input: resource_suffix } ] }
+      resource_id: { concat: [ helloworld, vapp, { get_input: env_name } ] }
       resource_config:
         description: test description
         fence_mode: natRouted
@@ -135,7 +135,7 @@ node_templates:
     type: cloudify.nodes.vcloud.RoutedVDCNetwork
     properties:
       client_config: *client_config
-      resource_id: { concat: [ helloworld, network, { get_input: resource_suffix } ] }
+      resource_id: { concat: [ helloworld, network, { get_input: env_name } ] }
       resource_config:
         gateway_name: { get_attribute: [ gateway, resource_id ] }
         network_cidr: 192.178.1.1/24

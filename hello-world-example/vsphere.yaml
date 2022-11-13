@@ -21,7 +21,7 @@ inputs:
     type: boolean
     default: false
 
-  resource_suffix:
+  env_name:
     type: string
     default: '1'
 

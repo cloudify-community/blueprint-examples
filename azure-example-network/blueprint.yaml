@@ -9,6 +9,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'cfy'
+
   subscription_id:
     type: string
     default: { get_secret: azure_subscription_id }
@@ -51,7 +55,7 @@ inputs:
     default: 5
 
   resource_prefix:
-    default: cfy
+    default: { get_input: env_name }
 
   resource_suffix:
     default: 0
