@@ -8,7 +8,7 @@ imports:
 
 inputs:
 
-  resource_name_prefix:
+  env_name:
     default: infra_
 
   resource_suffix:

@@ -89,7 +89,7 @@ If you are an Openstack user:
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-db.zip -n application.yaml -b db`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--resource_name_prefix=db`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-db.zip -n application.yaml -b db -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne -i infrastructure--env_name=db`
 
   Where `infrastructure--image_id` is ID of centos-7-with-docker image.
 ### Install the load balancer
@@ -97,7 +97,7 @@ If you are an Openstack user:
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-lb.zip -n application.yaml -b lb`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--resource_name_prefix='lb' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-lb.zip -n application.yaml -b lb -i infrastructure--env_name='lb' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
 
 
 ### Install the application (Drupal)
@@ -105,7 +105,7 @@ If you are an Openstack user:
   `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-app.zip -n application.yaml -b app`
 
   **Openstack**\
-  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--resource_name_prefix='app' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
+  `cfy install https://github.com/cloudify-community/blueprint-examples/releases/download/4.5.5-11/db-lb-app-app.zip -n application.yaml -b app -i infrastructure--env_name='app' -i infrastructure--image_id=ca19086a-1147-4052-85bd-ba40e9e350d4 -i infrastructure--flavor_id=3 -i infrastructure--region_name=RegionOne`
 
   
 ## Complete Application Installation

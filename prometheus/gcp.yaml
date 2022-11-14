@@ -19,15 +19,19 @@ inputs:
     description: The GCP zone to deploy the application in, such as 'us-west1-a'.
     default: 'us-west1-a'
 
+  env_name:
+    type: string
+    default: 'p'
+
   network_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: pnet
+    default: { concat: [ {get_input: env_name}, 'net'] }
 
   subnet_name:
     type: string
     description: The name of your GCP Virtual Network.
-    default: psubnet
+    default: { concat: [ {get_input: env_name}, 'subnet'] }
 
   image:
     type: string

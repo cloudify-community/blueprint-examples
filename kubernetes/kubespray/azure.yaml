@@ -46,7 +46,7 @@ inputs:
   size:
     default: Standard_A3
 
-  resource_prefix:
+  env_name:
     default: kube_
 
   resource_suffix:

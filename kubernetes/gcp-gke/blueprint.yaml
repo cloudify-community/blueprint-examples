@@ -21,6 +21,10 @@ inputs:
     type: string
     default: ex2
 
+  env_name:
+    type: string
+    default: { get_input: resource_prefix }
+
 dsl_definitions:
 
   client_config: &client_config
@@ -32,14 +36,14 @@ node_templates:
   kubernetes-cluster:
     type: cloudify.gcp.nodes.KubernetesCluster
     properties:
-      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
+      name: { concat: [ { get_input: env_name }, '-cluster']}
       client_config: *client_config
 
   kubernetes-cluster-attributes:
     type: cloudify.gcp.nodes.KubernetesCluster
     properties:
       use_external_resource: true
-      name: { concat: [ { get_input: resource_prefix }, '-cluster']}
+      name: { concat: [ { get_input: env_name }, '-cluster']}
       client_config: *client_config
     relationships:
       - type: cloudify.relationships.depends_on
@@ -48,7 +52,7 @@ node_templates:
   kubernetes-cluster-node-pool:
     type: cloudify.gcp.nodes.KubernetesNodePool
     properties:
-      name: { concat: [ { get_input: resource_prefix }, '-node-pool-1']}
+      name: { concat: [ { get_input: env_name }, '-node-pool-1']}
       cluster_id: { get_property: [ kubernetes-cluster, name] }
       additional_settings:
         config:

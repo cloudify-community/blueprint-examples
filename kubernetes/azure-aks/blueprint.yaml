@@ -36,18 +36,18 @@ inputs:
     required: true
     default: eastus2
 
-  resource_suffix:
+  env_name:
     type: string
     description: Must be a letter.
     default: 'a'
 
   resource_group_name:
     type: string
-    default: { concat: [ 'aks-test-rg', { get_input: resource_suffix } ] }
+    default: { concat: [ 'aks-test-rg', { get_input: env_name } ] }
 
   managed_cluster_name:
     type: string
-    default: { concat: [ 'aks-test-mc', { get_input: resource_suffix } ] }
+    default: { concat: [ 'aks-test-mc', { get_input: env_name } ] }
 
   service_account_name:
     type: string
@@ -71,12 +71,12 @@ dsl_definitions:
   resource_config: &resource_config
     location: { get_input: location }
     tags:
-      Name: { concat: [ "AKS_Test", { get_input: resource_suffix } ] }
+      Name: { concat: [ "AKS_Test", { get_input: env_name } ] }
       tier: "Testing"
     kubernetes_version: ""
-    dns_prefix: { concat: [ "akstest", { get_input: resource_suffix } ] }
+    dns_prefix: { concat: [ "akstest", { get_input: env_name } ] }
     agent_pool_profiles:
-      - name: { concat: [ "nodepool1", { get_input: resource_suffix } ] }
+      - name: { concat: [ "nodepool1", { get_input: env_name } ] }
         count: 3
         vmSize: "Standard_DS2_v2"
         osType: "Linux"
