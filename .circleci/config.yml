@@ -76,15 +76,14 @@ commands:
     steps:
       - run: |
           pip install cfy-lint
-            for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+          for d in `cat .cicd/supported_examples.json  | jq -r 'to_entries[] | .key'`
+          do
+            for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
             do
-                for f in `cat .cicd/supported_examples.json  | jq -r --arg keyvar "$d" '.[$keyvar][]'`
-                do
-                    echo "Testing $d/$f"
-                    cfy-lint -b $d/$f
-                done
+            echo "Testing $d/$f"
+            cfy-lint -b $d/$f
             done
-          fi
+          done
 
   validate_examples_nightlies:
     steps:
