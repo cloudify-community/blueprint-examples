@@ -1,0 +1,13 @@
+---
+- name: some file test
+  hosts: all
+  tasks:
+    - name: Ansible create file with content example
+      copy:
+        dest: "/tmp/ansible_test.txt"
+        content: |
+           "Hello, World!"
+    - name: read all text files in /tmp/ansible_test.txt
+      shell: cat < /tmp/ansible_test.txt
+      args:
+        executable: /bin/bash
