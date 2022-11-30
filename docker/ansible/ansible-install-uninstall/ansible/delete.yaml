@@ -1,0 +1,12 @@
+---
+- name: some file test
+  hosts: all
+  tasks:
+    - name: Delete content & directory
+      file:
+        state: absent
+        path: /tmp/ansible_test.txt
+    - name: saying goodbyes
+      shell:  echo "ByeBye, World!"
+      args:
+        executable: /bin/bash
