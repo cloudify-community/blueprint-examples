@@ -8,6 +8,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'cfy'
+
   gcp_credentials:
     type: string
     default: { get_secret: gcp_credentials }
@@ -28,7 +32,7 @@ inputs:
 
   resource_prefix:
     type: string
-    default: cfy
+    default: { get_input: env_name }
 
   resource_suffix:
     type: string

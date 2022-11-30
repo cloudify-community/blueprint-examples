@@ -66,11 +66,13 @@ inputs:
     description: Control parameters for names in resources.
     default: 'example'
 
+
 dsl_definitions:
 
   client_config: &client_config
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
+    aws_session_token: { get_secret: aws_session_token }
     region_name: { get_input: aws_region_name }
 
 node_templates:
@@ -111,12 +113,12 @@ node_templates:
       resource_config:
         kwargs:
           Filters:
-            - Name: name
-              Values:
-                - CentOS 7.7.1908 x86_64 with cloud-init (HVM)
-            - Name: owner-id
-              Values:
-                - 057448758665
+          - Name: name
+            Values:
+            - 'CentOS7-cloudify-examples-image'
+          - Name: owner-id
+            Values:
+            - '263721492972'
       client_config: *client_config
 
   ip:

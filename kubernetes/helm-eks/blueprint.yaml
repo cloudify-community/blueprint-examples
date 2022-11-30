@@ -23,10 +23,14 @@ inputs:
   infra_deployment_id:
     type: string
     description: The blueprint name, the deployment name.
-    default: { get_input: eks_cluster_name }
+    default: { get_input: env_name }
 
   eks_cluster_name:
     type: string
+
+  env_name:
+    type: string
+    default: { get_input: eks_cluster_name }
 
   repo_name:
     description: >
@@ -67,7 +71,7 @@ node_templates:
         deployment:
           id: { get_input: infra_deployment_id }
           inputs:
-            eks_cluster_name: { get_input: eks_cluster_name }
+            env_name: { get_input: env_name }
     interfaces:
       cloudify.interfaces.lifecycle:
         start:

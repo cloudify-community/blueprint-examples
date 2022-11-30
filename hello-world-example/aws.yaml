@@ -12,6 +12,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'helloworldexampleaws'
+
   aws_region_name:
     type: string
     description: The AWS region name, such as us-east-1 or us-west-1.
@@ -30,9 +34,10 @@ inputs:
   ami_name_filter:
     type: string
     description: The name of the AWS AMI in the AWS region.
-    default: 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727'
+    default: 'ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20210416'
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
@@ -46,6 +51,7 @@ dsl_definitions:
   client_config: &client_config
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
+    aws_session_token: { get_secret: aws_session_token }
     region_name: { get_input: aws_region_name }
 
 node_templates:
@@ -65,16 +71,16 @@ node_templates:
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
       use_public_ip: true
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: ami
-    - type: cloudify.relationships.depends_on
-      target: nic
-    - type: cloudify.relationships.depends_on
-      target: ip
-    - type: cloudify.relationships.depends_on
-      target: cloud_init
-    - type: cloudify.relationships.depends_on
-      target: agent_key
+      - type: cloudify.relationships.depends_on
+        target: ami
+      - type: cloudify.relationships.depends_on
+        target: nic
+      - type: cloudify.relationships.depends_on
+        target: ip
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+      - type: cloudify.relationships.depends_on
+        target: agent_key
 
   ami:
     type: cloudify.nodes.aws.ec2.Image
@@ -82,12 +88,12 @@ node_templates:
       resource_config:
         kwargs:
           Filters:
-          - Name: name
-            Values:
-            - { get_input: ami_name_filter }
-          - Name: owner-id
-            Values:
-            - { get_input: ami_owner_filter }
+            - Name: name
+              Values:
+                - { get_input: ami_name_filter }
+            - Name: owner-id
+              Values:
+                - { get_input: ami_owner_filter }
       client_config: *client_config
 
   ip:
@@ -95,8 +101,8 @@ node_templates:
     properties:
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: nic
+      - type: cloudify.relationships.depends_on
+        target: nic
 
   nic:
     type: cloudify.nodes.aws.ec2.Interface
@@ -107,12 +113,12 @@ node_templates:
           Description: Created by cloudify-hello-world-example.
           SubnetId: { get_attribute: [ subnet, aws_resource_id ] }
           Groups:
-          - { get_attribute: [ security_group, aws_resource_id ] }
+            - { get_attribute: [ security_group, aws_resource_id ] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: security_group
-    - type: cloudify.relationships.depends_on
-      target: subnet
+      - type: cloudify.relationships.depends_on
+        target: security_group
+      - type: cloudify.relationships.depends_on
+        target: subnet
 
   security_group_rules:
     type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
@@ -120,31 +126,31 @@ node_templates:
       client_config: *client_config
       resource_config:
         IpPermissions:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          IpRanges:
-          - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 22
+            ToPort: 22
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 80
+            ToPort: 80
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: security_group
+      - type: cloudify.relationships.contained_in
+        target: security_group
 
   security_group:
     type: cloudify.nodes.aws.ec2.SecurityGroup
     properties:
       client_config: *client_config
       resource_config:
-        GroupName: CloudifyHelloWorldGroup
-        Description: Created by cloudify-hello-world-example.
+        GroupName: { concat: [ { get_input: env_name }, '-group' ] }
+        Description: { concat: [ 'created by ', { get_input: env_name } ] }
         VpcId: { get_attribute: [ vpc, aws_resource_id ] }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: vpc
+      - type: cloudify.relationships.depends_on
+        target: vpc
 
   route_public_subnet_internet_gateway:
     type: cloudify.nodes.aws.ec2.Route
@@ -154,10 +160,10 @@ node_templates:
           DestinationCidrBlock: '0.0.0.0/0'
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: routetable
-    - type: cloudify.relationships.connected_to
-      target: internet_gateway
+      - type: cloudify.relationships.contained_in
+        target: routetable
+      - type: cloudify.relationships.connected_to
+        target: internet_gateway
     interfaces:
       cloudify.interfaces.lifecycle:
         stop: {}
@@ -167,10 +173,10 @@ node_templates:
     properties:
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.contained_in
-      target: vpc
-    - type: cloudify.relationships.connected_to
-      target: subnet
+      - type: cloudify.relationships.contained_in
+        target: vpc
+      - type: cloudify.relationships.connected_to
+        target: subnet
 
   subnet:
     type: cloudify.nodes.aws.ec2.Subnet
@@ -180,16 +186,16 @@ node_templates:
         CidrBlock: 10.10.4.0/24
         AvailabilityZone: { get_input: availability_zone }
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: vpc
+      - type: cloudify.relationships.depends_on
+        target: vpc
 
   internet_gateway:
     type: cloudify.nodes.aws.ec2.InternetGateway
     properties:
       client_config: *client_config
     relationships:
-    - type: cloudify.relationships.connected_to
-      target: vpc
+      - type: cloudify.relationships.depends_on
+        target: vpc
 
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
@@ -203,11 +209,11 @@ node_templates:
     properties:
       resource_config:
         users:
-        - name: { get_input: agent_user }
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_attribute: [agent_key, public_key_export] }
+          - name: { get_input: agent_user }
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_attribute: [agent_key, public_key_export] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: agent_key
@@ -233,7 +239,6 @@ outputs:
     description: The external endpoint of the application.
     value: { concat: [ 'http://', { get_attribute: [ ip, aws_resource_id ] }, ':80' ] }
 
-
 groups:
 
   scalable_compute:
@@ -249,4 +254,3 @@ policies:
     properties:
       default_instances: 1
     targets: [scalable_compute]
-

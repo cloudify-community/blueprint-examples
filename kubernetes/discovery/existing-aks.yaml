@@ -32,6 +32,10 @@ inputs:
   managed_cluster_name:
     type: string
 
+  env_name:
+    type: string
+    default: { get_input: managed_cluster_name}
+
 dsl_definitions:
 
   azure_config: &azure_config
@@ -47,7 +51,7 @@ node_templates:
     properties:
       use_external_resource: true
       resource_group: { get_input: resource_group_name }
-      name: { get_input: managed_cluster_name }
+      name: { get_input: env_name }
       azure_config: *azure_config
       store_kube_config_in_runtime: true
 

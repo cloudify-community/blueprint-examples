@@ -6,7 +6,7 @@ port = `ctx node properties port`
 cd `mktemp -d`
 
 #Crate the Hello World message in index.html
-echo "WeServer root" > index.html
+echo "Webserver root" > index.html
 
 #Run the wenserver process in background on the port cpesified and save process id to a pid.txt
 env -i /bin/bash -c "nohup python3 -m http.server $port > server_log.txt 2>&1 & echo \$! > pid.txt"

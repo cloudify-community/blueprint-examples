@@ -42,7 +42,7 @@ inputs:
   size:
     default: Standard_A3
 
-  resource_prefix:
+  env_name:
     default: prom_
 
   resource_suffix:

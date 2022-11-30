@@ -126,6 +126,7 @@ node_templates:
           environment:
             AWS_ACCESS_KEY_ID: { get_input: aws_access_key_id }
             AWS_SECRET_ACCESS_KEY: { get_input: aws_secret_access_key }
+            AWS_SESSION_TOKEN: { get_secret: aws_session_token }
             AWS_DEFAULT_REGION: { get_input: aws_region_name }
           volumes:
             - { get_input: container_volume }

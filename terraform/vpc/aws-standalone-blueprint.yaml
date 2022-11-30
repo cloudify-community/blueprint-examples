@@ -1,0 +1,149 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - plugin:cloudify-terraform-plugin?version= >=0.15.0
+  - https://raw.githubusercontent.com/cloudify-community/eaas-example/master/utils/custom_types.yaml
+
+inputs:
+  env_name:
+    type: string
+    default: ''
+    constraints:
+      - pattern: '(^ *$)|(^[a-zA-Z][a-zA-Z0-9]+$)'
+
+  aws_region_name:
+    type: string
+    default: us-east-1
+    constraints:
+    - valid_values:
+        - us-east-1 #US East (N. Virginia)
+        - us-east-2 #US East (Ohio) 
+        - us-west-1 #US West (N. California)  
+        - us-west-2 #US West (Oregon) 
+        - ca-central-1  #Canada (Central) 
+        - eu-central-1  #Europe (Frankfurt) 
+        - eu-west-1 #Europe (Ireland) 
+        - eu-west-2 #Europe (London)  
+        - eu-south-1  #Europe (Milan) 
+        - eu-west-3 #Europe (Paris) 
+        - eu-north-1  #Europe (Stockholm) 
+        - ap-northeast-3  #Asia Pacific (Osaka) 
+        - ap-northeast-2  #Asia Pacific (Seoul) 
+        - ap-southeast-1  #Asia Pacific (Singapore) 
+        - ap-southeast-2  #Asia Pacific (Sydney)  
+        - ap-northeast-1  #Asia Pacific (Tokyo)
+
+  availability_zone_1:
+    type: string
+    default: { concat: [ { get_input: aws_region_name }, 'a' ] }
+    hidden: true
+
+  availability_zone_2:
+    type: string
+    default: { concat: [ { get_input: aws_region_name }, 'b' ] }
+    hidden: true
+
+  cidr_block:
+    type: string
+    default: 10.0.0.0/16
+    hidden: true
+
+  subnet_1_cidr:
+    type: string
+    default: 10.0.0.0/24
+    hidden: true
+
+  subnet_2_cidr:
+    type: string
+    default: 10.0.1.0/24
+    hidden: true
+
+node_templates:
+    prefix:
+      type: eaas.nodes.UniquePrefixGenerator
+      properties:
+        predefined_value: { get_input: env_name }
+    
+    terraform:
+      type: cloudify.nodes.terraform
+      properties:
+        resource_config:
+          installation_source: https://releases.hashicorp.com/terraform/0.14.3/terraform_0.14.3_linux_amd64.zip
+    
+    terraform_module:
+      type: cloudify.nodes.terraform.Module
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          precreate:
+            implementation: scripts/convert_tags.py
+            executor: central_deployment_agent
+            inputs: 
+              vpc_tags:
+                - Key: Name
+                  Value: { concat: [ { get_attribute: [ prefix, value ] }, -vpc ] }
+              subnet_1_tags: 
+                - Key: Name
+                  Value: { concat: [ { get_attribute: [ prefix, value ] }, -subnet-1 ] }
+              subnet_2_tags: 
+                - Key: Name
+                  Value: { concat: [ { get_attribute: [ prefix, value ] }, -subnet-2 ] }
+      properties:
+        resource_config:
+          environment_variables:
+            AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
+            AWS_SECRET_ACCESS_KEY: { get_secret: aws_secret_access_key }
+          variables:
+            aws_region: { get_input: aws_region_name }
+            name: { concat: [ { get_attribute: [ prefix, value ] }, vpc ] }
+            cidr_block: { get_input: cidr_block }
+            vpc_tags: { get_attribute: [ terraform_module, vpc_tags ] }
+            availability_zone_1: { get_input: availability_zone_1 }
+            availability_zone_2: { get_input: availability_zone_2 }
+            subnet_1_cidr: { get_input: subnet_1_cidr }
+            subnet_2_cidr: { get_input: subnet_2_cidr }
+            subnet_1_tags: { get_attribute: [ terraform_module, subnet_1_tags ] }
+            subnet_2_tags: { get_attribute: [ terraform_module, subnet_2_tags ] }
+          source:
+            location: templates/tf-aws-vpc-master.zip
+      relationships:
+        - target: terraform
+          type: cloudify.terraform.relationships.run_on_host
+        - target: prefix
+          type: cloudify.relationships.depends_on
+
+labels:
+  obj-type: 
+    values: 
+      - aws
+      - terraform
+
+capabilities:
+  vpc_id:
+    description: |
+      AWS ID of the VPC
+    value: { get_attribute: [ terraform_module, resources, vpc, instances, 0, attributes, id ] }
+  subnet_ids:
+    description: |
+      AWS ID's of subnets
+    value:
+      - { get_attribute: [ terraform_module, resources, subnet_1, instances, 0, attributes, id ] }
+      - { get_attribute: [ terraform_module, resources, subnet_2, instances, 0, attributes, id ] }
+  availability_zones:
+    description: |
+      AWS availability zones to work with
+    value:
+      - { get_attribute: [ terraform_module, resources, subnet_1, instances, 0, attributes, availability_zone ] }
+      - { get_attribute: [ terraform_module, resources, subnet_2, instances, 0, attributes, availability_zone ] }
+  internet_gateway_id:
+    description: |
+      AWS ID of internet gateway
+    value: { get_attribute: [ terraform_module, resources, internet_gateway, instances, 0, attributes, id ] }
+  agents_security_group_id:
+    description: |
+      AWS ID of a security group that allows Cloudify Manager to access
+      VM's via SSH
+    value: { get_attribute: [ terraform_module, resources, agents_security_group, instances, 0, attributes, id ] }
+
+
+

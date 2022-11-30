@@ -12,6 +12,10 @@ imports:
 
 inputs:
 
+  env_name:
+    type: string
+    default: 'helloworldexampleawscf'
+
   aws_access_key_id:
     type: string
     default: { get_secret: aws_access_key_id }
@@ -36,16 +40,13 @@ inputs:
     type: string
     default: 172.30.0.0/24
 
-  resource_suffix:
-    default: '-a'
-
   key_pair_name:
     type: string
-    default: { concat: [ 'hello_world_key', { get_input: resource_suffix } ] }
+    default: { concat: [ 'hello_world_key', { get_input: env_name } ] }
 
   agent_key_name:
     type: string
-    default: agent_key
+    default: { concat: [ 'hello_world_key', { get_input: env_name } ] }
 
   agent_user:
     description: >
@@ -58,6 +59,7 @@ dsl_definitions:
   client_config: &client_config
     aws_access_key_id: { get_input: aws_access_key_id }
     aws_secret_access_key: { get_input: aws_secret_access_key }
+    aws_session_token: { get_secret: aws_session_token }
     region_name: { get_input: aws_region_name }
 
 node_templates:
@@ -81,14 +83,14 @@ node_templates:
         kwargs:
           StackName: Hello-World-Sample-Stack
           Parameters:
-          - ParameterKey: InstanceType
-            ParameterValue: m1.small
-          - ParameterKey: KeyName
-            ParameterValue: { get_input: key_pair_name }
-          - ParameterKey: VpcCIDR
-            ParameterValue: { get_input: vpc_cidr }
-          - ParameterKey: SubnetCIDR
-            ParameterValue: { get_input: subnet_cidr }
+            - ParameterKey: InstanceType
+              ParameterValue: m1.small
+            - ParameterKey: KeyName
+              ParameterValue: { get_input: key_pair_name }
+            - ParameterKey: VpcCIDR
+              ParameterValue: { get_input: vpc_cidr }
+            - ParameterKey: SubnetCIDR
+              ParameterValue: { get_input: subnet_cidr }
           TemplateURL: https://hello-world-cf-example.s3-eu-west-1.amazonaws.com/template.yaml
     relationships:
       - type: cloudify.relationships.depends_on
@@ -100,19 +102,19 @@ node_templates:
           implementation: scripts/cloudformation/expose_ip.py
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
-      properties:
-        resource_config:
-          key_name: { get_input: agent_key_name }
-          openssh_format: true
-        use_secret_store: true
-        use_secrets_if_exist: true
-      interfaces:
-        cloudify.interfaces.lifecycle:
-          create:
-            implementation: keys.cloudify_ssh_key.operations.create
-            inputs:
-              store_private_key_material: true
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 outputs:
 

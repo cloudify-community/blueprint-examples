@@ -10,7 +10,7 @@ imports:
 
 inputs:
 
-  resource_name_prefix:
+  env_name:
     description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
@@ -55,13 +55,12 @@ inputs:
   user_domain_name:
     description: Openstack user domain name.
     type: string
-    default:  default
+    default: default
 
   project_domain_name:
     description: The name of your OpenStack project.
     type: string
-    default:  default
-
+    default: default
 
 dsl_definitions:
 
@@ -86,7 +85,7 @@ node_templates:
         user: { get_input: agent_user }
       use_public_ip: true
       resource_config:
-        name: { concat: [ { get_input: resource_name_prefix }, '-infra-host' ] }
+        name: { concat: [ { get_input: env_name }, '-infra-host' ] }
         image_id: { get_input: image_id }
         flavor_id: { get_input: flavor_id }
         user_data: { get_attribute: [ cloud_init, cloud_config ] }
@@ -125,7 +124,7 @@ node_templates:
     properties:
       client_config: *client_config
       resource_config:
-        name: { concat: [ { get_input: resource_name_prefix }, '-infra-group' ] }
+        name: { concat: [ { get_input: env_name }, '-infra-group' ] }
         description: 'db lb app infra group'
       security_group_rules:
         - direction: ingress
@@ -172,8 +171,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id:  { get_capability: [ { get_input: network_deployment_name }, public_network ] }
-
+        id: { get_capability: [ { get_input: network_deployment_name }, public_network ] }
 
   router:
     type: cloudify.nodes.openstack.Router

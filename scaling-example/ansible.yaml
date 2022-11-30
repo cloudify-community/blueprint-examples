@@ -24,12 +24,12 @@ inputs:
   ami_owner_filter:
     type: string
     description: The AWS AMI owner number.
-    default: '057448758665'
+    default: '263721492972'
 
   ami_name_filter:
     type: string
     description: The name of the AWS AMI in the AWS region.
-    default: 'CentOS 7.7.1908 x86_64 with cloud-init (HVM)'
+    default: 'CentOS7-cloudify-examples-image'
 
   instance_type:
     type: string
@@ -45,7 +45,7 @@ inputs:
     type: string
     default: agent_key
 
-  resource_suffix:
+  env_name:
     type: string
     default: '0'
 
@@ -76,11 +76,12 @@ node_templates:
             number_of_attempts: 1
             run_data:
               availability_zone: { get_input: availability_zone }
-              resource_suffix: { get_input: resource_suffix }
+              env_name: { get_input: env_name }
               infra_info_file: { get_attribute: [ SELF, ansible_infra_info_file ] }
             ansible_env_vars: &env_vars
               AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
               AWS_SECRET_ACCESS_KEY: { get_secret: aws_secret_access_key }
+              AWS_SESSION_TOKEN: { get_secret: aws_session_token }
               AWS_REGION: { get_input: aws_region_name }
             extra_packages: &extra_packages
               - boto3==1.16.26
@@ -142,7 +143,7 @@ node_templates:
               ami_owner_filter: { get_input: ami_owner_filter }
               ami_name_filter: { get_input: ami_name_filter }
               ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
-              resource_suffix: { get_input: resource_suffix }
+              env_name: { get_input: env_name }
               infra_info_file: { get_attribute: [ SELF, ansible_infra_info_file ] }
             ansible_env_vars: *env_vars
             extra_packages: *extra_packages

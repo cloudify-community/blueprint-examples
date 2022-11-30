@@ -21,7 +21,7 @@ inputs:
     type: boolean
     default: false
 
-  resource_suffix:
+  env_name:
     type: string
     default: '1'
 
@@ -134,7 +134,6 @@ node_templates:
           inputs:
             store_public_key_material: true
             store_private_key_material: true
-
 
 capabilities:
 

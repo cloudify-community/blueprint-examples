@@ -12,7 +12,7 @@ imports:
 
 inputs:
 
-  resource_name_prefix:
+  env_name:
     description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
@@ -29,11 +29,13 @@ inputs:
     default: aws
 
   instance_type:
+    type: string
     description: >
       The AWS instance_type.
     default: 't2.micro'
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ec2-user'
@@ -43,6 +45,7 @@ dsl_definitions:
   client_config: &client_config
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
+    aws_session_token: { get_secret: aws_session_token }
     region_name: { get_capability: [ { get_input: network_deployment_name }, region_name ] }
 
 node_templates:
@@ -62,9 +65,9 @@ node_templates:
         InstanceType: { get_input: instance_type }
         kwargs:
           BlockDeviceMappings:
-          - DeviceName: '/dev/sda1'
-            Ebs:
-              DeleteOnTermination: True
+            - DeviceName: '/dev/sda1'
+              Ebs:
+                DeleteOnTermination: true
           Placement:
             AvailabilityZone: { get_capability: [ { get_input: network_deployment_name }, availability_zone ] }
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
@@ -150,7 +153,7 @@ node_templates:
     properties:
       client_config: *client_config
       resource_config:
-        GroupName: { concat: [ { get_input: resource_name_prefix }, '-infra-group' ] }
+        GroupName: { concat: [ { get_input: env_name }, '-infra-group' ] }
         Description: db lb app infra group
         VpcId: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
 
@@ -182,10 +185,10 @@ node_templates:
           Filters:
           - Name: owner-id
             Values:
-            - "057448758665"
+            - "263721492972"
           - Name: name
             Values:
-            - "CentOS 7.7.1908 x86_64 with cloud-init (HVM)"
+            - "CentOS7-cloudify-examples-image"
 
 groups:
 

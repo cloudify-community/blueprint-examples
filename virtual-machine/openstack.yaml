@@ -70,10 +70,6 @@ inputs:
     type: boolean
     default: false
 
-  use_existing_server:
-    type: boolean
-    default: false
-
   server_name:
     type: string
     default: { concat: [ cloudify-demo-server-, { get_input: resource_suffix } ] }
@@ -111,7 +107,6 @@ node_templates:
         image_id: { get_input: image }
         flavor_id: { get_input: flavor }
         user_data: { get_attribute: [ cloud_init, cloud_config ] }
-      use_external_resource: { get_input: use_existing_server }
       use_public_ip: true
     relationships:
       - type: cloudify.relationships.openstack.server_connected_to_port
