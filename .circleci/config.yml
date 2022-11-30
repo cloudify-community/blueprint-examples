@@ -186,6 +186,7 @@ jobs:
       - managerorb/create_manager_container_latest
       - lint-examples
       - validate_examples
+      - lint-examples
 
   blueprints-validation-nightlies:
     executor: cloudify-machine-py3
