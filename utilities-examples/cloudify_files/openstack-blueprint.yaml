@@ -11,22 +11,15 @@ imports:
 
 inputs:
 
-  security_group_rules:
-    default:
-      - direction: ingress
-        protocol: tcp
-        port_range_min: 22
-        port_range_max: 22
-
   user_domain_name:
     description: Openstack user domain name.
     type: string
-    default:  default
+    default: default
 
   project_domain_name:
     description: The name of your OpenStack project.
     type: string
-    default:  default
+    default: default
 
 dsl_definitions:
 
@@ -84,7 +77,6 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: cloudify_host_cloud_config
 
-
   cloudify_host_cloud_config:
     type: cloudify.nodes.CloudInit.CloudConfig
     properties:
@@ -129,7 +121,11 @@ node_templates:
       client_config: *openstack_config
       resource_config:
         name: basic_security_group
-      security_group_rules: { get_input: security_group_rules }
+      security_group_rules:
+        - direction: ingress
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
 
   public_ip:
     type: cloudify.nodes.openstack.FloatingIP
@@ -171,7 +167,7 @@ node_templates:
         type: cloudify.relationships.openstack.subnet_connected_to_router
 
   public_network:
-    type:  cloudify.nodes.openstack.Network
+    type: cloudify.nodes.openstack.Network
     properties:
       client_config: *openstack_config
       use_external_resource: true

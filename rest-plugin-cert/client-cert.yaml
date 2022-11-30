@@ -7,14 +7,17 @@ imports:
 inputs:
 
   rest_endpoint:
+    type: string
     description: >
       REST API endpoint
 
   rest_endpoint_cert:
+    type: string
     description: >
       REST API endpoint CA_BUNDLE
 
   rest_client_cert:
+    type: string
     description: >
       REST API client certificate
 

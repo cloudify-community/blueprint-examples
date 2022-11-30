@@ -13,9 +13,10 @@ inputs:
     type: string
     default: "eu-de"
     constraints:
-    - valid_values: ["us-south", "br-sao", "ca-tor", "us-east", "eu-de", "eu-gb", "jp-osa", "au-syd", "jp-tok"]
+      - valid_values: ["us-south", "br-sao", "ca-tor", "us-east", "eu-de", "eu-gb", "jp-osa", "au-syd", "jp-tok"]
 
   image:
+    type: string
     description: IMB Cloud Image name
     default: "ibm-centos-7-6-minimal-amd64-2"
 
@@ -59,7 +60,7 @@ node_templates:
           image: { get_input: image }
     relationships:
       - target: terraform
-        type: cloudify.terraform.relationships.run_on_host
+        type: cloudify.relationships.terraform.run_on_host
       - target: agent_key
         type: cloudify.relationships.depends_on
 
@@ -80,6 +81,7 @@ node_templates:
 
 capabilities:
   name:
+    description: name
     value: { get_attribute: [ cloud_resources, resources, vm, instances, 0, attributes, id ] }
 
   user:
@@ -89,4 +91,3 @@ capabilities:
   key_content:
     description: Private agent key
     value: { get_attribute: [agent_key, private_key_export] }
-

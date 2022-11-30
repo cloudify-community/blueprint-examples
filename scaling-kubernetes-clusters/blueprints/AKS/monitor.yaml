@@ -4,7 +4,6 @@ imports:
   - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
   - plugin:cloudify-web-monitoring-plugin
 
-
 inputs:
 
   cluster_deployment_name:

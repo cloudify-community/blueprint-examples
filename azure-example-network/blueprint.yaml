@@ -30,13 +30,16 @@ inputs:
     default: { get_secret: azure_client_secret }
 
   endpoint_resource:
+    type: string
     default: https://management.core.windows.net/
 
   endpoints_resource_manager:
+    type: string
     default: https://management.azure.com
 
   endpoint_verify:
-    default: True
+    type: boolean
+    default: true
 
   endpoint_storage:
     type: string
@@ -52,21 +55,27 @@ inputs:
     default: eastus2
 
   retry_after:
+    type: string
     default: 5
 
   resource_prefix:
+    type: string
     default: { get_input: env_name }
 
   resource_suffix:
+    type: string
     default: 0
 
   public_subnet_cidr:
+    type: string
     default: 10.10.2.0/24
 
   private_subnet_cidr:
+    type: string
     default: 10.10.3.0/24
 
   network_api_version:
+    type: string
     description: >
       API Version for Network
     default: "2015-06-15"
@@ -83,32 +92,31 @@ dsl_definitions:
     endpoint_verify: { get_input: endpoint_verify }
     endpoints_active_directory: { get_input: endpoints_active_directory }
 
-
 node_templates:
 
   resource_group:
-    type: cloudify.azure.nodes.ResourceGroup
+    type: cloudify.nodes.azure.ResourceGroup
     properties:
-      azure_config: *client_config
+      client_config: *client_config
       name: { concat: [ { get_input: resource_prefix }, 'resource_group', { get_input: resource_suffix } ] }
       location: { get_input: location }
 
   network:
-    type: cloudify.azure.nodes.network.VirtualNetwork
+    type: cloudify.nodes.azure.network.VirtualNetwork
     properties:
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { concat: [ { get_input: resource_prefix }, 'vnet', { get_input: resource_suffix } ] }
       location: { get_input: location }
       retry_after: { get_input: retry_after }
     relationships:
-      - type: cloudify.azure.relationships.contained_in_resource_group
+      - type: cloudify.relationships.azure.contained_in_resource_group
         target: resource_group
 
   subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { concat: [ { get_input: resource_prefix }, 'vsubnet', { get_input: resource_suffix } ] }
       location: { get_input: location }
@@ -116,19 +124,23 @@ node_templates:
       resource_config:
         addressPrefix: { get_input: public_subnet_cidr }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_virtual_network
-      target: network
+      - type: cloudify.relationships.azure.contained_in_virtual_network
+        target: network
 
 capabilities:
 
   resource_group:
+    description: 'resource group name'
     value: { get_attribute: [ resource_group, name ] }
 
   virtual_network:
+    description: 'virtual network name'
     value: { get_attribute: [ network, name ] }
 
   public_subnet:
+    description: 'public subnet name'
     value: { get_attribute: [ subnet, name ] }
 
   location:
+    description: 'Azure Region location'
     value: { get_input: location }

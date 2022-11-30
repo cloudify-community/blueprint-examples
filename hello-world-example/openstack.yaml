@@ -43,6 +43,7 @@ inputs:
     default: cloudify-hello-world-subnet
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: ubuntu
@@ -50,12 +51,12 @@ inputs:
   user_domain_name:
     description: Openstack user domain name.
     type: string
-    default:  default
+    default: default
 
   project_domain_name:
     description: The name of your OpenStack project.
     type: string
-    default:  default
+    default: default
 
   agent_key_name:
     type: string
@@ -118,8 +119,8 @@ node_templates:
         cidr: 10.10.4.0/24
         dns_nameservers: [8.8.4.4, 8.8.8.8]
         allocation_pools:
-        - start: 10.10.4.2
-          end: 10.10.4.254
+          - start: 10.10.4.2
+            end: 10.10.4.254
     relationships:
       - type: cloudify.relationships.contained_in
         target: network
@@ -182,11 +183,11 @@ node_templates:
     properties:
       resource_config:
         users:
-        - name: { get_input: agent_user }
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_attribute: [agent_key, public_key_export] }
+          - name: { get_input: agent_user }
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_attribute: [agent_key, public_key_export] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: agent_key

@@ -7,7 +7,6 @@ imports:
 
 node_templates:
 
-
   nodeA:
     type: cloudify.nodes.ApplicationModule
     interfaces:
@@ -25,7 +24,6 @@ node_templates:
           implementation: cloudify_custom_workflow.cloudify_custom_workflow.tasks.log
         interfaceB:
           implementation: cloudify_custom_workflow.cloudify_custom_workflow.tasks.log
-
 
 workflows:
   MyFlatWorkFlow:

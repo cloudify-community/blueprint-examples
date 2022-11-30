@@ -55,13 +55,12 @@ inputs:
   user_domain_name:
     description: Openstack user domain name.
     type: string
-    default:  default
+    default: default
 
   project_domain_name:
     description: The name of your OpenStack project.
     type: string
-    default:  default
-
+    default: default
 
 dsl_definitions:
 
@@ -172,8 +171,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id:  { get_capability: [ { get_input: network_deployment_name }, public_network ] }
-
+        id: { get_capability: [ { get_input: network_deployment_name }, public_network ] }
 
   router:
     type: cloudify.nodes.openstack.Router

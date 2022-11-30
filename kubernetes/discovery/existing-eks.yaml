@@ -41,7 +41,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_id: { get_input: env_name }
-      store_kube_config_in_runtime: True
+      store_kube_config_in_runtime: true
 
 capabilities:
 
@@ -52,8 +52,10 @@ capabilities:
       configuration: { get_attribute: [ eks_cluster, kubeconf ] }
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { get_attribute: [ eks_cluster, kubeconf, clusters, 0, cluster, server ] }
 
   connection_details:
+    description: 'connection details'
     value:
       file_content: { get_attribute: [ eks_cluster, kubeconf ] }

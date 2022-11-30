@@ -12,8 +12,8 @@ imports:
 inputs:
 
   aws_region_name:
-      type: string
-      default: 'us-east-1'
+    type: string
+    default: 'us-east-1'
 
   availability_zone:
     type: string
@@ -35,6 +35,7 @@ inputs:
     default: t2.micro
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ec2-user'
@@ -44,6 +45,7 @@ inputs:
     default: agent_key
 
   resource_suffix:
+    type: string
     default: { get_input: env_name }
 
   env_name:
@@ -53,8 +55,10 @@ inputs:
 
 node_templates:
 
-  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml during install workflow.
-  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml for more information about the properties provided.
+  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml
+  # during install workflow.
+  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml
+  # for more information about the properties provided.
   install-infra-playbook:
     type: cloudify.nodes.ansible.Executor
     properties:
@@ -63,7 +67,7 @@ node_templates:
       ansible_become: true
       run_data:
         instance_type: { get_input: instance_type }
-        ami_owner_filter: { get_input: ami_owner_filter  }
+        ami_owner_filter: { get_input: ami_owner_filter }
         ami_name_filter: { get_input: ami_name_filter }
         ec2_instance_user_data: { get_attribute: [ cloud_init, cloud_config ] }
         availability_zone: { get_input: availability_zone }
@@ -85,7 +89,8 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: cloud_init
 
-  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
+  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml
+  # playbook during uninstall workflow.
   # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
   uninstall-infra-playbook:
     type: cloudify.nodes.Root
@@ -106,13 +111,13 @@ node_templates:
               security_group_id: { get_attribute: [aws_infra_info, security_group_id] }
               subnet_id: { get_attribute: [aws_infra_info, subnet_id] }
               vpc_id: { get_attribute: [aws_infra_info, vpc_id] }
-              vpc_name:  { get_attribute: [aws_infra_info, vpc_name] }
+              vpc_name: { get_attribute: [aws_infra_info, vpc_name] }
             ansible_env_vars: *env_vars
             extra_packages: *extra_packages
     relationships:
       - type: cloudify.relationships.depends_on
         target: aws_infra_info
-  
+
   aws_infra_info:
     type: cloudify.nodes.Root
     interfaces:
@@ -129,11 +134,11 @@ node_templates:
     properties:
       resource_config:
         users:
-        - name: { get_input: agent_user }
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_attribute: [agent_key, public_key_export] }
+          - name: { get_input: agent_user }
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_attribute: [agent_key, public_key_export] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: agent_key
@@ -157,7 +162,7 @@ capabilities:
 
   endpoint:
     description: The external endpoint of the application.
-    value:  { get_attribute: [aws_infra_info, public_ip] }
+    value: { get_attribute: [aws_infra_info, public_ip] }
 
   user:
     description: user ID.

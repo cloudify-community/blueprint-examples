@@ -7,11 +7,13 @@ imports:
 inputs:
 
   rest_endpoint:
+    type: string
     description: >
       REST API endpoint
     default: "jsonplaceholder.typicode.com"
 
   rest_endpoint_cert_path:
+    type: string
     description: >
       REST API endpoint CA_BUNDLE
     # ubuntu
@@ -22,10 +24,10 @@ inputs:
     default: { get_secret: cacert_bundle }
 
   rest_endpoint_cert:
+    type: string
     description: >
       REST API endpoint CA_BUNDLE
       Use /inputs/rest_endpoint_cert.yaml as input
-
 
 node_templates:
 

@@ -102,7 +102,6 @@
     "azure.yaml",
     "azure-arm.yaml",
     "openstack.yaml",
-    "openstack-v2.yaml",
     "gcp.yaml",
     "ansible.yaml",
     "vsphere.yaml",

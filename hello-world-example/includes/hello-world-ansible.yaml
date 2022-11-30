@@ -9,7 +9,6 @@ node_templates:
     properties:
       playbook_path: apache2/playbook.yaml
       start_at_task: "install apache2"
-      # save_playbook: true
       ansible_env_vars:
         ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
         ANSIBLE_HOST_KEY_CHECKING: "False"
@@ -36,5 +35,5 @@ node_templates:
                         ansible_host: { get_attribute: [ vm, ip ] }
                         ansible_user: { get_input: agent_user }
                         ansible_ssh_private_key_file: { get_attribute: [agent_key, private_key_export] }
-                        ansible_become: True
+                        ansible_become: "True"
                         ansible_ssh_common_args: -o StrictHostKeyChecking=no

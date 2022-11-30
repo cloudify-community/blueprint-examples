@@ -13,6 +13,7 @@ imports:
 inputs:
   #This is our input hello, a default value world is defined to it
   hello:
+    type: string
     description: Say Hello to
     default: World
 
@@ -23,11 +24,12 @@ node_templates:
   MyResource:
     #The resource type is defined in the imported plugins,
     #In this case the type cloudify.nodes.ApplicationModule is defined in the types.yaml
-    type:  cloudify.nodes.ApplicationModule
+    type: cloudify.nodes.ApplicationModule
 
 #The output section expose resources that are needed by external users or software.
 #In this case were printing the value of the input named hello.
 capabilities:
   #we have defined the output hellow and assigned it a the value of the input hello
   hello:
-    value:  { get_input: hello }
+    description: 'hello'
+    value: { get_input: hello }

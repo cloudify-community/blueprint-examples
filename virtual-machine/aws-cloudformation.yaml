@@ -50,7 +50,8 @@ inputs:
 
   template_url:
     type: string
-    default: https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/blueprints/5.0.5/cloudformation/template.yaml
+    default:
+      'https://cloudify-release-eu.s3-eu-west-1.amazonaws.com/cloudify/blueprints/5.0.5/cloudformation/template.yaml'
 
   env_name:
     type: string
@@ -58,6 +59,7 @@ inputs:
     default: '-a'
 
   resource_suffix:
+    type: string
     default: { get_input: env_name }
 
   agent_user:
@@ -93,14 +95,14 @@ node_templates:
         kwargs:
           StackName: { concat: [ 'Two-Tier-Sample-Stack', { get_input: resource_suffix } ] }
           Parameters:
-          - ParameterKey: InstanceType
-            ParameterValue: t2.small
-          - ParameterKey: KeyName
-            ParameterValue: { concat: [ 'two_tier_key', { get_input: resource_suffix } ] }
-          - ParameterKey: VpcCIDR
-            ParameterValue: { get_input: vpc_cidr }
-          - ParameterKey: SubnetCIDR
-            ParameterValue: { get_input: subnet_cidr }
+            - ParameterKey: InstanceType
+              ParameterValue: t2.small
+            - ParameterKey: KeyName
+              ParameterValue: { concat: [ 'two_tier_key', { get_input: resource_suffix } ] }
+            - ParameterKey: VpcCIDR
+              ParameterValue: { get_input: vpc_cidr }
+            - ParameterKey: SubnetCIDR
+              ParameterValue: { get_input: subnet_cidr }
           TemplateURL: { get_input: template_url }
     relationships:
       - type: cloudify.relationships.depends_on
