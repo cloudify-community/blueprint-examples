@@ -36,8 +36,8 @@ inputs:
 
 node_types:
 
-  cloudify.kubernetes.resources.PersistentVolumeClaim:
-    derived_from: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+  cloudify.nodes.kubernetes.resources.PersistentVolumeClaim:
+    derived_from: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
     properties:
       api_mapping:
         default:
@@ -59,7 +59,7 @@ node_types:
 node_templates:
 
   pv:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       file:
         resource_path: resources/pv.yaml
@@ -71,7 +71,7 @@ node_templates:
         target: master
 
   pv-claim:
-    type: cloudify.kubernetes.resources.PersistentVolumeClaim
+    type: cloudify.nodes.kubernetes.resources.PersistentVolumeClaim
     properties:
       definition:
         apiVersion: v1
@@ -93,7 +93,7 @@ node_templates:
         target: pv
 
   service:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       file:
         resource_path: resources/service.yaml
@@ -117,7 +117,7 @@ node_templates:
         target: pv-claim
 
   deploy:
-    type: cloudify.kubernetes.resources.Deployment
+    type: cloudify.nodes.kubernetes.resources.Deployment
     properties:
       definition:
         apiVersion: extensions/v1beta1

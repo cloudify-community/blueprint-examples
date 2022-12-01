@@ -68,7 +68,7 @@ node_templates:
         target: kubernetes-cluster
 
   sanity_pod:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
         authentication:

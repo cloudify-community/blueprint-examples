@@ -130,7 +130,7 @@ node_templates:
         target: managed_cluster
 
   flask_app:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
         configuration:
@@ -160,7 +160,7 @@ node_templates:
         postdelete: {}
 
   flask_app_url:
-    type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
     properties:
       client_config:
         configuration:

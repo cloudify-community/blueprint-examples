@@ -137,7 +137,7 @@ node_templates:
         target: managed_cluster
 
   new_service_account:
-    type: cloudify.kubernetes.resources.ServiceAccount
+    type: cloudify.nodes.kubernetes.resources.ServiceAccount
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -154,7 +154,7 @@ node_templates:
         target: kubernetes_master
 
   new_role_binding:
-    type: cloudify.kubernetes.resources.RoleBinding
+    type: cloudify.nodes.kubernetes.resources.RoleBinding
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -178,7 +178,7 @@ node_templates:
         target: kubernetes_master
 
   secret:
-    type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -226,7 +226,7 @@ node_templates:
         target: secret
 
   sanity_pod:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
         configuration:

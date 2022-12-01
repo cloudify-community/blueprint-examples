@@ -56,7 +56,7 @@ inputs:
 node_templates:
 
   app_ingress:
-    type: cloudify.kubernetes.resources.BlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.BlueprintDefinedResource
     properties:
       client_config:
         configuration:
@@ -85,7 +85,7 @@ node_templates:
       target: app_svc
 
   app_svc:
-    type: cloudify.kubernetes.resources.Service
+    type: cloudify.nodes.kubernetes.resources.Service
     properties:
       client_config:
         configuration:
@@ -115,7 +115,7 @@ node_templates:
       target: app
 
   app:
-    type: cloudify.kubernetes.resources.Deployment
+    type: cloudify.nodes.kubernetes.resources.Deployment
     properties:
       client_config:
         configuration:
@@ -175,7 +175,7 @@ node_templates:
       target: my_volume_claim
 
   my_volume_claim:
-    type: cloudify.kubernetes.resources.BlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.BlueprintDefinedResource
     properties:
       client_config:
         configuration:
