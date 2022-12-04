@@ -60,7 +60,7 @@ node_templates:
               FROM amd64/centos:7
               MAINTAINER Cosmo (hello@cloudify.co)
               RUN yum install -y openssh-server openssh-clients
-              RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+              RUN curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" -o "get-pip.py"
               RUN python get-pip.py
               RUN pip install --upgrade pip==9.0.1
             - |-
@@ -79,7 +79,8 @@ node_templates:
           docker_ip: { get_input: docker_host }
           docker_user: { get_input: docker_user }
           docker_key: { get_secret: agent_key_private }
-        source: https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip
+        source:
+          'https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip'
         destination: ""
         ansible_sources:
           container_volume: { get_input: container_volume }
@@ -88,7 +89,7 @@ node_templates:
           ansible_user: { get_input: ansible_user }
           ansible_ssh_private_key_file: { get_secret: agent_key_private }
           ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
-          ansible_become: True
+          ansible_become: true
 
   docker_ansible_container:
     type: cloudify.nodes.docker.container
@@ -103,8 +104,8 @@ node_templates:
           command: { get_attribute: [docker_ansible_container_files, ansible_container_command_arg] }
           working_dir: { get_input: container_volume }
           environment:
-            ANSIBLE_HOST_KEY_CHECKING: False
-            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
+            ANSIBLE_HOST_KEY_CHECKING: "False"
+            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
           volumes:
             - { get_input: container_volume }
           volumes_mapping:

@@ -7,6 +7,7 @@ imports:
 inputs:
 
   rest_endpoint:
+    type: string
     description: >
       REST API endpoint
     default: "jsonplaceholder.typicode.com"
@@ -25,17 +26,17 @@ node_templates:
         start:
           inputs:
             templates:
-            - template_file: templates/get-user-all-properties-template.yaml
-              save_to: user-details
-            - template_file: templates/create-user-post-template.yaml
-              prerender: true
-              save_to: post_result
-              params_attributes:
-                USER_ID: [user-details, result_properties, user, id]
-                USERNAME: [user-details, result_properties, user, username]
-                WEBSITE: [user-details, result_properties, user, website]
-              params:
-                POST_ID: "1"
-            - template_file: templates/delete-user-post-template.yaml
-              params:
-                POST_ID: "1"
+              - template_file: templates/get-user-all-properties-template.yaml
+                save_to: user-details
+              - template_file: templates/create-user-post-template.yaml
+                prerender: true
+                save_to: post_result
+                params_attributes:
+                  USER_ID: [user-details, result_properties, user, id]
+                  USERNAME: [user-details, result_properties, user, username]
+                  WEBSITE: [user-details, result_properties, user, website]
+                params:
+                  POST_ID: "1"
+              - template_file: templates/delete-user-post-template.yaml
+                params:
+                  POST_ID: "1"

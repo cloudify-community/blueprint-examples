@@ -115,10 +115,10 @@ node_templates:
         AssumeRolePolicyDocument:
           Version: !!str 2012-10-17
           Statement:
-          - Effect: Allow
-            Principal:
-              Service: !!str ec2.amazonaws.com
-            Action: !!str sts:AssumeRole
+            - Effect: Allow
+              Principal:
+                Service: !!str ec2.amazonaws.com
+              Action: !!str sts:AssumeRole
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -147,8 +147,8 @@ node_templates:
   #           ParameterValue: '192.168.0.0/18'
   #         - ParameterKey: PrivateSubnet02Block
   #           ParameterValue: '192.168.64.0/18'
-  #         TemplateURL: https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-11-15/amazon-eks-vpc-private-subnets.yaml
-
+  #         TemplateURL:
+  # https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-11-15/amazon-eks-vpc-private-subnets.yaml
 
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
@@ -174,7 +174,7 @@ node_templates:
           inputs:
             modify_vpc_attribute_args:
               EnableDnsHostnames:
-                Value: True
+                Value: true
 
   internet_gateway:
     type: cloudify.nodes.aws.ec2.InternetGateway
@@ -239,8 +239,6 @@ node_templates:
         target: vpc
       - type: cloudify.relationships.depends_on
         target: internet_gateway
-
-
 
   private_route_table_02:
     type: cloudify.nodes.aws.ec2.RouteTable
@@ -361,12 +359,12 @@ node_templates:
         target: internet_gateway
 
   elastic_ip_01:
-   type: cloudify.nodes.aws.ec2.ElasticIP
-   properties:
-     resource_config:
-       kwargs:
-         Domain: 'vpc'
-     client_config: *client_config
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      resource_config:
+        kwargs:
+          Domain: 'vpc'
+      client_config: *client_config
 
   nat_gateway_01:
     type: cloudify.nodes.aws.ec2.NATGateway
@@ -382,12 +380,12 @@ node_templates:
         target: elastic_ip_01
 
   elastic_ip_02:
-   type: cloudify.nodes.aws.ec2.ElasticIP
-   properties:
-     resource_config:
-       kwargs:
-         Domain: 'vpc'
-     client_config: *client_config
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      resource_config:
+        kwargs:
+          Domain: 'vpc'
+      client_config: *client_config
 
   nat_gateway_02:
     type: cloudify.nodes.aws.ec2.NATGateway
@@ -459,12 +457,12 @@ node_templates:
       resource_config:
         kwargs:
           IpPermissions:
-           - IpProtocol: "-1"
-             FromPort: -1
-             ToPort: -1
-             IpRanges:
-              - CidrIp: 0.0.0.0/0
-             UserIdGroupPairs: [  { GroupId: { get_attribute: [ security_group, aws_resource_id ] } } ]
+            - IpProtocol: "-1"
+              FromPort: -1
+              ToPort: -1
+              IpRanges:
+                - CidrIp: 0.0.0.0/0
+              UserIdGroupPairs: [ { GroupId: { get_attribute: [ security_group, aws_resource_id ] } } ]
     relationships:
       - type: cloudify.relationships.contained_in
         target: security_group
@@ -485,10 +483,10 @@ node_templates:
               - { get_attribute: [ public_subnet_02, aws_resource_id ] }
             securityGroupIds:
               - { get_attribute: [ security_group, aws_resource_id ] }
-            endpointPublicAccess: True
-            endpointPrivateAccess: False
+            endpointPublicAccess: true
+            endpointPrivateAccess: false
       client_config: *client_config
-      store_kube_config_in_runtime: True
+      store_kube_config_in_runtime: true
     relationships:
       - type: cloudify.relationships.depends_on
         target: eks_service_iam_role
@@ -524,10 +522,10 @@ node_templates:
             desiredSize: 1
           diskSize: 20
           subnets:
-              - { get_attribute: [ private_subnet_01, aws_resource_id ] }
-              - { get_attribute: [ private_subnet_02, aws_resource_id ] }
-              - { get_attribute: [ public_subnet_01, aws_resource_id ] }
-              - { get_attribute: [ public_subnet_02, aws_resource_id ] }
+            - { get_attribute: [ private_subnet_01, aws_resource_id ] }
+            - { get_attribute: [ private_subnet_02, aws_resource_id ] }
+            - { get_attribute: [ public_subnet_01, aws_resource_id ] }
+            - { get_attribute: [ public_subnet_02, aws_resource_id ] }
           instanceTypes:
             - t3.medium
           amiType: AL2_x86_64
@@ -555,7 +553,7 @@ node_templates:
         target: eks_cluster
 
   new_service_account:
-    type: cloudify.kubernetes.resources.ServiceAccount
+    type: cloudify.nodes.kubernetes.resources.ServiceAccount
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -574,7 +572,7 @@ node_templates:
         target: eks_cluster
 
   new_role_binding:
-    type: cloudify.kubernetes.resources.RoleBinding
+    type: cloudify.nodes.kubernetes.resources.RoleBinding
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -588,9 +586,9 @@ node_templates:
           kind: ClusterRole
           name: cluster-admin
         subjects:
-        - kind: ServiceAccount
-          name: { get_input: service_account_name }
-          namespace: { get_input: service_account_namespace }
+          - kind: ServiceAccount
+            name: { get_input: service_account_name }
+            namespace: { get_input: service_account_namespace }
       options:
         namespace: { get_input: service_account_namespace }
     relationships:
@@ -602,7 +600,7 @@ node_templates:
         target: eks_cluster
 
   secret:
-    type: cloudify.kubernetes.resources.CustomBlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
@@ -656,12 +654,12 @@ node_templates:
         target: secret
 
   sanity_pod:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       client_config:
         configuration:
           api_options:
-            host:  { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
+            host: { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
             api_key: { get_attribute: [ store_token_and_kubeconfig, token ] }
             debug: false
             verify_ssl: false
@@ -686,29 +684,32 @@ node_templates:
         postdelete: {}
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
-      properties:
-        resource_config:
-          key_name: { get_input: agent_key_name }
-          openssh_format: true
-        use_secret_store: true
-        use_secrets_if_exist: true
-      interfaces:
-        cloudify.interfaces.lifecycle:
-          create:
-            implementation: keys.cloudify_ssh_key.operations.create
-            inputs:
-              store_private_key_material: true
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 capabilities:
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }
 
   connection_details:
+    description: 'connection details'
     value: *kubernetes_master_configuration
 
 outputs:
 
   endpoint:
+    description: 'The external endpoint of the application.'
     value: { get_attribute: [eks_cluster, kubeconf, clusters, 0, cluster, server ] }

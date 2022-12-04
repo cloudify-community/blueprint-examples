@@ -83,14 +83,14 @@ node_templates:
         kwargs:
           StackName: Hello-World-Sample-Stack
           Parameters:
-          - ParameterKey: InstanceType
-            ParameterValue: m1.small
-          - ParameterKey: KeyName
-            ParameterValue: { get_input: key_pair_name }
-          - ParameterKey: VpcCIDR
-            ParameterValue: { get_input: vpc_cidr }
-          - ParameterKey: SubnetCIDR
-            ParameterValue: { get_input: subnet_cidr }
+            - ParameterKey: InstanceType
+              ParameterValue: m1.small
+            - ParameterKey: KeyName
+              ParameterValue: { get_input: key_pair_name }
+            - ParameterKey: VpcCIDR
+              ParameterValue: { get_input: vpc_cidr }
+            - ParameterKey: SubnetCIDR
+              ParameterValue: { get_input: subnet_cidr }
           TemplateURL: https://hello-world-cf-example.s3-eu-west-1.amazonaws.com/template.yaml
     relationships:
       - type: cloudify.relationships.depends_on
@@ -102,19 +102,19 @@ node_templates:
           implementation: scripts/cloudformation/expose_ip.py
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
-      properties:
-        resource_config:
-          key_name: { get_input: agent_key_name }
-          openssh_format: true
-        use_secret_store: true
-        use_secrets_if_exist: true
-      interfaces:
-        cloudify.interfaces.lifecycle:
-          create:
-            implementation: keys.cloudify_ssh_key.operations.create
-            inputs:
-              store_private_key_material: true
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
 
 outputs:
 

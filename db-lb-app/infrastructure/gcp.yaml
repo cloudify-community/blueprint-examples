@@ -2,14 +2,15 @@ tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
   - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
-  - plugin:cloudify-gcp-plugin?version= >=1.6.0
+  - plugin:cloudify-gcp-plugin?version= >=1.8.5
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
 inputs:
 
   env_name:
-    default: infra_
+    type: string
+    default: 'infra_'
 
   image:
     type: string
@@ -22,6 +23,7 @@ inputs:
     default: n1-standard-1
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
@@ -35,9 +37,9 @@ dsl_definitions:
 node_templates:
 
   host:
-    type: cloudify.gcp.nodes.Instance
+    type: cloudify.nodes.gcp.Instance
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       agent_config:
         install_method: none
         key: { get_secret: agent_key_private }
@@ -54,10 +56,10 @@ node_templates:
           #!/bin/bash
           yum -t -y install libsemanage-python
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: subnet
-    - type: cloudify.relationships.depends_on
-      target: cloud_init
+      - type: cloudify.relationships.depends_on
+        target: subnet
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -66,12 +68,12 @@ node_templates:
           inputs:
             user: { get_input: agent_user }
             ssh_keys:
-            - { get_secret: agent_key_public }
+              - { get_secret: agent_key_public }
 
   firewall:
-    type: cloudify.gcp.nodes.FirewallRule
+    type: cloudify.nodes.gcp.FirewallRule
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       allowed:
         tcp:
           - 22
@@ -88,23 +90,23 @@ node_templates:
         target: network
 
   subnet:
-    type: cloudify.gcp.nodes.SubNetwork
+    type: cloudify.nodes.gcp.SubNetwork
     properties:
       use_external_resource: true
       name: { get_capability: [ gcp, subnet ] }
       region: { get_capability: [ gcp, region ] }
       subnet: 10.11.12.0/22
-      gcp_config: *gcp_config
+      client_config: *gcp_config
     relationships:
-    - type: cloudify.gcp.relationships.contained_in_network
-      target: network
+      - type: cloudify.relationships.gcp.contained_in_network
+        target: network
 
   network:
-    type: cloudify.gcp.nodes.Network
+    type: cloudify.nodes.gcp.Network
     properties:
       use_external_resource: true
       name: { get_capability: [ gcp, network ] }
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       auto_subnets: false
 
 groups:

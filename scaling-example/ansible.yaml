@@ -13,8 +13,8 @@ imports:
 inputs:
 
   aws_region_name:
-      type: string
-      default: 'us-east-1'
+    type: string
+    default: 'us-east-1'
 
   availability_zone:
     type: string
@@ -36,6 +36,7 @@ inputs:
     default: t2.micro
 
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ec2-user'
@@ -45,13 +46,17 @@ inputs:
     default: agent_key
 
   env_name:
+    type: string
     default: '0'
 
 node_templates:
 
-  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml during install workflow.
-  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml for more information about the properties provided.
-  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml playbook during uninstall workflow.
+  # Use ansible Executor node type in order to execute resources/ansible/playbook.yaml
+  # during install workflow.
+  # See https://github.com/cloudify-cosmo/cloudify-ansible-plugin/blob/master/plugin.yaml
+  # for more information about the properties provided.
+  # Override stop lifecycle interface for executing resources/ansible/uninstall-playbook.yaml
+  # playbook during uninstall workflow.
   # Execute ansible.cloudify_ansible.tasks.run task in order to do so.
   install_infra_playbook:
     type: cloudify.nodes.Root
@@ -169,11 +174,11 @@ node_templates:
     properties:
       resource_config:
         users:
-        - name: { get_input: agent_user }
-          shell: /bin/bash
-          sudo: ['ALL=(ALL) NOPASSWD:ALL']
-          ssh-authorized-keys:
-          - { get_attribute: [agent_key, public_key_export] }
+          - name: { get_input: agent_user }
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_attribute: [agent_key, public_key_export] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: agent_key
@@ -197,7 +202,7 @@ groups:
 
   vm-group:
     members:
-    - install_eni_vm_playbook
+      - install_eni_vm_playbook
 
 policies:
 

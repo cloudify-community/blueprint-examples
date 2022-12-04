@@ -20,4 +20,3 @@ node_templates:
         file_path: { get_input: file_path }
         owner: cfyuser:cfyuser
         mode: 777
-        

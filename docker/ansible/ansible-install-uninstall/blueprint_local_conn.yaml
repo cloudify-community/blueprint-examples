@@ -1,0 +1,146 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+  - plugin:cloudify-docker-plugin
+
+inputs:
+
+  install_playbook_name:
+    description: installation playbook name
+    type: string
+    default: "create.yaml"
+
+  install_playbook:
+    description: >
+      installation playbook path [inside blueprint to be exported to docker host]
+    type: string
+    default: {concat: ["ansible/", {get_input: install_playbook_name}]}
+
+  uninstall_playbook_name:
+    description: uninstallation playbook name
+    type: string
+    default: "delete.yaml"
+
+  uninstall_playbook:
+    description: >
+      uninstallation playbook path [inside blueprint to be exported to docker host]
+    type: string
+    default: {concat: ["ansible/", {get_input: uninstall_playbook_name}]}
+
+  ansible_version:
+    description: Ansible version to prepare image for
+    type: string
+    default: "2.9.5"
+
+  image_tag:
+    description: Tag for the image to build
+    type: string
+    default: "ansible:"
+
+  container_volume:
+    description: volume that will be mapped to container
+    type: string
+    default: "/ansible-playbooks"
+
+dsl_definitions:
+
+  docker_config: &docker_config
+    docker_sock_file: /var/run/docker.sock
+
+node_templates:
+
+  docker_ansible_image:
+    type: cloudify.nodes.docker.image
+    properties:
+      client_config: *docker_config
+      resource_config:
+        image_content:
+          concat:
+            - |
+              FROM amd64/centos:7
+              MAINTAINER Cosmo (hello@cloudify.co)
+              RUN yum install -y openssh-server openssh-clients
+              RUN curl "https://bootstrap.pypa.io/pip/2.7/get-pip.py" -o "get-pip.py"
+              RUN python get-pip.py
+              RUN pip install --upgrade pip==9.0.1
+            - |-
+              RUN pip install ansible==
+            - { get_input: ansible_version }
+        tag:
+          concat:
+            - { get_input: image_tag }
+            - { get_input: ansible_version }
+
+  install_ansible_container_files:
+    type: cloudify.nodes.docker.container_files
+    properties:
+      resource_config:
+        docker_machine:
+          docker_ip: { get_input: docker_host }
+          docker_user: { get_input: docker_user }
+          docker_key: { get_secret: agent_key_private }
+        source: {get_input: install_playbook}
+        destination: ""
+        ansible_sources:
+          container_volume: { get_input: container_volume }
+          playbook_path:
+            concat:
+              - {get_input: container_volume }
+              - /
+              - {get_input: install_playbook_name}
+          ansible_host: 127.0.0.1
+          ansible_connection: local
+
+  uninstall_ansible_container_files:
+    type: cloudify.nodes.docker.container_files
+    properties:
+      resource_config:
+        docker_machine:
+          docker_ip: { get_input: docker_host }
+          docker_user: { get_input: docker_user }
+          docker_key: { get_secret: agent_key_private }
+        source: {get_input: uninstall_playbook}
+        destination: ""
+        ansible_sources:
+          container_volume: { get_input: container_volume }
+          playbook_path:
+            concat:
+              - {get_input: container_volume }
+              - /
+              - {get_input: uninstall_playbook_name}
+          ansible_host: 127.0.0.1
+          ansible_connection: local
+
+  docker_ansible_container:
+    type: cloudify.nodes.docker.container
+    properties:
+      client_config: *docker_config
+      resource_config:
+        image_tag:
+          concat:
+            - { get_input: image_tag }
+            - { get_input: ansible_version }
+        container_args:
+          command: { get_attribute: [install_ansible_container_files, ansible_container_command_arg] }
+          working_dir: { get_input: container_volume }
+          environment:
+            ANSIBLE_HOST_KEY_CHECKING: False
+            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
+          volumes:
+            - { get_input: container_volume }
+          volumes_mapping:
+            - { get_attribute: [install_ansible_container_files, destination] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: docker_ansible_image
+      - type: cloudify.relationships.depends_on
+        target: install_ansible_container_files
+      - type: cloudify.relationships.depends_on
+        target: uninstall_ansible_container_files
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        stop:
+          implementation: docker.cloudify_docker.tasks.stop_container
+          inputs:
+            stop_command: { get_attribute: [uninstall_ansible_container_files, ansible_container_command_arg] }

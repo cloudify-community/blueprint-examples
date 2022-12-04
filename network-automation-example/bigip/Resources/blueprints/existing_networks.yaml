@@ -14,21 +14,24 @@ inputs:
     default: 60
 
   network_api_version:
+    type: string
     description: API Version for Network
     default: "2015-06-15"
 
   azure_network_deployment_name:
+    type: string
     description: Name of deployment responsible for creation resource group, security group and networks.
     default: VNFM-Networking-Prov-Azure-networks
 
   resource_prefix:
+    type: string
     description: Prefix of every resource created at this deployment on Azure.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    type: string
     description: Suffix of every resource created at this deployment on Azure.
     default: { get_secret: resource_suffix }
-
 
 dsl_definitions:
 
@@ -40,9 +43,9 @@ dsl_definitions:
 
 node_templates:
   resource_group:
-    type: cloudify.azure.nodes.ResourceGroup
+    type: cloudify.nodes.azure.ResourceGroup
     properties:
-      azure_config: *client_config
+      client_config: *client_config
       name: {get_capability: [{ get_input: azure_network_deployment_name }, resource_group] }
       location: { get_secret: azure_location }
       use_external_resource: true
@@ -51,63 +54,63 @@ node_templates:
     type: cloudify.azure.nodes.network.VirtualNetwork
     properties:
       use_external_resource: true
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { get_capability: [ { get_input: azure_network_deployment_name }, virtual_network] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
     relationships:
-      - type: cloudify.azure.relationships.contained_in_resource_group
+      - type: cloudify.relationships.azure.contained_in_resource_group
         target: resource_group
 
   mgmt_subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
       use_external_resource: true
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { get_capability: [ { get_input: azure_network_deployment_name }, mgmt_subnet] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_virtual_network
-      target: virtual_network
+      - type: cloudify.relationships.azure.contained_in_virtual_network
+        target: virtual_network
 
   public_subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
       use_external_resource: true
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { get_capability: [ { get_input: azure_network_deployment_name }, public_subnet] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_virtual_network
-      target: virtual_network
+      - type: cloudify.relationships.azure.contained_in_virtual_network
+        target: virtual_network
 
   wan_subnet:
     type: cloudify.azure.nodes.network.Subnet
     properties:
       use_external_resource: true
-      azure_config: *client_config
+      client_config: *client_config
       api_version: { get_input: network_api_version }
       name: { get_capability: [ { get_input: azure_network_deployment_name }, wan_subnet] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_virtual_network
-      target: virtual_network
+      - type: cloudify.relationships.azure.contained_in_virtual_network
+        target: virtual_network
 
   #Security group
   network_security_group:
     type: cloudify.azure.nodes.network.NetworkSecurityGroup
     properties:
-      azure_config: *client_config
+      client_config: *client_config
       use_external_resource: true
       name: { get_capability: [ { get_input: azure_network_deployment_name }, network_security_group ] }
       location: { get_secret: azure_location }
       retry_after: { get_input: retry_after }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_resource_group
-      target: resource_group
+      - type: cloudify.relationships.azure.contained_in_resource_group
+        target: resource_group

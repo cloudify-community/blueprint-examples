@@ -1,18 +1,11 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 description: >
-  This blueprint describes a generic network topology in Openstack that is used by other blueprints in this opensource VNF series.
-  Install a deployment with this blueprint. Other applications in the series will use a deployment proxy to attach to these recourses.
-  For more information on this feature, see: https://docs.cloudify.co/5.0.0/working_with/service_composition/component/.
-
-dsl_definitions:
-
-  client_config: &client_config
-    password: { get_secret: openstack_password }
-    username: { get_secret: openstack_username }
-    project_name: { get_secret: openstack_tenant_name }
-    region_name: { get_input: region }
-    auth_url: { get_secret: openstack_auth_url }
+  This blueprint describes a generic network topology in Openstack that is used by other blueprints
+  in this opensource VNF series. Install a deployment with this blueprint.
+  Other applications in the series will use a deployment proxy to attach to these recourses.
+  For more information on this feature,
+  see: https://docs.cloudify.co/5.0.0/working_with/service_composition/component/.
 
 imports:
 
@@ -22,12 +15,15 @@ imports:
 inputs:
 
   external_network_id:
+    type: string
     description: OpenStack tenant external network id.
 
   router_id:
+    type: string
     description: Cloudify Manager's connected router ID
 
   mgmt_network_id:
+    type: string
     description: Cloudify Manager's network ID
 
   region:
@@ -35,28 +31,42 @@ inputs:
     default: ''
 
   nameservers:
+    type: list
     description: DNS servers to configure on the machine.
     default: [8.8.4.4, 8.8.8.8]
 
   public_subnet_cidr:
+    type: string
     description: Network between the HA-Proxy and the pFsense.
     default: 10.10.0.0/24
 
   public_subnet_application_pool:
+    type: list
     description: IP pool for the public network to associate IP from.
     default:
       - start: 10.10.0.2
         end: 10.10.0.254
 
   private_subnet_cidr:
+    type: string
     description: Network between the pFsense and the HTTPd.
     default: 10.10.1.0/24
 
   private_subnet_application_pool:
+    type: list
     description: IP pool for the private network to associate IP from.
     default:
       - start: 10.10.1.2
         end: 10.10.1.254
+
+dsl_definitions:
+
+  client_config: &client_config
+    password: { get_secret: openstack_password }
+    username: { get_secret: openstack_username }
+    project_name: { get_secret: openstack_tenant_name }
+    region_name: { get_input: region }
+    auth_url: { get_secret: openstack_auth_url }
 
 node_templates:
 
@@ -136,22 +146,29 @@ node_templates:
 outputs:
 
   external_network:
+    description: 'external_network'
     value: { get_attribute: [ external-network, id ] }
 
   router:
+    description: 'router'
     value: { get_attribute: [ router, id ] }
 
   public_network:
+    description: 'public_network'
     value: { get_attribute: [ public-network, id ] }
 
   private_network:
+    description: 'private_network'
     value: { get_attribute: [ private-network, id ] }
 
   mgmt_network:
+    description: 'mgmt_network'
     value: { get_attribute: [ management-network, id ] }
 
   public_subnet:
+    description: 'public_subnet'
     value: { get_attribute: [ public-subnet, id ] }
 
   private_subnet:
+    description: 'private_subnet'
     value: { get_attribute: [ private-subnet, id ] }

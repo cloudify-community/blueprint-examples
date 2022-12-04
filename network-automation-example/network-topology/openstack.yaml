@@ -10,50 +10,62 @@ imports:
 inputs:
 
   external_network_id:
+    type: string
     description: Openstack tenant external network name.
 
   resource_prefix:
+    type: string
     description: Prefix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    type: string
     description: Suffix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_suffix }
 
   nameservers:
+    type: list
     default: [8.8.4.4, 8.8.8.8]
 
   mgmt_subnet_cidr:
+    type: string
     default: 10.10.1.0/24
 
   mgmt_subnet_allocation_pools:
+    type: list
     default:
-    - start: 10.10.1.2
-      end: 10.10.1.254
+      - start: 10.10.1.2
+        end: 10.10.1.254
 
   public_subnet_cidr:
+    type: string
     default: 10.10.2.0/24
 
   public_subnet_allocation_pools:
+    type: list
     default:
-    - start: 10.10.2.2
-      end: 10.10.2.254
+      - start: 10.10.2.2
+        end: 10.10.2.254
 
   wan_subnet_cidr:
+    type: string
     default: 10.10.3.0/24
 
   wan_subnet_allocation_pools:
+    type: list
     default:
-    - start: 10.10.3.2
-      end: 10.10.3.254
+      - start: 10.10.3.2
+        end: 10.10.3.254
 
   lan_subnet_cidr:
+    type: string
     default: 10.10.4.0/24
 
   lan_subnet_allocation_pools:
+    type: list
     default:
-    - start: 10.10.4.2
-      end: 10.10.4.254
+      - start: 10.10.4.2
+        end: 10.10.4.254
 
 dsl_definitions:
 
@@ -238,38 +250,48 @@ node_templates:
           port_range_min: null
           port_range_max: null
 
-
 capabilities:
 
   external_network:
+    description: 'external network'
     value: { get_attribute: [ external_network, id ] }
 
   router:
+    description: 'router'
     value: { get_attribute: [ router, id ] }
 
   mgmt_network:
+    description: 'mgmt network'
     value: { get_attribute: [ mgmt_network, id ] }
 
   public_network:
+    description: 'public network'
     value: { get_attribute: [ public_network, id ] }
 
   wan_network:
+    description: 'wan network'
     value: { get_attribute: [ wan_network, id ] }
 
   lan_network:
+    description: 'lan network'
     value: { get_attribute: [ lan_network, id ] }
 
   mgmt_subnet:
+    description: 'mgmt subnet'
     value: { get_attribute: [ mgmt_subnet, id ] }
 
   public_subnet:
+    description: 'public subnet'
     value: { get_attribute: [ public_subnet, id ] }
 
   wan_subnet:
+    description: 'wan subnet'
     value: { get_attribute: [ wan_subnet, id ] }
 
   lan_subnet:
+    description: 'lan subnet'
     value: { get_attribute: [ lan_subnet, id ] }
 
   network_security_group:
+    description: 'network security group'
     value: { get_attribute: [ network_security_group, id ] }

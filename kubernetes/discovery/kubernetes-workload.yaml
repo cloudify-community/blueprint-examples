@@ -8,13 +8,13 @@ blueprint_labels:
 
   csys-obj-type:
     values:
-    - environment
+      - environment
 
 labels:
 
   csys-obj-type:
     values:
-     - environment
+      - environment
 
 inputs:
 
@@ -25,7 +25,7 @@ inputs:
 node_templates:
 
   kubernetes_deployment:
-    type: cloudify.kubernetes.resources.SharedCluster
+    type: cloudify.nodes.kubernetes.resources.SharedCluster
     properties:
       client_config:
         configuration: { get_capability: [ { get_input: deployment }, connection_details ] }
@@ -34,10 +34,10 @@ node_templates:
           id: { get_input: deployment }
 
   resource:
-    type: cloudify.kubernetes.resources.FileDefinedResource
+    type: cloudify.nodes.kubernetes.resources.FileDefinedResource
     properties:
       file:
         resource_path: resources/pod.yaml
     relationships:
-    - type: cloudify.relationships.kubernetes.connected_to_shared_cluster
-      target: kubernetes_deployment
+      - type: cloudify.relationships.kubernetes.connected_to_shared_cluster
+        target: kubernetes_deployment

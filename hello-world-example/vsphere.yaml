@@ -17,10 +17,6 @@ inputs:
     type: string
     default: true
 
-  use_external_resource:
-    type: boolean
-    default: false
-
   env_name:
     type: string
     default: '1'
@@ -98,7 +94,6 @@ node_templates:
   vm:
     type: cloudify.vsphere.nodes.Server
     properties:
-      use_external_resource: { get_input: use_external_resource }
       connection_config: *connection_config
       agent_config:
         install_method: none
@@ -134,7 +129,6 @@ node_templates:
           inputs:
             store_public_key_material: true
             store_private_key_material: true
-
 
 capabilities:
 

@@ -1,3 +1,3 @@
 #!/bin/bash -e
-rm -f /tmp/app
+rm -f -r /tmp/app
 
