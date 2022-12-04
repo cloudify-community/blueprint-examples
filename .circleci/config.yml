@@ -269,10 +269,7 @@ workflows:
   version: 2
   tests:
     jobs:
-      - blueprints-validation
-      - getting-started-aws:
-          requires:
-            - blueprints-validation
+      - getting-started-aws
       - getting-started-aws-terraform:
           requires:
             - getting-started-aws
@@ -288,20 +285,16 @@ workflows:
       - getting-started-azure:
           requires:
             - getting-started-gcp
-            - blueprints-validation
           filters:
             branches:
               only: master
       - getting-started-azure-arm:
           requires:
             - getting-started-azure
-            - blueprints-validation
           filters:
             branches:
               only: master
       - getting-started-gcp:
-          requires:
-            - blueprints-validation
           filters:
             branches:
               only: master
