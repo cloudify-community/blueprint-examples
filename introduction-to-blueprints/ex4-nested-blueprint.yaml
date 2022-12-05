@@ -1,4 +1,4 @@
-tosca_definitions_version: cloudify_dsl_1_3
+tosca_definitions_version: cloudify_dsl_1_4
 description: >
   Service Composition- describing how to create relationship between independent services
   In this case we run the same web server and application from ex3 as an independent deployment

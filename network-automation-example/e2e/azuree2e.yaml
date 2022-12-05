@@ -1,4 +1,4 @@
-tosca_definitions_version: cloudify_dsl_1_3
+tosca_definitions_version: cloudify_dsl_1_4
 
 description: >
   This is the master blueprint for the Cloudify VNF example. It provisions all the atomic components,
