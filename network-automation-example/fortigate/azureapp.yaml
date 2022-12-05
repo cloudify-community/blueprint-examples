@@ -4,7 +4,7 @@ description: >
    Applies base configuration for newly created FortiGate VM.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:

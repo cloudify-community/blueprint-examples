@@ -7,7 +7,7 @@ description: >
 # Import the relevant resource libraries (plugins) which will be used in this blueprints
 imports:
   #The types.yaml contains the basic building blocks of a blueprint
-  - https://cloudify.co/spec/cloudify/6.3.0/types.yaml
+  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
 
 # Defining input that will be populated as an output once the deployment is executed
 inputs:
