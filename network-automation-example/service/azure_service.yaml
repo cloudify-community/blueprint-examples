@@ -1,4 +1,4 @@
-tosca_definitions_version: cloudify_dsl_1_3
+tosca_definitions_version: cloudify_dsl_1_4
 
 description: >
   Creates port forwading on Fortigate and load balancing rule on BIG-IP LTM to allow traffic forwarding
