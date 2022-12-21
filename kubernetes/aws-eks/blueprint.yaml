@@ -30,6 +30,7 @@ inputs:
 
   eks_cluster_name:
     type: string
+    default: eks_cluster_name
 
   env_name:
     type: string
