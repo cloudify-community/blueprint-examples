@@ -10,54 +10,67 @@ imports:
 inputs:
 
   aws_access_key_id:
+    display_label: 'Aws Access Key Id'
     type: string
     default: { get_secret: aws_access_key_id }
 
   aws_secret_access_key:
+    display_label: 'Aws Secret Access Key'
     type: string
     default: { get_secret: aws_secret_access_key }
 
   aws_region_name:
+    display_label: 'Aws Region Name'
     type: string
     default: 'us-east-1'
 
   availability_zone_1:
+    display_label: 'Availability Zone 1'
     type: string
     default: { concat: [ { get_input: aws_region_name}, 'd' ] }
 
   availability_zone_2:
+    display_label: 'Availability Zone 2'
     type: string
     default: { concat: [ { get_input: aws_region_name}, 'e' ] }
 
   eks_cluster_name:
+    display_label: 'Eks Cluster Name'
     type: string
     default: eks_cluster_name
 
   env_name:
+    display_label: 'Env Name'
     type: string
     default: { get_input: eks_cluster_name }
 
   eks_nodegroup_name:
+    display_label: 'Eks Nodegroup Name'
     type: string
     default: { concat: [ 'eks_node_group', { get_input: env_name } ] }
 
   kubernetes_version:
+    display_label: 'Kubernetes Version'
     type: string
     default: ''
 
   service_account_name:
+    display_label: 'Service Account Name'
     type: string
     default: examples-user
 
   service_account_namespace:
+    display_label: 'Service Account Namespace'
     type: string
     default: default
 
   ssh_keypair:
+    display_label: 'Ssh Keypair'
     type: string
     default: { concat: [ 'eks_key', { get_input: env_name } ] }
 
   agent_key_name:
+    display_label: 'Agent Key Name'
     type: string
     default: agent_key
 
@@ -718,11 +731,11 @@ node_templates:
         AssumeRolePolicyDocument:
           Version: !!str '2012-10-17'
           Statement:
-          - Effect: Allow
-            Principal:
-              Federated: { get_attribute: [ eks_helper, federated ] }
-            Action: sts:AssumeRoleWithWebIdentity
-            Condition: { get_attribute: [ eks_helper, condition ] }
+            - Effect: Allow
+              Principal:
+                Federated: { get_attribute: [ eks_helper, federated ] }
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition: { get_attribute: [ eks_helper, condition ] }
     relationships:
       - type: cloudify.relationships.depends_on
         target: eks_helper
