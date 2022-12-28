@@ -2,61 +2,75 @@ tosca_definitions_version: cloudify_dsl_1_4
 
 imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
-  - plugin:cloudify-aws-plugin?version= >=2.9.0
+  - plugin:cloudify-aws-plugin?version= >=3.1.3
   - plugin:cloudify-kubernetes-plugin?version= >=2.11.0
+  - plugin:cloudify-helm-plugin
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
 inputs:
 
   aws_access_key_id:
+    display_label: 'Aws Access Key Id'
     type: string
     default: { get_secret: aws_access_key_id }
 
   aws_secret_access_key:
+    display_label: 'Aws Secret Access Key'
     type: string
     default: { get_secret: aws_secret_access_key }
 
   aws_region_name:
+    display_label: 'Aws Region Name'
     type: string
     default: 'us-east-1'
 
   availability_zone_1:
+    display_label: 'Availability Zone 1'
     type: string
     default: { concat: [ { get_input: aws_region_name}, 'd' ] }
 
   availability_zone_2:
+    display_label: 'Availability Zone 2'
     type: string
     default: { concat: [ { get_input: aws_region_name}, 'e' ] }
 
   eks_cluster_name:
+    display_label: 'Eks Cluster Name'
     type: string
     default: eks_cluster_name
 
   env_name:
+    display_label: 'Env Name'
     type: string
     default: { get_input: eks_cluster_name }
 
   eks_nodegroup_name:
+    display_label: 'Eks Nodegroup Name'
     type: string
     default: { concat: [ 'eks_node_group', { get_input: env_name } ] }
 
   kubernetes_version:
+    display_label: 'Kubernetes Version'
     type: string
     default: ''
 
   service_account_name:
+    display_label: 'Service Account Name'
     type: string
     default: examples-user
 
   service_account_namespace:
+    display_label: 'Service Account Namespace'
     type: string
     default: default
 
   ssh_keypair:
+    display_label: 'Ssh Keypair'
     type: string
     default: { concat: [ 'eks_key', { get_input: env_name } ] }
 
   agent_key_name:
+    display_label: 'Agent Key Name'
     type: string
     default: agent_key
 
@@ -66,6 +80,19 @@ dsl_definitions:
     aws_access_key_id: { get_input: aws_access_key_id }
     aws_secret_access_key: { get_input: aws_secret_access_key }
     region_name: { get_input: aws_region_name }
+
+node_types:
+
+  cloudify.nodes.EKSHelper:
+    derived_from: cloudify.nodes.Root
+    properties:
+      resource_config:
+        type: dict
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          executor: central_deployment_agent
+          implementation: scripts/ekshelper.py
 
 node_templates:
 
@@ -129,27 +156,6 @@ node_templates:
               - PolicyArn: arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
               - PolicyArn: arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
               - PolicyArn: arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-
-  # eks_vpc_stack:
-  #   type: cloudify.nodes.aws.CloudFormation.Stack
-  #   properties:
-  #     client_config: *client_config
-  #     resource_config:
-  #       kwargs:
-  #         StackName: EKS-VPC
-  #         Parameters:
-  #         - ParameterKey: VpcBlock
-  #           ParameterValue: '192.168.0.0/16'
-  #         - ParameterKey: PublicSubnet01Block
-  #           ParameterValue: '192.168.128.0/18'
-  #         - ParameterKey: PublicSubnet02Block
-  #           ParameterValue: '192.168.192.0/18'
-  #         - ParameterKey: PrivateSubnet01Block
-  #           ParameterValue: '192.168.0.0/18'
-  #         - ParameterKey: PrivateSubnet02Block
-  #           ParameterValue: '192.168.64.0/18'
-  #         TemplateURL:
-  # https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2019-11-15/amazon-eks-vpc-private-subnets.yaml
 
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
@@ -640,6 +646,24 @@ node_templates:
       cloudify.interfaces.lifecycle:
         delete: {}
 
+  aws_secret:
+    type: cloudify.nodes.kubernetes.resources.Secret
+    properties:
+      client_config:
+        configuration: *kubernetes_master_configuration
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: aws-secret
+          namespace: kube-system
+        stringData:
+          key_id: { get_input: aws_access_key_id }
+          access_key: { get_input: aws_secret_access_key }
+    relationships:
+      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
+        target: kubernetes_master
+
   store_token_and_kubeconfig:
     type: cloudify.nodes.Root
     interfaces:
@@ -653,6 +677,110 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: secret
+
+  helm_install:
+    type: cloudify.nodes.helm.Binary
+
+  aws-ebs-csi-driver:
+    type: cloudify.nodes.helm.Repo
+    properties:
+      resource_config:
+        name: aws-ebs-csi-driver
+        repo_url: https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+
+  release:
+    type: cloudify.nodes.helm.Release
+    properties:
+      client_config:
+        configuration: *kubernetes_master_configuration
+      resource_config:
+        name: "aws-ebs-csi-driver"
+        chart: aws-ebs-csi-driver/aws-ebs-csi-driver
+        flags:
+          - name: namespace
+            value: kube-system
+    relationships:
+      - target: helm_install
+        type: cloudify.helm.relationships.run_on_host
+      - target: aws-ebs-csi-driver
+        type: cloudify.relationships.depends_on
+      - target: eks_node_group
+        type: cloudify.relationships.depends_on
+
+  eks_helper:
+    type: cloudify.nodes.EKSHelper
+    properties:
+      resource_config:
+        aws_region_name: { get_input: aws_region_name }
+        issuer: { get_attribute: [ eks_cluster, resource, identity, oidc, issuer ] }
+        account_id: { get_attribute: [ eks_nodegroup_iam_role, account_id ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: release
+
+  iam_assumable_role_ebs_csi:
+    type: cloudify.nodes.aws.iam.Role
+    properties:
+      client_config: *client_config
+      resource_config:
+        RoleName: { get_attribute: [ eks_helper, role_name ] }
+        Path: !!str /service-role/
+        AssumeRolePolicyDocument:
+          Version: !!str '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: { get_attribute: [ eks_helper, federated ] }
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition: { get_attribute: [ eks_helper, condition ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: eks_helper
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: aws.cloudify_aws.iam.resources.role.create
+          inputs:
+            modify_role_attribute_args:
+              - PolicyArn: arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy
+
+  ebs-csi-controller-sa:
+    type: cloudify.nodes.kubernetes.resources.ServiceAccount
+    properties:
+      use_external_resource: true
+      client_config:
+        configuration: *kubernetes_master_configuration
+      definition:
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          annotations:
+            meta.helm.sh/release-name: aws-ebs-csi-driver
+            meta.helm.sh/release-namespace: kube-system
+            eks.amazonaws.com/role-arn: { get_attribute: [ iam_assumable_role_ebs_csi, aws_resource_arn ] }
+          labels:
+            app.kubernetes.io/component: csi-driver
+            app.kubernetes.io/instance: aws-ebs-csi-driver
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: aws-ebs-csi-driver
+            app.kubernetes.io/version: 1.13.0
+            helm.sh/chart: aws-ebs-csi-driver-2.13.0
+          name: ebs-csi-controller-sa
+          namespace: kube-system
+      options:
+        namespace: kube-system
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: kubernetes.cloudify_kubernetes.tasks.resource_update
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: kubernetes_master
+      - type: cloudify.relationships.depends_on
+        target: iam_assumable_role_ebs_csi
 
   sanity_pod:
     type: cloudify.nodes.kubernetes.resources.FileDefinedResource
@@ -670,6 +798,8 @@ node_templates:
     relationships:
       - type: cloudify.relationships.depends_on
         target: store_token_and_kubeconfig
+      - type: cloudify.relationships.depends_on
+        target: ebs-csi-controller-sa
     interfaces:
       cloudify.interfaces.lifecycle:
         precreate: {}
