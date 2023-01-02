@@ -57,6 +57,21 @@ inputs:
     type: string
     default: https://charts.bitnami.com/bitnami
 
+  aws_access_key_id:
+    display_label: 'Aws Access Key Id'
+    type: string
+    default: { get_secret: aws_access_key_id }
+
+  aws_secret_access_key:
+    display_label: 'Aws Secret Access Key'
+    type: string
+    default: { get_secret: aws_secret_access_key }
+
+  aws_region_name:
+    display_label: 'Aws Region Name'
+    type: string
+    default: 'us-east-1'
+
 node_templates:
 
   eks_cluster:
@@ -72,6 +87,9 @@ node_templates:
           id: { get_input: infra_deployment_id }
           inputs:
             env_name: { get_input: env_name }
+            aws_access_key_id: { get_input: aws_access_key_id }
+            aws_secret_access_key: { get_input: aws_secret_access_key }
+            aws_region_name: { get_input: aws_region_name }
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
