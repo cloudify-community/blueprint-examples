@@ -127,20 +127,12 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: agent_key
 
-  kubernetes_master:
-    type: cloudify.kubernetes.nodes.Master
-    properties:
-      configuration: &kubernetes_master_configuration
-        file_content: { get_attribute: [ managed_cluster, kubeconf ] }
-    relationships:
-      - type: cloudify.relationships.depends_on
-        target: managed_cluster
-
   new_service_account:
     type: cloudify.nodes.kubernetes.resources.ServiceAccount
     properties:
       client_config:
-        configuration: *kubernetes_master_configuration
+        configuration: &kubernetes_master_configuration
+          file_content: { get_attribute: [ managed_cluster, kubeconf ] }
       definition:
         apiVersion: v1
         kind: ServiceAccount
@@ -151,7 +143,7 @@ node_templates:
         namespace: { get_input: service_account_namespace }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: kubernetes_master
+        target: managed_cluster
 
   new_role_binding:
     type: cloudify.nodes.kubernetes.resources.RoleBinding
@@ -175,38 +167,22 @@ node_templates:
         namespace: { get_input: service_account_namespace }
     relationships:
       - type: cloudify.relationships.depends_on
-        target: kubernetes_master
+        target: managed_cluster
 
   secret:
-    type: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.Secret
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
-      use_external_resource: true
       definition:
         apiVersion: v1
         kind: Secret
         metadata:
-          name: {get_attribute: [new_service_account, kubernetes, secrets, 0, name]}
-      api_mapping:
-        create:
-          api: CoreV1Api
-          method: create_namespaced_secret
-          payload: V1Secret
-        read:
-          api: CoreV1Api
-          method: read_namespaced_secret
-        update:
-          api: CoreV1Api
-          method: replace_namespaced_secret
-          payload: V1Secret
-        delete:
-          api: CoreV1Api
-          method: delete_namespaced_secret
-          payload: V1DeleteOptions
+          name: { concat: [ { get_input: service_account_name }, -token ] }
+          annotations:
+            kubernetes.io/service-account.name: { get_input: service_account_name }
+        type: kubernetes.io/service-account-token
     relationships:
-      - type: cloudify.relationships.depends_on
-        target: kubernetes_master
       - type: cloudify.relationships.depends_on
         target: new_role_binding
       - type: cloudify.relationships.depends_on
