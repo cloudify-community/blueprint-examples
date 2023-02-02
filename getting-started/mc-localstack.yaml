@@ -12,6 +12,7 @@ imports:
 
 inputs:
   infra_name:
+    display_label: 'Infra Name'
     description: >
       Name of infrastructure blueprint to deploy.
     type: string
@@ -25,23 +26,27 @@ inputs:
           - gcp
 
   infra_archive:
+    display_label: 'Infra Archive'
      # Don't update this line - it is being updated automatically
      # during merging. The getting-started.zip will have the updated URL.
     type: string
     default: 'https://github.com/cloudify-community/blueprint-examples/releases/download/latest/virtual-machine.zip'
 
   infra_exists:
+    display_label: 'Infra Exists'
     type: string
     description: >
       Whether a getting started infrastructure blueprint has already been uploaded to the manager or not.
     default: false
 
   infra_deployment_id:
+    display_label: 'Infra Deployment Id'
     type: string
     description: The blueprint name, the deployment name.
     default: { concat: [ 'infra-', { get_input: infra_name } ] }
 
   env_name:
+    display_label: 'Env Name'
     type: string
     description: Control parameters for names in resources.
     default: mclocalstack

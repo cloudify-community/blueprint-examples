@@ -13,36 +13,43 @@ imports:
 inputs:
 
   env_name:
+    display_label: 'Env Name'
     type: string
     default: 'helloworldexampleaws'
 
   aws_region_name:
+    display_label: 'Aws Region Name'
     type: string
     description: The AWS region name, such as us-east-1 or us-west-1.
     default: 'us-east-1'
 
   availability_zone:
+    display_label: 'Availability Zone'
     type: string
     description: The availability zone in the AWS Region.
     default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   ami_owner_filter:
+    display_label: 'Ami Owner Filter'
     type: string
     description: The AWS AMI owner number.
     default: '099720109477'
 
   ami_name_filter:
+    display_label: 'Ami Name Filter'
     type: string
     description: The name of the AWS AMI in the AWS region.
     default: 'ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-20210416'
 
   agent_user:
+    display_label: 'Agent User'
     type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ubuntu'
 
   agent_key_name:
+    display_label: 'Agent Key Name'
     type: string
     default: agent_key
 

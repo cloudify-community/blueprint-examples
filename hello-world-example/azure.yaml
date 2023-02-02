@@ -13,38 +13,46 @@ imports:
 inputs:
 
   env_name:
+    display_label: 'Env Name'
     type: string
     default: 'cfyhwazure'
 
   resource_prefix:
+    display_label: 'Resource Prefix'
     type: string
     default: { get_input: env_name }
 
   resource_suffix:
+    display_label: 'Resource Suffix'
     type: string
     default: '0'
 
   resource_group_name:
+    display_label: 'Resource Group Name'
     type: string
     description: Your Azure Resource Group.
     default: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
 
   network_name:
+    display_label: 'Network Name'
     type: string
     description: Your Azure Virtual Network.
     default: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
 
   subnet_name:
+    display_label: 'Subnet Name'
     type: string
     description: Your Azure Virtual Network Subnet.
     default: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
 
   location:
+    display_label: 'Location'
     type: string
     description: Your Azure Region.
     default: eastus2
 
   image:
+    display_label: 'Image'
     type: dict
     default:
       publisher: Canonical
@@ -53,19 +61,23 @@ inputs:
       version: latest
 
   size:
+    display_label: 'Size'
     type: string
     default: Standard_A0
 
   retry_after:
+    display_label: 'Retry After'
     type: integer
     default: 60
 
   agent_user:
+    display_label: 'Agent User'
     type: string
     description: The user name of the agent on the instance created from the image.
     default: ubuntu
 
   agent_key_name:
+    display_label: 'Agent Key Name'
     type: string
     default: agent_key
 
