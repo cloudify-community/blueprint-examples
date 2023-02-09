@@ -38,15 +38,53 @@ Parameters:
 Mappings:
   RegionMap:
     us-east-1:
-      AMI: ami-03248a0341eadb1f1
-    ca-central-1:
-      AMI: ami-033e6106180a626d0
+      AMI: ami-0aa7d40eeae50c9a9
+    us-east-2:
+      AMI: ami-05bfbece1ed5beb54
     us-west-1:
-      AMI: ami-01dd5a8ef26e6341d
+      AMI: ami-0036b4598ccd42565
     us-west-2:
-      AMI: ami-024b56adf74074ca6
+      AMI: ami-06e85d4c3149db26a
+    ca-central-1:
+      AMI: ami-092e716d46cd65cac
     eu-west-1:
-      AMI: ami-0eee6eb870dc1cefa
+      AMI: ami-0b752bf1df193a6c4
+    eu-west-2:
+      AMI: ami-08cd358d745620807
+    eu-west-3:
+      AMI: ami-0ca5ef73451e16dc1
+    eu-south-1:
+      AMI: ami-06616ff86c8948392
+    eu-north-1:
+      AMI: ami-01e030f0ef61658cf
+    eu-central-1:
+      AMI: ami-06c39ed6b42908a36
+    eu-central-2:
+      AMI: ami-0ca7640dd81056a0e
+    sa-east-1:
+      AMI: ami-08f74c738bf3f5a45
+    me-south-1:
+      AMI: ami-08dddb5ab1e4c2136
+    me-central-1:
+      AMI: ami-0aa3235987efcb835
+    af-south-1:
+      AMI: ami-0f241793029d4241e
+    ap-east-1:
+      AMI: ami-02fc7c4779a001773
+    ap-southeast-3:
+      AMI: ami-0da2d702dc1ff462f
+    ap-sout-1:
+      AMI: ami-01a4f99c4ac11b03c
+    ap-northeast-3:
+      AMI: ami-062f8fd8345beef36
+    ap-northeast-2:
+      AMI: ami-013218fccb68a90d4
+    ap-northeast-1:
+      AMI: ami-0753e0e42b20e96e3
+    ap-southeast-2:
+      AMI: ami-023dd49682f8a7c2b
+    ap-southeast-1:
+      AMI: ami-06ee4e2261a4dc5c3
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
