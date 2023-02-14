@@ -607,44 +607,23 @@ node_templates:
         target: eks_cluster
 
   secret:
-    type: cloudify.nodes.kubernetes.resources.CustomBlueprintDefinedResource
+    type: cloudify.nodes.kubernetes.resources.Secret
     properties:
       client_config:
         configuration: *kubernetes_master_configuration
-      use_external_resource: true
       definition:
         apiVersion: v1
         kind: Secret
         metadata:
-          name: {get_attribute: [new_service_account, kubernetes, secrets, 0, name]}
-      api_mapping:
-        create:
-          api: CoreV1Api
-          method: create_namespaced_secret
-          payload: V1Secret
-        read:
-          api: CoreV1Api
-          method: read_namespaced_secret
-        update:
-          api: CoreV1Api
-          method: replace_namespaced_secret
-          payload: V1Secret
-        delete:
-          api: CoreV1Api
-          method: delete_namespaced_secret
-          payload: V1DeleteOptions
+          name: { concat: [ { get_input: service_account_name }, -token ] }
+          annotations:
+            kubernetes.io/service-account.name: { get_input: service_account_name }
+        type: kubernetes.io/service-account-token
     relationships:
-      - type: cloudify.relationships.depends_on
-        target: kubernetes_master
       - type: cloudify.relationships.depends_on
         target: new_role_binding
       - type: cloudify.relationships.depends_on
         target: new_service_account
-      - type: cloudify.relationships.aws.eks.connected_to_eks_cluster
-        target: eks_cluster
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        delete: {}
 
   aws_secret:
     type: cloudify.nodes.kubernetes.resources.Secret
