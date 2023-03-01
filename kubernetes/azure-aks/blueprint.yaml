@@ -12,52 +12,65 @@ imports:
 inputs:
   # Azure account information
   subscription_id:
+    display_label: Subscription Id
     type: string
     required: false
     default: { get_secret: azure_subscription_id }
 
   tenant_id:
+    display_label: Tenant Id
     type: string
     required: false
     default: { get_secret: azure_tenant_id }
 
   client_id:
+    display_label: Client Id
     type: string
     required: false
     default: { get_secret: azure_client_id }
 
   client_secret:
+    display_label: Client Secret
     type: string
     required: false
     default: { get_secret: azure_client_secret }
 
   location:
+    display_label: Location
     type: string
     required: true
     default: eastus2
 
   env_name:
+    display_label: Env Name
     type: string
-    description: Must be a letter.
-    default: 'a'
+    description: Must be a single letter. Managed Cluster Name has length restrictions.
+    default: a1
+    constraints:
+      - pattern: '^[a-z][a-z0-9]{1,5}$'
 
   resource_group_name:
+    display_label: Resource Group Name
     type: string
-    default: { concat: [ 'aks-test-rg', { get_input: env_name } ] }
+    default: { concat: [ 'cfyaksrg', { get_input: env_name } ] }
 
   managed_cluster_name:
+    display_label: Managed Cluster Name
     type: string
-    default: { concat: [ 'aks-test-mc', { get_input: env_name } ] }
+    default: { concat: [ 'cfyaks', { get_input: env_name } ] }
 
   service_account_name:
+    display_label: Service Account Name
     type: string
     default: examples-user
 
   service_account_namespace:
+    display_label: Service Account Namespace
     type: string
     default: default
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -114,7 +127,7 @@ node_templates:
       client_config: *azure_config
 
   managed_cluster:
-    type: cloudify.azure.nodes.compute.ManagedCluster
+    type: cloudify.nodes.azure.compute.ManagedCluster
     properties:
       resource_group: { get_input: resource_group_name }
       name: { get_input: managed_cluster_name }
