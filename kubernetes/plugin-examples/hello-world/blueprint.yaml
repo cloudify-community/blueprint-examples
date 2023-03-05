@@ -6,60 +6,44 @@ imports:
 
 inputs:
 
-  kubernetes_master_endpoint:
-    type: string
-
-  kubernetes_client_config:
-    type: dict
-    default:
-      configuration:
-        api_options:
-          host: { get_input: kubernetes_master_endpoint }
-          api_key: { get_secret: kubernetes_token }
-          debug: false
-          verify_ssl: false
-
   app_name:
+    display_label: App Name
     type: string
     description: Prefix to use for application service / deployment names
     default: cloudify-hello-world
 
   container:
+    display_label: Container
     description: Standard container reference
     type: string
     default: gcr.io/google-samples/node-hello:1.0
 
   container_port:
+    display_label: Container Port
     description: Exposed container port to reference
     type: integer
     default: 8080
 
-  validate_status:
+  kubernetes_endpoint:
+    display_label: Kubernetes Endpoint
     type: string
-    default: true
+
+  kubernetes_token:
+    display_label: Kubernetes Token
+    type: string
 
 node_templates:
 
   hello-world:
     type: cloudify.nodes.kubernetes.resources.FileDefinedResource
-    interfaces:
-      cloudify.interfaces.validation:
-        check_status:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_read
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_create
-        poststart:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_read
-        update:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_update
-        delete:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_delete
-        pull:
-          implementation: kubernetes.cloudify_kubernetes.tasks.file_resource_read
     properties:
-      client_config: { get_input: kubernetes_client_config }
-      validate_resource_status: { get_input: validate_status }
+      client_config:
+        configuration:
+          api_options:
+            host: { get_input: kubernetes_endpoint }
+            api_key: { get_input: kubernetes_token }
+            debug: false
+            verify_ssl: false
       file:
         resource_path: resources.yaml
         template_variables:
