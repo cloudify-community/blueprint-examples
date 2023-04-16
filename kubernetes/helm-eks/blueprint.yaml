@@ -36,13 +36,13 @@ inputs:
     description: >
       Name of the repo to add.
     type: string
-    default: bitnami
+    default: hello
 
   chart_name:
     type: string
     description: >
       Chart package name to deploy from repo.
-    default: postgresql
+    default: hello
 
   helm_installation_source:
     description: >
@@ -55,7 +55,7 @@ inputs:
       URL of the repo to add. For example:
       https://kubernetes-charts.storage.googleapis.com/
     type: string
-    default: https://charts.bitnami.com/bitnami
+    default: https://www.kleinloog.ch/hello-helm/
 
   aws_access_key_id:
     display_label: 'Aws Access Key Id'
@@ -122,7 +122,7 @@ node_templates:
           api_options:
             api_key: { get_secret: kubernetes_token }
       resource_config:
-        name: "examplerelease"
+        name: "my-hello"
         chart: { concat: [ { get_input: repo_name }, '/', { get_input: chart_name } ] }
     relationships:
       - target: helm_install
