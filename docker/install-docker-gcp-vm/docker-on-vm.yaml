@@ -1,7 +1,7 @@
-tosca_definitions_version: cloudify_dsl_1_3
+tosca_definitions_version: cloudify_dsl_1_4
 
 imports:
-  - http://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - http://cloudify.co/spec/cloudify/7.0.0/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
   - plugin:cloudify-docker-plugin
@@ -23,12 +23,8 @@ inputs:
     description: Centos image.
     default: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-7-v20191210
 
-  instance_type:
-    type: string
-    description: A small GCP machine type.
-    default: n1-standard-2
-
   agent_user:
+    type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
@@ -36,15 +32,6 @@ inputs:
   agent_key_name:
     type: string
     default: agent_key
-
-  env_name:
-    type: string
-    description: Control parameters for names in resources.
-    default: 'example'
-
-  docker_host:
-    type: string
-    default: { get_attribute: [vm, ip] }
 
   docker_user:
     type: string
@@ -66,11 +53,11 @@ inputs:
 dsl_definitions:
 
   docker_config: &docker_config
-    docker_host: { get_input: docker_host }
+    docker_host: { get_attribute: [vm, ip] }
     docker_rest_port: 2375
 
   docker_machine_config: &docker_machine_config
-    docker_ip: { get_input: docker_host }
+    docker_ip: { get_attribute: [vm, ip] }
     docker_user: { get_input: docker_user }
     docker_key: { get_attribute: [agent_key, private_key_export] }
 
@@ -79,6 +66,36 @@ dsl_definitions:
     zone: { get_input: zone }
 
 node_templates:
+
+  docker_centos_image:
+    type: cloudify.nodes.docker.image
+    properties:
+      client_config: *docker_config
+      resource_config:
+        image_content:
+          concat:
+            - |
+              FROM amd64/centos:7
+              MAINTAINER Cosmo (hello@cloudify.co)
+              RUN yum install -y openssh-server openssh-clients
+        tag:
+          concat:
+            - { get_input: image_tag }
+            - { get_input: centos_version }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: docker_installation
+
+  docker_centos_container_files:
+    type: cloudify.nodes.docker.container_files
+    properties:
+      resource_config:
+        docker_machine: *docker_machine_config
+        source: https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip
+        destination: ""
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: docker_installation
 
   docker_centos_container:
     type: cloudify.nodes.docker.container
@@ -102,51 +119,18 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: docker_centos_container_files
 
-  docker_centos_image:
-    type: cloudify.nodes.docker.image
-    properties:
-      client_config: *docker_config
-      resource_config:
-        image_content:
-          concat:
-            - |
-              FROM amd64/centos:7
-              MAINTAINER Cosmo (hello@cloudify.co)
-              RUN yum install -y openssh-server openssh-clients
-        tag:
-          concat:
-            - { get_input: image_tag }
-            - { get_input: centos_version }
-    relationships:
-    - type: cloudify.relationships.depends_on
-      target: docker_installation
-
-  docker_centos_container_files:
-    type: cloudify.nodes.docker.container_files
-    properties:
-      resource_config:
-        docker_machine:
-          docker_ip: { get_input: docker_host }
-          docker_user: { get_input: docker_user }
-          docker_key: { get_attribute: [agent_key, private_key_export] }
-        source: https://github.com/cloudify-community/blueprint-examples/releases/download/5.0.5-28/hello-world-example.zip
-        destination: ""
-    relationships:
-    - type: cloudify.relationships.depends_on
-      target: docker_installation
-
   docker_installation:
     type: cloudify.nodes.docker.host
     properties:
       docker_machine: *docker_machine_config
     relationships:
-    - type: cloudify.relationships.depends_on
-      target: vm
+      - type: cloudify.relationships.depends_on
+        target: vm
 
   vm:
-    type: cloudify.gcp.nodes.Instance
+    type: cloudify.nodes.gcp.Instance
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       agent_config:
         install_method: none
         key: { get_attribute: [agent_key, private_key_export] }
@@ -155,14 +139,14 @@ node_templates:
       zone: { get_input: zone }
       external_ip: true
     relationships:
-    - type: cloudify.relationships.connected_to
-      target: firewall
-    - type: cloudify.relationships.depends_on
-      target: subnet
-    - type: cloudify.relationships.depends_on
-      target: agent_key
-    - type: cloudify.relationships.depends_on
-      target: disk
+      - type: cloudify.relationships.connected_to
+        target: firewall
+      - type: cloudify.relationships.depends_on
+        target: subnet
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+      - type: cloudify.relationships.depends_on
+        target: disk
     interfaces:
       cloudify.interfaces.lifecycle:
         create:
@@ -174,17 +158,17 @@ node_templates:
               - { get_attribute: [agent_key, public_key_export] }
 
   disk:
-    type: cloudify.gcp.nodes.Volume
+    type: cloudify.nodes.gcp.Volume
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       image: { get_input: image }
       size: 20
       boot: true
 
   firewall:
-    type: cloudify.gcp.nodes.FirewallRule
+    type: cloudify.nodes.gcp.FirewallRule
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       allowed:
         tcp:
           - 22
@@ -203,19 +187,19 @@ node_templates:
         target: network
 
   subnet:
-    type: cloudify.gcp.nodes.SubNetwork
+    type: cloudify.nodes.gcp.SubNetwork
     properties:
       region: { get_input: region }
       subnet: 10.11.12.0/22
-      gcp_config: *gcp_config
+      client_config: *gcp_config
     relationships:
-    - type: cloudify.gcp.relationships.contained_in_network
-      target: network
+      - type: cloudify.relationships.gcp.contained_in_network
+        target: network
 
   network:
-    type: cloudify.gcp.nodes.Network
+    type: cloudify.nodes.gcp.Network
     properties:
-      gcp_config: *gcp_config
+      client_config: *gcp_config
       auto_subnets: false
 
   agent_key:
@@ -237,8 +221,8 @@ groups:
 
   vm-group:
     members:
-    - vm
-    - disk
+      - vm
+      - disk
 
 policies:
 
