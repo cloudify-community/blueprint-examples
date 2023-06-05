@@ -51,7 +51,7 @@ dsl_definitions:
 node_templates:
 
   vm:
-    type: cloudify.gcp.nodes.Instance
+    type: cloudify.nodes.gcp.Instance
     properties:
       client_config: *gcp_config
       agent_config:
@@ -81,7 +81,7 @@ node_templates:
               - { get_attribute: [agent_key, public_key_export] }
 
   disk:
-    type: cloudify.gcp.nodes.Volume
+    type: cloudify.nodes.gcp.Volume
     properties:
       client_config: *gcp_config
       image: { get_input: image }
@@ -89,7 +89,7 @@ node_templates:
       boot: true
 
   firewall:
-    type: cloudify.gcp.nodes.FirewallRule
+    type: cloudify.nodes.gcp.FirewallRule
     properties:
       client_config: *gcp_config
       allowed:
@@ -110,17 +110,17 @@ node_templates:
         target: network
 
   subnet:
-    type: cloudify.gcp.nodes.SubNetwork
+    type: cloudify.nodes.gcp.SubNetwork
     properties:
       region: { get_input: region }
       subnet: 10.11.12.0/22
       client_config: *gcp_config
     relationships:
-      - type: cloudify.gcp.relationships.contained_in_network
+      - type: cloudify.relationships.gcp.contained_in_network
         target: network
 
   network:
-    type: cloudify.gcp.nodes.Network
+    type: cloudify.nodes.gcp.Network
     properties:
       client_config: *gcp_config
       auto_subnets: false
