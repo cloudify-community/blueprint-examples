@@ -80,6 +80,9 @@ node_templates:
   vm:
     type: cloudify.nodes.aws.ec2.Instances
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
       agent_config:
         install_method: none
@@ -124,6 +127,9 @@ node_templates:
   ip:
     type: cloudify.nodes.aws.ec2.ElasticIP
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
     relationships:
       - type: cloudify.relationships.depends_on
@@ -132,6 +138,9 @@ node_templates:
   nic:
     type: cloudify.nodes.aws.ec2.Interface
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
       resource_config:
         kwargs:
@@ -193,6 +202,9 @@ node_templates:
   security_group:
     type: cloudify.nodes.aws.ec2.SecurityGroup
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
       resource_config:
         GroupName: CloudifyGettingStartedExample
@@ -221,6 +233,9 @@ node_templates:
   routetable:
     type: cloudify.nodes.aws.ec2.RouteTable
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
     relationships:
       - type: cloudify.relationships.contained_in
@@ -231,6 +246,9 @@ node_templates:
   subnet:
     type: cloudify.nodes.aws.ec2.Subnet
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
       resource_config:
         CidrBlock: 10.10.4.0/24
@@ -242,6 +260,9 @@ node_templates:
   internet_gateway:
     type: cloudify.nodes.aws.ec2.InternetGateway
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
     relationships:
       - type: cloudify.relationships.connected_to
@@ -250,6 +271,9 @@ node_templates:
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
     properties:
+      Tags:
+        - Key: Created By
+          Value: Blueprint Examples
       client_config: *client_config
       resource_config:
         CidrBlock: 10.10.0.0/16
