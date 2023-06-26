@@ -62,7 +62,7 @@ inputs:
     default: agent_key
 
   env_name:
-    type: string
+    type: node_instance
     description: Control parameters for names in resources.
     default: 'example'
 
