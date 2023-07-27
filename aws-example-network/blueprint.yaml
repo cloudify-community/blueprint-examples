@@ -144,6 +144,9 @@ node_templates:
     type: cloudify.nodes.aws.ec2.NATGateway
     properties:
       client_config: *client_config
+      resource_config:
+        kwargs:
+          ConnectivityType: public
     relationships:
       - type: cloudify.relationships.depends_on
         target: public_subnet
