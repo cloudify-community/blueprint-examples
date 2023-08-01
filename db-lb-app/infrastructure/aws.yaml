@@ -97,9 +97,12 @@ node_templates:
       resource_config:
         kwargs:
           Description: db-lb-app db-nic.
-          SubnetId: { get_attribute: [ subnet, aws_resource_id] }
           Groups:
             - { get_attribute: [ security_group, aws_resource_id ] }
+          SubnetId: { get_attribute: [ subnet, aws_resource_id] }
+      Tags:
+        - Key: Name
+          Value: DB-LB-App DB
     relationships:
       - type: cloudify.relationships.depends_on
         target: subnet
