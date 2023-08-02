@@ -22,17 +22,17 @@ inputs:
   aws_region_name:
     display_label: 'Aws Region Name'
     type: string
-    default: 'us-east-1'
+    default: 'eu-west-2'
 
   availability_zone_1:
     display_label: 'Availability Zone 1'
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'd' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'a' ] }
 
   availability_zone_2:
     display_label: 'Availability Zone 2'
     type: string
-    default: { concat: [ { get_input: aws_region_name}, 'e' ] }
+    default: { concat: [ { get_input: aws_region_name}, 'b' ] }
 
   eks_cluster_name:
     display_label: 'Eks Cluster Name'
