@@ -8,6 +8,16 @@ imports:
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
+  csys-obj-parent:
+    values:
+      - openstack-example-network
+
 inputs:
 
   env_name:
@@ -158,7 +168,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ { get_input: network_deployment_name }, public_subnet ] }
+        id: { get_environment_capability: public_subnet }
     relationships:
       - type: cloudify.relationships.contained_in
         target: network
@@ -171,7 +181,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ { get_input: network_deployment_name }, public_network ] }
+        id: { get_environment_capability: public_network }
 
   router:
     type: cloudify.nodes.openstack.Router
@@ -179,7 +189,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ { get_input: network_deployment_name }, public_network_router ] }
+        id: { get_environment_capability: public_network_router }
     relationships:
       - type: cloudify.relationships.connected_to
         target: external_network
@@ -190,7 +200,7 @@ node_templates:
       client_config: *client_config
       use_external_resource: true
       resource_config:
-        id: { get_capability: [ { get_input: network_deployment_name }, external_network ] }
+        id: { get_environment_capability: external_network }
         kwargs:
           routing:
             external: true

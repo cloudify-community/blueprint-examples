@@ -10,6 +10,16 @@ imports:
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
+  csys-obj-parent:
+    values:
+      - aws-example-network
+
 inputs:
 
   env_name:
@@ -46,7 +56,7 @@ dsl_definitions:
     aws_access_key_id: { get_secret: aws_access_key_id }
     aws_secret_access_key: { get_secret: aws_secret_access_key }
     aws_session_token: { get_secret: aws_session_token }
-    region_name: { get_capability: [ { get_input: network_deployment_name }, region_name ] }
+    region_name: { get_environment_capability: region_name }
 
 node_templates:
 
@@ -69,7 +79,7 @@ node_templates:
               Ebs:
                 DeleteOnTermination: true
           Placement:
-            AvailabilityZone: { get_capability: [ { get_input: network_deployment_name }, availability_zone ] }
+            AvailabilityZone: { get_environment_capability: availability_zone }
           UserData: { get_attribute: [ cloud_init, cloud_config ] }
       use_public_ip: true
     relationships:
@@ -158,26 +168,26 @@ node_templates:
       resource_config:
         GroupName: { concat: [ { get_input: env_name }, '-infra-group' ] }
         Description: db lb app infra group
-        VpcId: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
+        VpcId: { get_environment_capability: vpc_id }
 
   subnet:
     type: cloudify.nodes.aws.ec2.Subnet
     properties:
       client_config: *client_config
       use_external_resource: true
-      resource_id: { get_capability: [ { get_input: network_deployment_name }, public_subnet_id ] }
+      resource_id: { get_environment_capability: public_subnet_id }
       resource_config:
-        CidrBlock: 'N/A'
-        AvailabilityZone: 'N/A'
+        CidrBlock: { get_environment_capability: public_subnet_cidr }
+        AvailabilityZone: { get_environment_capability: availability_zone }
 
   vpc:
     type: cloudify.nodes.aws.ec2.Vpc
     properties:
       client_config: *client_config
       use_external_resource: true
-      resource_id: { get_capability: [ { get_input: network_deployment_name }, vpc_id ] }
+      resource_id: { get_environment_capability: vpc_id }
       resource_config:
-        CidrBlock: 'N/A'
+        CidrBlock:  { get_environment_capability: vpc_cidr }
 
   centos_core_ami:
     type: cloudify.nodes.aws.ec2.Image

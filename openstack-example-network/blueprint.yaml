@@ -6,6 +6,12 @@ imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
   - plugin:cloudify-openstack-plugin?version= >=3.2.2
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
 inputs:
 
   external_network_id:

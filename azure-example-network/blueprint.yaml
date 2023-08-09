@@ -7,6 +7,12 @@ imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
   - plugin:cloudify-azure-plugin
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
 inputs:
 
   env_name:

@@ -6,6 +6,12 @@ imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
   - plugin:cloudify-gcp-plugin?version= >=1.6.0
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
 inputs:
 
   env_name:

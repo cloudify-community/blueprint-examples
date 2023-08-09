@@ -1,0 +1,281 @@
+tosca_definitions_version: cloudify_dsl_1_4
+
+description: Blueprint doesn't do much.
+
+imports:
+  - cloudify/types/types.yaml
+
+relationships:
+
+  cloudify.relationships.blueprint.depends_on:
+    derived_from: cloudify.relationships.depends_on
+    source_interfaces:
+      cloudify.interfaces.relationship_lifecycle:
+        establish:
+          implementation: |
+            #!/usr/bin/env python3
+            from cloudify import ctx as ctx_from_import
+            from functools import wraps
+            try:
+                from cloudify.constants import RELATIONSHIP_INSTANCE, NODE_INSTANCE
+            except ImportError:
+                NODE_INSTANCE = 'node-instance'
+                RELATIONSHIP_INSTANCE = 'relationship-instance'
+
+            DEPRECATION_WARNINGS = {
+                'cloudify.relationships.blueprint.depends_on': 'cloudify.blueprint.relationships.depends_on',
+                'cloudify.nodes.Foo': 'cloudify.nodes.Root',
+                'cloudify.nodes.Bar': 'cloudify.nodes.Root',
+            }
+
+            def warn_deprecation(func):
+                @wraps(func)
+                def inner(*args, **kwargs):
+                    check_deprecated_node_type()
+                    check_deprecated_relationship()
+                    return func(*args, **kwargs)
+                return inner
+
+            def check_deprecated_relationship():
+                if ctx_from_import.type == RELATIONSHIP_INSTANCE:
+                    for rel in ctx_from_import.source.instance.relationships:
+                        if rel.target.node.id == ctx_from_import.target.node.id:
+                            new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                            if new_rel_type:
+                                log_deprecation(rel.type, new_rel_type, 'relationship')
+                    source_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.source.node.type)
+                    target_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.target.node.type)
+                    if source_node_type:
+                        log_deprecation(
+                            ctx_from_import.source.node.type,
+                            source_node_type,
+                            'source node')
+                    if target_node_type:
+                        log_deprecation(
+                            ctx_from_import.target.node.type,
+                            target_node_type,
+                            'target node')
+                else:
+                    for rel in ctx_from_import.instance.relationships:
+                        new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                        if new_rel_type:
+                            log_deprecation(
+                                rel.type,
+                                new_rel_type,
+                                'relationship'
+                            )
+
+            def check_deprecated_node_type():
+                if ctx_from_import.type != NODE_INSTANCE:
+                    return
+                new_node_type = DEPRECATION_WARNINGS.get(ctx_from_import.node.type)
+                if new_node_type:
+                    log_deprecation(ctx_from_import.node.type, new_node_type)
+
+            def log_deprecation(old_type, new_type, rel_or_node=None):
+                rel_or_node = rel_or_node or 'node'
+                ctx_from_import.logger.error(
+                    'The {rel_or_node} type {old_type} is deprecated, '
+                    'please update your blueprint to use {new_type}'.format(
+                        rel_or_node=rel_or_node,
+                        old_type=old_type,
+                        new_type=new_type,
+                    )
+                )
+
+            @warn_deprecation
+            def remove_node():
+                ctx_from_import.logger.info('Starting.')
+
+            if __name__ == "__main__":
+
+                remove_node()
+
+
+node_types:
+
+  cloudify.nodes.Foo:
+    derived_from: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        precreate:
+          implementation: |
+            #!/usr/bin/env python3
+            from cloudify import ctx as ctx_from_import
+            from functools import wraps
+            try:
+                from cloudify.constants import RELATIONSHIP_INSTANCE, NODE_INSTANCE
+            except ImportError:
+                NODE_INSTANCE = 'node-instance'
+                RELATIONSHIP_INSTANCE = 'relationship-instance'
+
+            DEPRECATION_WARNINGS = {
+                'cloudify.relationships.blueprint.depends_on': 'cloudify.blueprint.relationships.depends_on',
+                'cloudify.nodes.Foo': 'cloudify.nodes.Root',
+                'cloudify.nodes.Bar': 'cloudify.nodes.Root',
+            }
+
+            def warn_deprecation(func):
+                @wraps(func)
+                def inner(*args, **kwargs):
+                    check_deprecated_node_type()
+                    check_deprecated_relationship()
+                    return func(*args, **kwargs)
+                return inner
+
+            def check_deprecated_relationship():
+                if ctx_from_import.type == RELATIONSHIP_INSTANCE:
+                    for rel in ctx_from_import.source.instance.relationships:
+                        if rel.target.node.id == ctx_from_import.target.node.id:
+                            new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                            if new_rel_type:
+                                log_deprecation(rel.type, new_rel_type, 'relationship')
+                    source_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.source.node.type)
+                    target_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.target.node.type)
+                    if source_node_type:
+                        log_deprecation(
+                            ctx_from_import.source.node.type,
+                            source_node_type,
+                            'source node')
+                    if target_node_type:
+                        log_deprecation(
+                            ctx_from_import.target.node.type,
+                            target_node_type,
+                            'target node')
+                else:
+                    for rel in ctx_from_import.instance.relationships:
+                        new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                        if new_rel_type:
+                            log_deprecation(
+                                rel.type,
+                                new_rel_type,
+                                'relationship'
+                            )
+
+            def check_deprecated_node_type():
+                if ctx_from_import.type != NODE_INSTANCE:
+                    return
+                new_node_type = DEPRECATION_WARNINGS.get(ctx_from_import.node.type)
+                if new_node_type:
+                    log_deprecation(ctx_from_import.node.type, new_node_type)
+
+            def log_deprecation(old_type, new_type, rel_or_node=None):
+                rel_or_node = rel_or_node or 'node'
+                ctx_from_import.logger.error(
+                    'The {rel_or_node} type {old_type} is deprecated, '
+                    'please update your blueprint to use {new_type}'.format(
+                        rel_or_node=rel_or_node,
+                        old_type=old_type,
+                        new_type=new_type,
+                    )
+                )
+
+            @warn_deprecation
+            def remove_node():
+                ctx_from_import.logger.info('Starting.')
+
+            if __name__ == "__main__":
+
+                remove_node()
+
+
+  cloudify.nodes.Bar:
+    derived_from: cloudify.nodes.Root
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        precreate:
+          implementation: |
+            #!/usr/bin/env python3
+            from cloudify import ctx as ctx_from_import
+            from functools import wraps
+            try:
+                from cloudify.constants import RELATIONSHIP_INSTANCE, NODE_INSTANCE
+            except ImportError:
+                NODE_INSTANCE = 'node-instance'
+                RELATIONSHIP_INSTANCE = 'relationship-instance'
+
+            DEPRECATION_WARNINGS = {
+                'cloudify.relationships.blueprint.depends_on': 'cloudify.blueprint.relationships.depends_on',
+                'cloudify.nodes.Foo': 'cloudify.nodes.Root',
+                'cloudify.nodes.Bar': 'cloudify.nodes.Root',
+            }
+
+            def warn_deprecation(func):
+                @wraps(func)
+                def inner(*args, **kwargs):
+                    check_deprecated_node_type()
+                    check_deprecated_relationship()
+                    return func(*args, **kwargs)
+                return inner
+
+            def check_deprecated_relationship():
+                if ctx_from_import.type == RELATIONSHIP_INSTANCE:
+                    for rel in ctx_from_import.source.instance.relationships:
+                        if rel.target.node.id == ctx_from_import.target.node.id:
+                            new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                            if new_rel_type:
+                                log_deprecation(rel.type, new_rel_type, 'relationship')
+                    source_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.source.node.type)
+                    target_node_type = DEPRECATION_WARNINGS.get(
+                        ctx_from_import.target.node.type)
+                    if source_node_type:
+                        log_deprecation(
+                            ctx_from_import.source.node.type,
+                            source_node_type,
+                            'source node')
+                    if target_node_type:
+                        log_deprecation(
+                            ctx_from_import.target.node.type,
+                            target_node_type,
+                            'target node')
+                else:
+                    for rel in ctx_from_import.instance.relationships:
+                        new_rel_type = DEPRECATION_WARNINGS.get(rel.type)
+                        if new_rel_type:
+                            log_deprecation(
+                                rel.type,
+                                new_rel_type,
+                                'relationship'
+                            )
+
+            def check_deprecated_node_type():
+                if ctx_from_import.type != NODE_INSTANCE:
+                    return
+                new_node_type = DEPRECATION_WARNINGS.get(ctx_from_import.node.type)
+                if new_node_type:
+                    log_deprecation(ctx_from_import.node.type, new_node_type)
+
+            def log_deprecation(old_type, new_type, rel_or_node=None):
+                rel_or_node = rel_or_node or 'node'
+                ctx_from_import.logger.error(
+                    'The {rel_or_node} type {old_type} is deprecated, '
+                    'please update your blueprint to use {new_type}'.format(
+                        rel_or_node=rel_or_node,
+                        old_type=old_type,
+                        new_type=new_type,
+                    )
+                )
+
+            @warn_deprecation
+            def remove_node():
+                ctx_from_import.logger.info('Starting.')
+
+            if __name__ == "__main__":
+
+                remove_node()
+
+node_templates:
+
+  foo:
+    type: cloudify.nodes.Foo
+    relationships:
+      - type: cloudify.relationships.blueprint.depends_on
+        target: bar
+
+  bar:
+    type: cloudify.nodes.Bar
