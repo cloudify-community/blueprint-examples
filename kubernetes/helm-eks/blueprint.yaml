@@ -72,6 +72,16 @@ inputs:
     type: string
     default: 'us-east-1'
 
+  availability_zone_1:
+    display_label: 'Availability Zone 1'
+    type: string
+    default: { concat: [ { get_input: aws_region_name}, 'a' ] }
+
+  availability_zone_2:
+    display_label: 'Availability Zone 2'
+    type: string
+    default: { concat: [ { get_input: aws_region_name}, 'b' ] }
+
 node_templates:
 
   eks_cluster:
@@ -90,6 +100,9 @@ node_templates:
             aws_access_key_id: { get_input: aws_access_key_id }
             aws_secret_access_key: { get_input: aws_secret_access_key }
             aws_region_name: { get_input: aws_region_name }
+            availability_zone_1: { get_input: availability_zone_1 }
+            availability_zone_2: { get_input: availability_zone_2 }
+
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
