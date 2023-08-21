@@ -1,0 +1,65 @@
+tosca_definitions_version: cloudify_dsl_1_4
+
+description: >
+  https://docs.docker.com/engine/install/centos/
+  https://docs.docker.com/engine/install/linux-postinstall/
+  https://kifarunix.com/configure-docker-daemon-for-remote-connections/
+
+imports:
+  - cloudify/types/types.yaml
+
+inputs:
+
+  docker_ip:
+    type: string
+
+  docker_endpoint:
+    type: string
+    display_label: The endpoint.
+    default: { concat: [ 'tcp://', { get_input: docker_ip }, ':2375' ] }
+
+node_types:
+
+  cloudify.nodes.docker.Container:
+    derived_from: cloudify.nodes.Compute
+    properties:
+      client_config:
+        type: dict
+      resource_config:
+        type: dict
+    interfaces:
+      cloudify.interfaces.cloudify_agent:
+        create:
+          implementation: ./scripts/cloudify_agent_api.py
+          executor: central_deployment_agent
+        stop: {}
+        stop_amqp: {}
+        delete: {}
+      cloudify.interfaces.lifecycle:
+        precreate:
+          implementation: ./scripts/docker_api.py
+          executor: central_deployment_agent
+        create:
+          implementation: ./scripts/docker_api.py
+          executor: central_deployment_agent
+        stop:
+          implementation: ./scripts/docker_api.py
+          executor: central_deployment_agent
+        delete:
+          implementation: ./scripts/docker_api.py
+          executor: central_deployment_agent
+
+node_templates:
+
+  container:
+    type: cloudify.nodes.docker.Container
+    properties:
+      agent_config:
+        install_method: provided
+        user: cfyuser
+      client_config:
+        base_url: { get_input: docker_endpoint }
+      resource_config:
+        tty: true
+        stdin_open: true
+        detach: true
