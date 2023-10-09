@@ -2,12 +2,19 @@ tosca_definitions_version: cloudify_dsl_1_4
 
 description: Installs HTTPD with Ansible.
 
+inputs:
+
+  playbook_path:
+    type: string
+    display_label: Playbook Path
+    default: apache2/playbook.yaml
+
 node_templates:
 
   hello-world:
     type: cloudify.nodes.ansible.Playbook
     properties:
-      playbook_path: apache2/playbook.yaml
+      playbook_path: { get_input: playbook_path }
       start_at_task: "install apache2"
       ansible_env_vars:
         ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"
