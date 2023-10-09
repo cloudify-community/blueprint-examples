@@ -20,7 +20,7 @@ inputs:
       - pattern: '(^ *$)|(^[a-zA-Z][a-zA-Z0-9]+$)'
   region_name:
     type: string
-    default: 'westus'
+    default: 'us-west-1'
 
 
 node_templates:
@@ -28,7 +28,7 @@ node_templates:
     type: eaas.nodes.UniquePrefixGenerator
     properties:
       predefined_value: { get_input: resource_prefix }
-
+      
   terraform:
     type: cloudify.nodes.terraform
     properties:
@@ -40,16 +40,13 @@ node_templates:
     properties:
       resource_config:
         environment_variables:
-          ARM_SUBSCRIPTION_ID: { get_secret: azure_subscription_id }
-          ARM_TENANT_ID: { get_secret: azure_tenant_id }
-          ARM_CLIENT_ID: { get_secret: azure_client_id }
-          ARM_CLIENT_SECRET: { get_secret: azure_client_secret }
+          AWS_ACCESS_KEY_ID: { get_secret: aws_access_key_id }
+          AWS_SECRET_ACCESS_KEY: { get_secret: aws_secret_access_key  }
         variables:
-          blob_name: { concat: [ { get_attribute: [ prefix, value ] }, bucket ] }
-          rg_name: { concat: [ { get_attribute: [ prefix, value ] }, rg ] }
-          rg_location: { get_input: region_name }
+          bucket_name: { concat: [ { get_attribute: [ prefix, value ] }, bucket ] }
+          bucket_region: { get_input: region_name }
         source:
-          location: templates/tf-blob-master.zip
+          location: s3-templates/tf-bucket-master.zip
     relationships:
       - target: prefix
         type: cloudify.relationships.depends_on
@@ -58,4 +55,4 @@ node_templates:
 
 capabilities:
   bucket_url:
-    value: { get_attribute: [ terraform_module, resources, blob, instances, 0, attributes, id ] }
+    value: { concat: [ 'https://', { get_attribute: [ terraform_module, resources, bucket, instances, 0, attributes, bucket_regional_domain_name ] } ] }

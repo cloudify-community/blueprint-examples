@@ -77,6 +77,7 @@ node_templates:
               host_string: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, endpoint ]}
               user: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, user ]}
               key: { get_capability: [ { get_attribute: [ infrastructure, deployment, id ] }, key_content ]}
+              port: 22222
               always_use_pty: false
     relationships:
       - type: cloudify.relationships.depends_on

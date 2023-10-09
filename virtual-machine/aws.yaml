@@ -1,7 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_4
 
 description: >
-  This blueprint creates an AWS infrastructure environment.
+  This blueprint does something.
 
 imports:
   - http://cloudify.co/spec/cloudify/6.4.0/types.yaml
@@ -11,6 +11,7 @@ imports:
 inputs:
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: 'us-east-1'
     constraints:
@@ -306,6 +307,8 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
+
+outputs: {}
 
 capabilities:
 

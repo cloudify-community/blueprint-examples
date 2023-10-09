@@ -6,6 +6,11 @@ imports:
   - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
   - plugin:cloudify-aws-plugin
 
+labels:
+  csys-obj-type:
+    values:
+      - environment
+
 inputs:
 
   aws_access_key_id:
@@ -144,6 +149,9 @@ node_templates:
     type: cloudify.nodes.aws.ec2.NATGateway
     properties:
       client_config: *client_config
+      resource_config:
+        kwargs:
+          ConnectivityType: public
     relationships:
       - type: cloudify.relationships.depends_on
         target: public_subnet
@@ -183,6 +191,14 @@ capabilities:
   region_name:
     description: 'aws region name'
     value: { get_input: region_name }
+
+  vpc_cidr:
+    description: vpc_cidr
+    value: { get_input: vpc_cidr }
+
+  public_subnet_cidr:
+    description: public_subnet_cidr
+    value: { get_input: public_subnet_cidr }
 
   ec2_region_endpoint:
     description: 'ec2 region endpoint'

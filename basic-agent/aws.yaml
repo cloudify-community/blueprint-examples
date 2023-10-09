@@ -1,0 +1,171 @@
+tosca_definitions_version: cloudify_dsl_1_4
+
+description: |
+  This blueprint creates a vm with an agent.
+  The requirements are as follows:
+  Your Cloudify manager should also be connected to the subnet (subnet_id).
+  Your Cloudify manager should also be governed by the security group (security_group_id).
+  Your security group should allow SSH between the vms in that security group.
+  Your security group should have 5671, 53333 ports open also to other vms on that security group.
+  There should be basic local routing for the subnet route table.
+
+imports:
+  - http://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - plugin:cloudify-aws-plugin
+  - plugin:cloudify-utilities-plugin?version= >=1.22.1
+
+inputs:
+
+  security_group_id:
+    type: string
+
+  subnet_id:
+    type: string
+
+  aws_region_name:
+    display_label: Aws Region Name
+    type: string
+    default: 'us-east-1'
+    constraints:
+      - valid_values:
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+          - eu-central-1
+          - eu-west-1
+          - eu-west-2
+          - eu-south-1
+          - eu-west-3
+          - eu-north-1
+          - af-south-1
+          - ap-east-1
+          - ap-south-1
+          - ap-northeast-3
+          - ap-northeast-2
+          - ap-southeast-1
+          - ap-southeast-2
+          - ap-northeast-1
+          - ca-central-1
+          - cn-north-1
+          - cn-northwest-1
+          - me-south-1
+          - sa-east-1
+
+  instance_type:
+    type: string
+    default: t2.large
+    constraints:
+      - valid_values:
+          - t2.micro
+          - t2.small
+          - t2.medium
+          - t2.large
+          - t2.xlarge
+          - t2.2xlarge
+
+  agent_user:
+    type: string
+    description: >
+      The username of the agent running on the instance created from the image.
+    default: 'centos'
+
+  agent_key_name:
+    type: string
+    default: agent_key
+
+dsl_definitions:
+
+  client_config: &client_config
+    aws_access_key_id: { get_secret: aws_access_key_id }
+    aws_secret_access_key: { get_secret: aws_secret_access_key }
+    region_name: { get_input: aws_region_name }
+
+node_templates:
+
+  vm:
+    type: cloudify.nodes.aws.ec2.Instances
+    properties:
+      client_config: *client_config
+      agent_config:
+        install_method: remote
+        user: { get_input: agent_user }
+        key: { get_attribute: [agent_key, private_key_export] }
+        port: 22
+      resource_config:
+        ImageId: { get_attribute: [ ami, aws_resource_id ] }
+        InstanceType: { get_input: instance_type }
+        kwargs:
+          UserData: { get_attribute: [ cloud_init, cloud_config ] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: ami
+      - type: cloudify.relationships.depends_on
+        target: nic
+      - type: cloudify.relationships.depends_on
+        target: ip
+      - type: cloudify.relationships.depends_on
+        target: cloud_init
+
+  ami:
+    type: cloudify.nodes.aws.ec2.Image
+    properties:
+      resource_config:
+        kwargs:
+          Filters:
+          - Name: name
+            Values:
+            - 'CentOS7-cloudify-examples-image'
+          - Name: owner-id
+            Values:
+            - '263721492972'
+      client_config: *client_config
+
+  ip:
+    type: cloudify.nodes.aws.ec2.ElasticIP
+    properties:
+      client_config: *client_config
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: nic
+
+  nic:
+    type: cloudify.nodes.aws.ec2.Interface
+    properties:
+      client_config: *client_config
+      resource_config:
+        kwargs:
+          Description: Created by cloudify-getting-started-example.
+          SubnetId: { get_input: subnet_id }
+          Groups:
+            - { get_input: security_group_id }
+
+  cloud_init:
+    type: cloudify.nodes.CloudInit.CloudConfig
+    properties:
+      resource_config:
+        users:
+          - name: { get_input: agent_user }
+            shell: /bin/bash
+            sudo: ['ALL=(ALL) NOPASSWD:ALL']
+            ssh-authorized-keys:
+              - { get_attribute: [agent_key, public_key_export] }
+    relationships:
+      - type: cloudify.relationships.depends_on
+        target: agent_key
+
+  agent_key:
+    type: cloudify.keys.nodes.RSAKey
+    properties:
+      resource_config:
+        key_name: { get_input: agent_key_name }
+        openssh_format: true
+      use_secret_store: true
+      use_secrets_if_exist: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: keys.cloudify_ssh_key.operations.create
+          inputs:
+            store_private_key_material: true
+

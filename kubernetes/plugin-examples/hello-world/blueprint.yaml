@@ -45,7 +45,7 @@ node_templates:
             debug: false
             verify_ssl: false
       file:
-        resource_path: resources.yaml
+        resource_path: k8s-resources.yaml
         template_variables:
           APP_NAME: { get_input: app_name }
           PORT: { get_input: container_port }

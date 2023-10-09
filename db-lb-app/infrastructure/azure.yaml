@@ -6,6 +6,16 @@ imports:
   - plugin:cloudify-utilities-plugin
   - includes/cloud-init.yaml
 
+labels:
+
+  csys-obj-type:
+    values:
+      - environment
+
+  csys-obj-parent:
+    values:
+      - azure-example-network
+
 inputs:
 
   env_name:
@@ -58,7 +68,7 @@ node_templates:
       use_public_ip: true
       os_family: linux
       retry_after: 60
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
       storage_endpoint: core.windows.net
       resource_config:
         hardwareProfile:
@@ -67,7 +77,7 @@ node_templates:
           imageReference:
             publisher: OpenLogic
             offer: CentOS
-            sku: '7-CI'
+            sku: '7_9-gen2'
             version: latest
         osProfile:
           customData: { get_attribute: [ cloud_init, cloud_config ] }
@@ -95,7 +105,7 @@ node_templates:
     type: cloudify.azure.nodes.network.NetworkInterfaceCard
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
     relationships:
       - type: cloudify.relationships.azure.contained_in_resource_group
         target: resource_group
@@ -108,7 +118,7 @@ node_templates:
     type: cloudify.azure.nodes.network.IPConfiguration
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
       resource_config:
         privateIPAllocationMethod: Dynamic
     relationships:
@@ -123,7 +133,7 @@ node_templates:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
       resource_config:
         publicIPAllocationMethod: Static
     relationships:
@@ -134,7 +144,7 @@ node_templates:
     type: cloudify.azure.nodes.network.NetworkSecurityGroup
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
       resource_config:
         securityRules:
           - name: shell_access
@@ -212,8 +222,8 @@ node_templates:
     properties:
       client_config: *client_config
       use_external_resource: true
-      name: { get_capability: [ azure, public_subnet ] }
-      location: { get_capability: [ azure, location ] }
+      name: { get_environment_capability: public_subnet }
+      location: { get_environment_capability: location }
       resource_config:
         addressPrefix: { get_input: public_subnet_cidr }
     relationships:
@@ -225,8 +235,8 @@ node_templates:
     properties:
       client_config: *client_config
       use_external_resource: true
-      name: { get_capability: [ azure, virtual_network ] }
-      location: { get_capability: [ azure, location ] }
+      name: { get_environment_capability: virtual_network }
+      location: { get_environment_capability: location }
     relationships:
       - type: cloudify.relationships.azure.contained_in_resource_group
         target: resource_group
@@ -235,7 +245,7 @@ node_templates:
     type: cloudify.nodes.azure.compute.AvailabilitySet
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
     relationships:
       - type: cloudify.relationships.azure.contained_in_resource_group
         target: resource_group
@@ -244,7 +254,7 @@ node_templates:
     type: cloudify.nodes.azure.storage.StorageAccount
     properties:
       client_config: *client_config
-      location: { get_capability: [ azure, location ] }
+      location: { get_environment_capability: location }
       resource_config:
         accountType: Standard_LRS
     relationships:
@@ -256,8 +266,8 @@ node_templates:
     properties:
       client_config: *client_config
       use_external_resource: true
-      name: { get_capability: [ azure, resource_group ] }
-      location: { get_capability: [ azure, location ] }
+      name: { get_environment_capability: resource_group }
+      location: { get_environment_capability: location }
 
 groups:
 
