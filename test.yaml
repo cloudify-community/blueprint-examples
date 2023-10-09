@@ -1,0 +1,16 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Foo
+
+imports:
+  - cloudify/types/types.yaml
+
+inputs:
+
+  foo:
+    type: string
+    default: bar
+
+node_templates: {}
+
+

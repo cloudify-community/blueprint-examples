@@ -8,19 +8,23 @@ imports:
 inputs:
 
   env_name:
+    display_label: Env Name
     type: string
     description: Control parameters for names in resources.
     default: 'cfyinfra'
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     default: { get_input: env_name }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     default: '0'
 
   location:
+    display_label: Location
     type: string
     description: Your Azure Region.
     default: eastus2
@@ -68,6 +72,7 @@ inputs:
           - australiacentral2
 
   image:
+    display_label: Image
     type: dict
     description: >
       Image to use.
@@ -78,6 +83,7 @@ inputs:
       version: latest
 
   size:
+    display_label: Size
     description: >
        Name of Virtual Machine Size in Azure.
     type: string
@@ -95,15 +101,18 @@ inputs:
           - Standard_B20ms
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 60
 
   agent_user:
+    display_label: Agent User
     type: string
     description: The user name of the agent on the instance created from the image.
     default: 'centos'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -117,8 +126,11 @@ dsl_definitions:
 
 node_templates:
 
+  new_node_template:
+    type: cloudify.nodes.azure
+
   vm:
-    type: cloudify.azure.nodes.compute.VirtualMachine
+    type: cloudify.nodes.azure.compute.VirtualMachine
     properties:
       location: { get_input: location }
       retry_after: { get_input: retry_after }
@@ -156,7 +168,7 @@ node_templates:
         target: agent_key
 
   nic:
-    type: cloudify.azure.nodes.network.NetworkInterfaceCard
+    type: cloudify.nodes.azure.network.NetworkInterfaceCard
     properties:
       location: { get_input: location }
       azure_config: *azure_config
@@ -170,7 +182,7 @@ node_templates:
         target: ip_config
 
   ip_config:
-    type: cloudify.azure.nodes.network.IPConfiguration
+    type: cloudify.nodes.azure.network.IPConfiguration
     properties:
       location: { get_input: location }
       azure_config: *azure_config
@@ -184,7 +196,7 @@ node_templates:
         target: ip
 
   network_security_group:
-    type: cloudify.azure.nodes.network.NetworkSecurityGroup
+    type: cloudify.nodes.azure.network.NetworkSecurityGroup
     properties:
       name: { concat: [ { get_input: resource_prefix }, nsg, { get_input: resource_suffix } ] }
       location: { get_input: location }
@@ -274,7 +286,7 @@ node_templates:
         target: resource_group
 
   ip:
-    type: cloudify.azure.nodes.network.PublicIPAddress
+    type: cloudify.nodes.azure.network.PublicIPAddress
     properties:
       location: { get_input: location }
       azure_config: *azure_config
@@ -286,7 +298,7 @@ node_templates:
         target: resource_group
 
   availability_set:
-    type: cloudify.azure.nodes.compute.AvailabilitySet
+    type: cloudify.nodes.azure.compute.AvailabilitySet
     properties:
       name: { concat: [ { get_input: resource_prefix }, availset, { get_input: resource_suffix } ] }
       location: { get_input: location }
@@ -309,7 +321,7 @@ node_templates:
         target: resource_group
 
   subnet:
-    type: cloudify.azure.nodes.network.Subnet
+    type: cloudify.nodes.azure.network.Subnet
     properties:
       resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       name: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
@@ -322,7 +334,7 @@ node_templates:
         target: network
 
   network:
-    type: cloudify.azure.nodes.network.VirtualNetwork
+    type: cloudify.nodes.azure.network.VirtualNetwork
     properties:
       resource_group_name: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
       name: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
