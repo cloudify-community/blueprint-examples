@@ -15,6 +15,8 @@ node_templates:
     type: cloudify.nodes.ansible.Playbook
     properties:
       playbook_path: { get_input: playbook_path }
+      run_data:
+        tenant_name: { get_sys: [tenant, name] }
       start_at_task: "install apache2"
       ansible_env_vars:
         ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: "False"

@@ -64,3 +64,5 @@
       cloudify_runtime_property:
         path: hello
         value: world
+        client_kwargs:
+          tenant: "{{tenant_name}}"
