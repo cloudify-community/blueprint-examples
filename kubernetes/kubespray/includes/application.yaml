@@ -1,4 +1,4 @@
-tosca_definitions_version: cloudify_dsl_1_4
+tosca_definitions_version: cloudify_dsl_1_5
 
 description: Install Kubernetes on kube-master and kube-node with kubespray.
 

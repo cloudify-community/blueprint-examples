@@ -1,5 +1,5 @@
 #This is the blueprint header that defines the DSL version
-tosca_definitions_version: cloudify_dsl_1_4
+tosca_definitions_version: cloudify_dsl_1_5
 
 description: >
   Input and outputs - describing the most basic blueprint structure
