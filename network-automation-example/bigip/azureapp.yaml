@@ -4,7 +4,7 @@ description: >
   Licensing BIG IP with provided registration key and applying VLAN configuration.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
 
 inputs:

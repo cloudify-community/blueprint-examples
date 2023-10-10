@@ -9,7 +9,7 @@ description: >
   The webserver and application will run on the <manager host>:8000
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - cloudify/types/types.yaml
 
 inputs:
 
