@@ -1,4 +1,4 @@
-tosca_definitions_version: cloudify_dsl_1_4
+tosca_definitions_version: cloudify_dsl_1_5
 
 description: Cloudify Helm-eks blueprint. Creates EKS cluster and installs helm chart on top of it.
 
