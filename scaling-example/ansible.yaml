@@ -6,7 +6,7 @@ description: >
   libselinux-python/libselinux-python3 on the manager VM is prerequisite.
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - cloudify/types/types.yaml
   - plugin:cloudify-ansible-plugin?version= >=2.12.0
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 

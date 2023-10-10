@@ -6,7 +6,7 @@ description: >
   your local environment
 
 imports:
-  - https://cloudify.co/spec/cloudify/6.4.0/types.yaml
+  - cloudify/types/types.yaml
   - plugin:cloudify-fabric-plugin
   - plugin:cloudify-utilities-plugin
 
