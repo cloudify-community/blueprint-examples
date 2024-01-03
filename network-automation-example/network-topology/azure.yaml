@@ -18,40 +18,48 @@ imports:
 inputs:
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 5
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Azure.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Azure.
     default: { get_secret: resource_suffix }
 
   mgmt_subnet_cidr:
+    display_label: Mgmt Subnet Cidr
     type: string
     description: Management subnet CIDR
     default: 10.10.1.0/24
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     description: Public subnet CIDR
     default: 10.10.2.0/24
 
   wan_subnet_cidr:
+    display_label: Wan Subnet Cidr
     type: string
     description: WAN subnet CIDR
     default: 10.10.3.0/24
 
   lan_subnet_cidr:
+    display_label: Lan Subnet Cidr
     type: string
     description: LAN subnet CIDR
     default: 10.10.4.0/24
 
   network_api_version:
+    display_label: Network Api Version
     type: string
     description: API Version for Network
     default: "2015-06-15"

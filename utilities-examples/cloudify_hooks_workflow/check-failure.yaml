@@ -8,11 +8,13 @@ imports:
 inputs:
 
   raise_failure_first:
+    display_label: Raise Failure First
     type: string
     description: do we raise exeption on action
     default: cloudify.interfaces.lifecycle.start
 
   autouninstall:
+    display_label: Autouninstall
     type: string
     description: run uninstall after failure
     default: "yes"

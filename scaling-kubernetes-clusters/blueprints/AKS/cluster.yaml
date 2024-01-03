@@ -55,40 +55,48 @@ node_types:
 inputs:
   # Azure account information
   subscription_id:
+    display_label: Subscription Id
     type: string
     required: false
     default: { get_secret: azure_subscription_id }
 
   tenant_id:
+    display_label: Tenant Id
     type: string
     required: false
     default: { get_secret: azure_tenant_id }
 
   client_id:
+    display_label: Client Id
     type: string
     required: false
     default: { get_secret: azure_client_id }
 
   client_secret:
+    display_label: Client Secret
     type: string
     required: false
     default: { get_secret: azure_client_secret }
 
   location:
+    display_label: Location
     type: string
     required: true
     default: eastus2
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Must be a letter.
     default: 'a'
 
   resource_group_name:
+    display_label: Resource Group Name
     type: string
     default: { concat: [ 'aks-test-rg', { get_input: resource_suffix } ] }
 
   managed_cluster_name:
+    display_label: Managed Cluster Name
     type: string
     default: { concat: [ 'aks-test-mc', { get_input: resource_suffix } ] }
 

@@ -26,7 +26,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
+      type: cloudify.nodes.keys.RSAKey
       properties:
         resource_config:
           key_name: { get_input: agent_key_name }
@@ -39,8 +39,6 @@ node_templates:
             implementation: keys.cloudify_ssh_key.operations.create
             inputs:
               store_private_key_material: true
-
-
 
 #          - name: prometheus-node-exporter
 #            sudo:

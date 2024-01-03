@@ -8,26 +8,32 @@ imports:
 inputs:
 
   kubespray_ansible_playbook_path:
+    display_label: Kubespray Ansible Playbook Path
     type: string
     default: kubespray/cluster.yml
 
   kubespray_ansible_playbook_path_scale:
+    display_label: Kubespray Ansible Playbook Path Scale
     type: string
     default: kubespray/scale.yml
 
   kubespray_ansible_playbook_path_removal:
+    display_label: Kubespray Ansible Playbook Path Removal
     type: string
     default: kubespray/remove-node.yml
 
   kubespray_dns_mode:
+    display_label: Kubespray Dns Mode
     type: string
     default: coredns
 
   kubespray_kube_network_plugin:
+    display_label: Kubespray Kube Network Plugin
     type: string
     default: flannel
 
   kubespray_ansible_ssh_common_args:
+    display_label: Kubespray Ansible Ssh Common Args
     type: string
     default: '-o ControlMaster=auto -o ControlPersist=30m -o ConnectionAttempts=100 -o UserKnownHostsFile=/dev/null -o "StrictHostKeyChecking no"'
 

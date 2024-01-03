@@ -9,16 +9,19 @@ imports:
 inputs:
 
   mgmt_ip:
+    display_label: Mgmt Ip
     type: string
     description: >
       Management IP address
     default: "10.239.1.112"
 
   username:
+    display_label: Username
     type: string
     default: "admin"
 
   password:
+    display_label: Password
     type: string
     default: "admin"
 

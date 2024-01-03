@@ -66,17 +66,16 @@ node_templates:
           adminUsername: { get_secret: bigip_username }
           adminPassword: { get_secret: bigip_password }
     relationships:
-    - type: cloudify.azure.relationships.contained_in_resource_group
-      target: resource_group
-    - type: cloudify.azure.relationships.connected_to_storage_account
-      target: storage_account
-    - type: cloudify.azure.relationships.connected_to_nic
-      target: wan_nic
-    - type: cloudify.azure.relationships.connected_to_nic
-      target: public_nic
-    - type: cloudify.azure.relationships.connected_to_nic
-      target: mgmt_nic
-
+      - type: cloudify.azure.relationships.contained_in_resource_group
+        target: resource_group
+      - type: cloudify.azure.relationships.connected_to_storage_account
+        target: storage_account
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: wan_nic
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: public_nic
+      - type: cloudify.azure.relationships.connected_to_nic
+        target: mgmt_nic
 
   storage_account:
     type: cloudify.azure.nodes.storage.StorageAccount

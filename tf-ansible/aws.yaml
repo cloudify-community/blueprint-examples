@@ -9,6 +9,7 @@ imports:
 
 inputs:
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     description: AWS Region to deploy resources into
     default: us-east-1
@@ -39,23 +40,28 @@ inputs:
         - sa-east-1
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: EC2 instance type to deploy (e.g., t2.small)
     default: t2.small
 
   public_key_content:
+    display_label: Public Key Content
     type: string
     description: Contents of a public key. The corresponding private key must be in the secret store.
 
   vpc_cidr:
+    display_label: Vpc Cidr
     type: string
     description: CIDR network for the deployed VPC
 
   subnet_cidr:
+    display_label: Subnet Cidr
     type: string
     description: CIDR network for the deployed subnet. Must fall within the VPC CIDR.
 
   website_message:
+    display_label: Website Message
     type: string
     description: A message to display on the home page of the deployed web server
     default: Welcome to NGINX, deployed by Cloudify
@@ -67,7 +73,7 @@ node_templates:
     properties:
       resource_config:
         installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
-  
+
   shared_resources:
     type: cloudify.nodes.terraform.Module
     properties:

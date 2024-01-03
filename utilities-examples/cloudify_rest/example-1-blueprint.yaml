@@ -9,12 +9,14 @@ imports:
 inputs:
 
   rest_endpoint:
+    display_label: Rest Endpoint
     type: string
     description: >
       REST API endpoint
     default: "jsonplaceholder.typicode.com"
 
   rest_endpoint_cert_path:
+    display_label: Rest Endpoint Cert Path
     type: string
     description: >
       REST API endpoint CA_BUNDLE
@@ -26,6 +28,7 @@ inputs:
     default: { get_secret: cacert_bundle }
 
   rest_endpoint_cert:
+    display_label: Rest Endpoint Cert
     type: string
     description: >
       REST API endpoint CA_BUNDLE

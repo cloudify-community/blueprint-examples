@@ -10,58 +10,70 @@ imports:
 inputs:
 
   external_network_id:
+    display_label: External Network Id
     type: string
     description: Openstack tenant external network name.
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_suffix }
 
   nameservers:
+    display_label: Nameservers
     type: list
     default: [8.8.4.4, 8.8.8.8]
 
   mgmt_subnet_cidr:
+    display_label: Mgmt Subnet Cidr
     type: string
     default: 10.10.1.0/24
 
   mgmt_subnet_allocation_pools:
+    display_label: Mgmt Subnet Allocation Pools
     type: list
     default:
       - start: 10.10.1.2
         end: 10.10.1.254
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: 10.10.2.0/24
 
   public_subnet_allocation_pools:
+    display_label: Public Subnet Allocation Pools
     type: list
     default:
       - start: 10.10.2.2
         end: 10.10.2.254
 
   wan_subnet_cidr:
+    display_label: Wan Subnet Cidr
     type: string
     default: 10.10.3.0/24
 
   wan_subnet_allocation_pools:
+    display_label: Wan Subnet Allocation Pools
     type: list
     default:
       - start: 10.10.3.2
         end: 10.10.3.254
 
   lan_subnet_cidr:
+    display_label: Lan Subnet Cidr
     type: string
     default: 10.10.4.0/24
 
   lan_subnet_allocation_pools:
+    display_label: Lan Subnet Allocation Pools
     type: list
     default:
       - start: 10.10.4.2

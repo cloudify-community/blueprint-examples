@@ -9,6 +9,7 @@ imports:
 inputs:
 
   rest_endpoint:
+    display_label: Rest Endpoint
     type: string
     description: >
       REST API endpoint

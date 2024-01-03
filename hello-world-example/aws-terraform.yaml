@@ -14,20 +14,24 @@ imports:
 inputs:
 
   agent_user:
+    display_label: Agent User
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'ubuntu'
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: 'us-east-1'
 
   aws_zone_name:
+    display_label: Aws Zone Name
     type: string
     default: { concat: [ { get_input: aws_region_name }, 'd' ] }
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -67,7 +71,7 @@ node_templates:
             ip: { get_attribute: [ SELF, resources, eip, instances, 0, attributes, public_ip ] }
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

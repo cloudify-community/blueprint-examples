@@ -9,6 +9,7 @@ imports:
 inputs:
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "ansible_local:0.1"
@@ -20,7 +21,6 @@ dsl_definitions:
 
 node_templates:
 
-
   docker_ansible_container:
     type: cloudify.nodes.docker.container
     properties:
@@ -31,8 +31,8 @@ node_templates:
           command: 'ansible-playbook -i hosts create.yaml'
           working_dir: '/'
           environment:
-            ANSIBLE_HOST_KEY_CHECKING: False
-            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
+            ANSIBLE_HOST_KEY_CHECKING: false
+            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: false
     interfaces:
       cloudify.interfaces.lifecycle:
         stop:

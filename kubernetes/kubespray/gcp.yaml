@@ -13,35 +13,42 @@ imports:
 inputs:
 
   region:
+    display_label: Region
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
     default: 'europe-west1'
 
   zone:
+    display_label: Zone
     type: string
     description: The GCP zone to deploy the application in, such as europe-west1-b.
     default: 'europe-west1-b'
 
   env_name:
+    display_label: Env Name
     type: string
     default: 'kube'
 
   network_name:
+    display_label: Network Name
     type: string
     description: The name of your GCP Virtual Network.
-    default: { concat: [ { get_input: env_name } ,vnet ] }
+    default: { concat: [ { get_input: env_name }, vnet ] }
 
   subnet_name:
+    display_label: Subnet Name
     type: string
     description: The name of your GCP Virtual Network.
-    default: { concat: [ { get_input: env_name } ,vsubnet ] }
+    default: { concat: [ { get_input: env_name }, vsubnet ] }
 
   image:
+    display_label: Image
     type: string
     description: A Centos 7 image.
     default: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-7-v20170523
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: A small GCP machine type.
     default: n1-standard-2
@@ -51,6 +58,7 @@ inputs:
     default: centos
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -155,7 +163,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
+      type: cloudify.nodes.keys.RSAKey
       properties:
         resource_config:
           key_name: { get_input: agent_key_name }

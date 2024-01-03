@@ -10,12 +10,14 @@ imports:
 inputs:
 
   agent_user:
+    display_label: Agent User
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'ubuntu'
 
   region_name:
+    display_label: Region Name
     type: string
     default: 'eastus'
     constraints:
@@ -69,6 +71,7 @@ inputs:
           - swedensouth
 
   image:
+    display_label: Image
     type: list
     description: Azure Image reference
     default:
@@ -78,18 +81,22 @@ inputs:
       version: latest
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   location:
+    display_label: Location
     type: string
     default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
 
   source_path:
+    display_label: Source Path
     type: string
     default: template/modules/azure/public_vm
 
   prefix:
+    display_label: Prefix
     type: string
     default: cfy
 
@@ -121,7 +128,7 @@ node_templates:
         type: cloudify.relationships.depends_on
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

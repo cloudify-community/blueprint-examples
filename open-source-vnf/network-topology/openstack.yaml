@@ -15,32 +15,39 @@ imports:
 inputs:
 
   external_network_id:
+    display_label: External Network Id
     type: string
     description: OpenStack tenant external network id.
 
   router_id:
+    display_label: Router Id
     type: string
     description: Cloudify Manager's connected router ID
 
   mgmt_network_id:
+    display_label: Mgmt Network Id
     type: string
     description: Cloudify Manager's network ID
 
   region:
+    display_label: Region
     type: string
     default: ''
 
   nameservers:
+    display_label: Nameservers
     type: list
     description: DNS servers to configure on the machine.
     default: [8.8.4.4, 8.8.8.8]
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     description: Network between the HA-Proxy and the pFsense.
     default: 10.10.0.0/24
 
   public_subnet_application_pool:
+    display_label: Public Subnet Application Pool
     type: list
     description: IP pool for the public network to associate IP from.
     default:
@@ -48,11 +55,13 @@ inputs:
         end: 10.10.0.254
 
   private_subnet_cidr:
+    display_label: Private Subnet Cidr
     type: string
     description: Network between the pFsense and the HTTPd.
     default: 10.10.1.0/24
 
   private_subnet_application_pool:
+    display_label: Private Subnet Application Pool
     type: list
     description: IP pool for the private network to associate IP from.
     default:

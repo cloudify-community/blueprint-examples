@@ -9,24 +9,29 @@ imports:
 inputs:
 
   docker_host:
+    display_label: Docker Host
     type: string
     required: true
 
   docker_user:
+    display_label: Docker User
     type: string
     required: true
 
   centos_version:
+    display_label: Centos Version
     description: Ansible version to prepare image for
     type: string
     default: "7"
 
   container_volume:
+    display_label: Container Volume
     description: volume that will be mapped to container
     type: string
     default: "/mnt/vol1"
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "centos:"

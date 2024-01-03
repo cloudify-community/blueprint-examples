@@ -9,10 +9,12 @@ imports:
 inputs:
 
   endpoint:
+    display_label: Endpoint
     type: string
     default: api.github.com
 
   commit:
+    display_label: Commit
     type: string
 
 node_templates:

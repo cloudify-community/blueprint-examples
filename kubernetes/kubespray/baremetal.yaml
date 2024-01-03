@@ -11,7 +11,6 @@ imports:
 
 inputs:
 
-
   master_ip:
     description: >
       The ip address used for the master.
@@ -32,7 +31,6 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
-
 node_types:
 
   k8s-cluster: &k8s-cluster
@@ -44,7 +42,6 @@ node_types:
           user: { get_input: agent_user }
           port: 22
           key: { get_input: agent_key_private }
-
 
   kube-master: *k8s-cluster
 
@@ -61,7 +58,6 @@ node_templates:
     type: kube-node
     properties:
       ip: { get_input: node_ip }
-
 
 groups:
 

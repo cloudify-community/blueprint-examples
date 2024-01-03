@@ -10,6 +10,7 @@ imports:
 inputs:
 
   database_deployment:
+    display_label: Database Deployment
     description: >
       The deployment ID of an existing deployment.
       For example, db or public-cloud-db.

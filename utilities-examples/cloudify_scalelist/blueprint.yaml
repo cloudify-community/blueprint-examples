@@ -104,14 +104,14 @@ node_templates:
       cloudify.interfaces.lifecycle:
         create:
           inputs:
-            defined_in_inputs: { get_attribute: [one,  resource_id]  }
+            defined_in_inputs: { get_attribute: [one, resource_id] }
 # Toggle to test wait for failed tasks.
 #        start:
 #          executor: central_deployment_agent
 #          implementation: scripts/start.py
         delete:
           inputs:
-            defined_in_inputs: { get_attribute: [one,  resource_id]  }
+            defined_in_inputs: { get_attribute: [one, resource_id] }
 
   three:
     type: scale_example_compute
@@ -131,10 +131,10 @@ node_templates:
      cloudify.interfaces.lifecycle:
        create:
          inputs:
-           defined_in_inputs: { get_attribute: [three,  resource_id]  }
+           defined_in_inputs: { get_attribute: [three, resource_id] }
        delete:
          inputs:
-           defined_in_inputs: { get_attribute: [three,  resource_id]  }
+           defined_in_inputs: { get_attribute: [three, resource_id] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: two
@@ -150,10 +150,10 @@ node_templates:
      cloudify.interfaces.lifecycle:
        create:
          inputs:
-           defined_in_inputs: { get_attribute: [four,  resource_id]  }
+           defined_in_inputs: { get_attribute: [four, resource_id] }
        delete:
          inputs:
-           defined_in_inputs: { get_attribute: [four,  resource_id]  }
+           defined_in_inputs: { get_attribute: [four, resource_id] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: four
@@ -169,10 +169,10 @@ node_templates:
      cloudify.interfaces.lifecycle:
        create:
          inputs:
-           defined_in_inputs: { get_attribute: [four,  resource_id]  }
+           defined_in_inputs: { get_attribute: [four, resource_id] }
        delete:
          inputs:
-           defined_in_inputs: { get_attribute: [four,  resource_id]  }
+           defined_in_inputs: { get_attribute: [four, resource_id] }
     relationships:
       - type: cloudify.relationships.connected_to
         target: four
@@ -205,19 +205,19 @@ policies:
   two_scaling_policy:
     type: cloudify.policies.scaling
     properties:
-      default_instances:  1
+      default_instances: 1
     targets: [two_scale]
 
   four_scaling_policy:
     type: cloudify.policies.scaling
     properties:
-      default_instances:  1
+      default_instances: 1
     targets: [four_scale]
 
   five_scaling_policy:
     type: cloudify.policies.scaling
     properties:
-      default_instances:  0
+      default_instances: 0
     targets: [five_scale]
 
   # Failed to validate blueprint Nodes and groups cannot be members in multiple

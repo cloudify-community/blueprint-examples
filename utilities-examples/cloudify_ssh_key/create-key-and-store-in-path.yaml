@@ -9,18 +9,22 @@ imports:
 inputs:
 
   private_key_path:
+    display_label: Private Key Path
     type: string
     default: ~/.ssh/example-key.pem
 
   public_key_path:
+    display_label: Public Key Path
     type: string
     default: ~/.ssh/example-key.pem.pub
 
   use_secret_store:
+    display_label: Use Secret Store
     type: string
     default: false
 
   openssh_format:
+    display_label: Openssh Format
     type: string
     default: true
 
@@ -33,7 +37,7 @@ dsl_definitions:
 node_templates:
 
   manager_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config: *RESOURCE_CONFIG
       use_secret_store: { get_input: use_secret_store }

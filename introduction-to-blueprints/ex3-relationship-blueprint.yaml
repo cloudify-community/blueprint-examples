@@ -14,11 +14,13 @@ imports:
 inputs:
 
   webserver_port:
+    display_label: Webserver Port
     type: string
     description: The HTTP web server port
     default: 8000
 
   app_git:
+    display_label: App Git
     type: string
     description: A url of a web based javascript application
     default: https://github.com/zxcodes/Calculator

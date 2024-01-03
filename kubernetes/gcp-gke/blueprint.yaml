@@ -10,18 +10,22 @@ imports:
 
 inputs:
   gcp_credentials:
+    display_label: Gcp Credentials
     type: string
     default: { get_secret: gcp_credentials }
 
   zone:
+    display_label: Zone
     type: string
     default: 'us-west1-a'
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     default: ex2
 
   env_name:
+    display_label: Env Name
     type: string
     default: { get_input: resource_prefix }
 

@@ -9,6 +9,7 @@ imports:
 
 inputs:
   env_name:
+    display_label: Env Name
     type: string
     default: ''
     constraints:
@@ -28,20 +29,22 @@ inputs:
         - CanadaCentral
 
   cidr_block:
+    display_label: Cidr Block
     type: string
     default: 10.0.0.0/16
     hidden: true
 
   subnet_1_cidr:
+    display_label: Subnet 1 Cidr
     type: string
     default: 10.0.0.0/24
     hidden: true
 
   subnet_2_cidr:
+    display_label: Subnet 2 Cidr
     type: string
     default: 10.0.1.0/24
     hidden: true
-
 
 node_templates:
   prefix:
@@ -67,11 +70,11 @@ node_templates:
         variables:
           azure_location_name: { get_input: azure_location_name }
           rg_name: { concat : [ { get_attribute : [prefix, value] }, 'rg' ] }
-          rg_tags: 
+          rg_tags:
             Name: { get_attribute : [prefix, value] }
-          sg_name: { concat: [ { get_attribute : [prefix, value] } , '-cfy-agents' ] }
+          sg_name: { concat: [ { get_attribute : [prefix, value] }, '-cfy-agents' ] }
           vnet_name: { concat: [ { get_attribute : [prefix, value] }, '-vnet' ] }
-          vnet_tags: 
+          vnet_tags:
             Name: { concat: [ { get_attribute : [prefix, value] }, '-vnet' ] }
           cidr_block: { get_input: cidr_block }
           subnet_1_name: { concat: [ { get_attribute : [prefix, value] }, '-subnet-1' ] }
@@ -88,8 +91,8 @@ node_templates:
         type: cloudify.relationships.depends_on
 
 labels:
-  obj-type: 
-    values: 
+  obj-type:
+    values:
       - aws
       - terraform
 
@@ -105,7 +108,7 @@ capabilities:
   subnet_ids:
     description: |
       Azure ID's of subnets
-    value: 
+    value:
       - { get_attribute: [ terraform_module, resources, subnet_1, instances, 0, attributes, name ] }
       - { get_attribute: [ terraform_module, resources, subnet_2, instances, 0, attributes, name ] }
   agents_security_group_id:

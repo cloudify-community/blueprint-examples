@@ -9,38 +9,45 @@ imports:
 inputs:
 
   install_playbook_name:
+    display_label: Install Playbook Name
     description: installation playbook name
     type: string
     default: "create.yaml"
 
   install_playbook:
+    display_label: Install Playbook
     description: >
       installation playbook path [inside blueprint to be exported to docker host]
     type: string
     default: {concat: ["ansible/", {get_input: install_playbook_name}]}
 
   uninstall_playbook_name:
+    display_label: Uninstall Playbook Name
     description: uninstallation playbook name
     type: string
     default: "delete.yaml"
 
   uninstall_playbook:
+    display_label: Uninstall Playbook
     description: >
       uninstallation playbook path [inside blueprint to be exported to docker host]
     type: string
     default: {concat: ["ansible/", {get_input: uninstall_playbook_name}]}
 
   ansible_version:
+    display_label: Ansible Version
     description: Ansible version to prepare image for
     type: string
     default: "2.9.5"
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "ansible:"
 
   container_volume:
+    display_label: Container Volume
     description: volume that will be mapped to container
     type: string
     default: "/ansible-playbooks"
@@ -127,8 +134,8 @@ node_templates:
           command: { get_attribute: [install_ansible_container_files, ansible_container_command_arg] }
           working_dir: { get_input: container_volume }
           environment:
-            ANSIBLE_HOST_KEY_CHECKING: False
-            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
+            ANSIBLE_HOST_KEY_CHECKING: false
+            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: false
           volumes:
             - { get_input: container_volume }
           volumes_mapping:

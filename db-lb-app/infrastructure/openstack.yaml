@@ -21,10 +21,12 @@ labels:
 inputs:
 
   env_name:
+    display_label: Env Name
     description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
   network_deployment_name:
+    display_label: Network Deployment Name
     description: >
       The deployment ID of an existing deployment.
       For example, openstack-example-network.
@@ -37,37 +39,44 @@ inputs:
     default: openstack
 
   openstack_region:
+    display_label: Openstack Region
     description: >
       The Openstack region_name, for example RegionOne.
     type: string
     default: { get_secret: openstack_region }
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     description: The CIDR of the public subnet.
     type: string
     default: 10.10.1.0/24
 
   agent_user:
+    display_label: Agent User
     description: The SSH username.
     type: string
     default: centos
 
   image_id:
+    display_label: Image Id
     description: The ID of Centos 7 image that is available in your account.
     type: string
     default: { get_secret: base_image_id }
 
   flavor_id:
+    display_label: Flavor Id
     description: The ID of an appropriate flavor that is available in your account, for example 3.
     type: string
     default: { get_secret: base_flavor_id }
 
   user_domain_name:
+    display_label: User Domain Name
     description: Openstack user domain name.
     type: string
     default: default
 
   project_domain_name:
+    display_label: Project Domain Name
     description: The name of your OpenStack project.
     type: string
     default: default

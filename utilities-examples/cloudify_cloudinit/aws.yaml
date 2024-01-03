@@ -10,31 +10,38 @@ imports:
 inputs:
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     description: The AWS region name, such as us-east-1 or us-west-1.
     default: 'us-east-1'
 
   aws_availability_zone:
+    display_label: Aws Availability Zone
     type: string
     default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   public_key:
+    display_label: Public Key
     type: string
     default: { get_secret: agent_key_public }
 
   vpc_cidr:
+    display_label: Vpc Cidr
     type: string
     default: 10.10.0.0/16
 
   subnet_cidr:
+    display_label: Subnet Cidr
     type: string
     default: 10.10.0.0/24
 
   ami_image_filter_name:
+    display_label: Ami Image Filter Name
     type: string
     default: 'ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-20170727'
 
   ami_image_filter_owner:
+    display_label: Ami Image Filter Owner
     type: string
     default: '099720109477'
 

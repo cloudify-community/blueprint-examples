@@ -9,6 +9,7 @@ imports:
 inputs:
 
   file_path:
+    display_label: File Path
     description: Path to save the file.
     type: string
 

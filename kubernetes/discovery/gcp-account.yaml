@@ -10,11 +10,13 @@ imports:
 inputs:
 
   gcp-credentials-secret:
+    display_label: Gcp-Credentials-Secret
     type: string
     required: false
     default: gcp_credentials
 
   zone:
+    display_label: Zone
     type: string
     default: 'us-west1-a'
 

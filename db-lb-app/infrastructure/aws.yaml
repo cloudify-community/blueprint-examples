@@ -23,10 +23,12 @@ labels:
 inputs:
 
   env_name:
+    display_label: Env Name
     description: A prefix for resource names for resources that will be created, for example, db or lb.
     type: string
 
   network_deployment_name:
+    display_label: Network Deployment Name
     description: >
       The deployment ID of an existing deployment.
       For example, aws-example-network.
@@ -39,12 +41,14 @@ inputs:
     default: aws
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: >
       The AWS instance_type.
     default: 't2.micro'
 
   agent_user:
+    display_label: Agent User
     type: string
     description: >
       The username of the agent running on the instance created from the image.

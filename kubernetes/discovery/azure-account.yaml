@@ -10,21 +10,25 @@ imports:
 inputs:
 
   subscription-id-secret:
+    display_label: Subscription-Id-Secret
     type: string
     required: false
     default: azure_subscription_id
 
   tenant-id-secret:
+    display_label: Tenant-Id-Secret
     type: string
     required: false
     default: azure_tenant_id
 
   client-id-secret:
+    display_label: Client-Id-Secret
     type: string
     required: false
     default: azure_client_id
 
   client-secret-secret:
+    display_label: Client-Secret-Secret
     type: string
     required: false
     default: azure_client_secret

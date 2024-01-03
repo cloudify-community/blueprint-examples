@@ -9,6 +9,7 @@ imports:
 
 inputs:
   image:
+    display_label: Image
     type: dict
     description: Image information
     default:
@@ -18,25 +19,30 @@ inputs:
       version: latest
 
   size:
+    display_label: Size
     type: string
     description: Name of Virtual Machine Size in Azure.
     default: Basic_A0
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 60
 
   network_deployment_name:
+    display_label: Network Deployment Name
     type: string
     description: Name of deployment responsible for creation resource group, security group and networks.
     default: VNFM-Networking-Prov-Azure-networks
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Azure.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Azure.
     default: { get_secret: resource_suffix }
@@ -124,7 +130,7 @@ node_templates:
             content: { get_secret: webserver_website }
 
   keypair:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         public_key_path:

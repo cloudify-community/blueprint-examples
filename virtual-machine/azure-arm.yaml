@@ -10,37 +10,43 @@ imports:
 inputs:
 
   env_name:
+    display_label: Env Name
     type: string
     description: Control parameters for names in resources.
     default: 'cfyinfraarm'
 
   resource_prefix:
-    default: {  get_input: env_name }
+    default: { get_input: env_name }
 
   resource_suffix:
     default: '0'
 
   resource_group_name:
+    display_label: Resource Group Name
     type: string
     description: Your Azure Resource Group.
     default: { concat: [ { get_input: resource_prefix }, rg, { get_input: resource_suffix } ] }
 
   network_name:
+    display_label: Network Name
     type: string
     description: Your Azure Virtual Network.
     default: { concat: [ { get_input: resource_prefix }, vn, { get_input: resource_suffix } ] }
 
   subnet_name:
+    display_label: Subnet Name
     type: string
     description: Your Azure Virtual Network Subnet.
     default: { concat: [ { get_input: resource_prefix }, sub, { get_input: resource_suffix } ] }
 
   location:
+    display_label: Location
     type: string
     description: Your Azure Region.
     default: eastus2
 
   priority:
+    display_label: Priority
     type: string
     description: The VM's priority
     constraints:
@@ -60,12 +66,14 @@ inputs:
       version: latest
 
   size:
+    display_label: Size
     description: >
        Name of Virtual Machine Size in Azure.
     type: string
     default: Standard_B1s
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 60
 
@@ -74,6 +82,7 @@ inputs:
     default: centos
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -113,7 +122,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

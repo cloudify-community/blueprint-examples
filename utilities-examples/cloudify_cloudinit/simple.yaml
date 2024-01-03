@@ -9,18 +9,22 @@ imports:
 inputs:
 
   user:
+    display_label: User
     type: string
     default: centos
 
   group:
+    display_label: Group
     type: string
     default: wheel
 
   shell:
+    display_label: Shell
     type: string
     default: /bin/bash
 
   sudo:
+    display_label: Sudo
     type: list
     default: ['ALL=(ALL) NOPASSWD:ALL']
 

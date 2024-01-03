@@ -10,25 +10,30 @@ imports:
 inputs:
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 60
 
   network_api_version:
+    display_label: Network Api Version
     type: string
     description: API Version for Network
     default: "2015-06-15"
 
   azure_network_deployment_name:
+    display_label: Azure Network Deployment Name
     type: string
     description: Name of deployment responsible for creation resource group, security group and networks.
     default: VNFM-Networking-Prov-Azure-networks
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Azure.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Azure.
     default: { get_secret: resource_suffix }

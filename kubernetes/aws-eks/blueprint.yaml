@@ -796,7 +796,7 @@ node_templates:
         postdelete: {}
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

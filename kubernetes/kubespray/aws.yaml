@@ -24,10 +24,12 @@ inputs:
     default: { get_secret: aws_secret_access_key }
 
   region_name:
+    display_label: Region Name
     type: string
     default: 'eu-central-1'
 
   availability_zone:
+    display_label: Availability Zone
     type: string
     default: { concat: [ { get_input: region_name }, 'b' ] }
 
@@ -57,6 +59,7 @@ inputs:
     default: 'ec2-user'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -82,7 +85,6 @@ node_types:
           user: { get_input: agent_user }
       use_public_ip:
         default: true
-
 
   kube-master: *k8s-cluster
 
@@ -421,7 +423,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
+      type: cloudify.nodes.keys.RSAKey
       properties:
         resource_config:
           key_name: { get_input: agent_key_name }

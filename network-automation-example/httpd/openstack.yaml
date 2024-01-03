@@ -9,28 +9,34 @@ imports:
 
 inputs:
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Openstack.
     default: { get_secret: resource_suffix }
 
   openstack_network_deployment_name:
+    display_label: Openstack Network Deployment Name
     type: string
     default: VNFM-Networking-Prov-Openstack-networks
 
   flavor_id:
+    display_label: Flavor Id
     type: string
     default: 3
 
   image_id:
+    display_label: Image Id
     type: string
     default: 1d6340df-2f14-41e6-ab27-bbd35e818fdf
 
   vnf_vm_name:
+    display_label: Vnf Vm Name
     type: string
     default: webserver
 
@@ -149,7 +155,7 @@ node_templates:
       use_external_resource: true
 
   keypair:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         public_key_path:

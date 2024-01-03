@@ -12,22 +12,27 @@ imports:
 inputs:
 
   subscription_id:
+    display_label: Subscription Id
     type: string
     default: { get_secret: azure_subscription_id }
 
   tenant_id:
+    display_label: Tenant Id
     type: string
     default: { get_secret: azure_tenant_id }
 
   client_id:
+    display_label: Client Id
     type: string
     default: { get_secret: azure_client_id }
 
   client_secret:
+    display_label: Client Secret
     type: string
     default: { get_secret: azure_client_secret }
 
   location:
+    display_label: Location
     type: string
     description: Your Azure Region.
     default: eastus2
@@ -53,6 +58,7 @@ inputs:
     default: centos
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: 10.10.0.0/24
 
@@ -60,6 +66,7 @@ inputs:
     description: a list of jobs.
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -224,8 +231,8 @@ node_templates:
           linuxConfiguration:
             ssh:
               publicKeys:
-              - keydata: { get_attribute: [agent_key, public_key_export] }
-                path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
+                - keydata: { get_attribute: [agent_key, public_key_export] }
+                  path: { concat: [ '/home/', { get_input: agent_user }, '/.ssh/authorized_keys' ] }
             disablePasswordAuthentication: true
     relationships:
       - type: cloudify.azure.relationships.contained_in_resource_group
