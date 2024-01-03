@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint is a configuration example.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin

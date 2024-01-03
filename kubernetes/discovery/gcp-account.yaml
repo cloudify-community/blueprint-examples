@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint uses the GCP plugin discovery type to discover GCP GKE clusters and expose them as services in Cloudify.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-gcp-plugin

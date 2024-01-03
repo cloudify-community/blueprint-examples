@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint deploys a Kubernetes workload on an exposed Kubernetes service,
+  which has been discovered using one of the discovery blueprints.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-kubernetes-plugin?version= >=2.13.0
@@ -19,6 +23,7 @@ labels:
 inputs:
 
   deployment:
+    display_label: Deployment
     type: string
     default: eks
 

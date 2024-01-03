@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint is included in other blueprints in order to set up a RSA key
+  and create a Cloud Init instruction to put that key on a VM.
+
 imports:
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 

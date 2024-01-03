@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates VMs Vsphere and installs on them Kubernetes using kubespray ansible role.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-vsphere-plugin

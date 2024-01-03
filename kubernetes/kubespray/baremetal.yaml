@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint installs Kubernetes using kubespray ansible role on some machine accessible at master_ip.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-ansible-plugin?version= >=2.10.0

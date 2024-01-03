@@ -1,5 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint deploys some Azure infrastructure using Terraform and installs some app using Ansible.
 
 imports:
   - cloudify/types/types.yaml

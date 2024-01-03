@@ -1,5 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint installs an application using Cloudify on Vsphere.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-vsphere-plugin

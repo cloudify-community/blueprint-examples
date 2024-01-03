@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a VM and network in GCP. It then installs docker on it. Then it builds a docker image on that vm. Finally, it creates a docker container from that image.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin

@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint is an Azure infrastructure blueprint that creates a VM and network using the Azure plugin.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-azure-plugin

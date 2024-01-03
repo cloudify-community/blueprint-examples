@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This is a Kubernetes plugin example that 
+  deploys some Kubernetes resources defined in the file k8s-resources.yaml.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-kubernetes-plugin?version= >=2.7.0

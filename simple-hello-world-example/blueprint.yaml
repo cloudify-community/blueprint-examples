@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint deploys a webserver on the Cloudify manager using a local python process.
+
 imports:
   - cloudify/types/types.yaml
 

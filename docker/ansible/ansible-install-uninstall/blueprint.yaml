@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint builds a docker image with Ansible and then runs a container using that image that reverts Ansible changes made in another container.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
