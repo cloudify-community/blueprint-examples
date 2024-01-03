@@ -134,8 +134,8 @@ node_templates:
           command: { get_attribute: [install_ansible_container_files, ansible_container_command_arg] }
           working_dir: { get_input: container_volume }
           environment:
-            ANSIBLE_HOST_KEY_CHECKING: false
-            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: false
+            ANSIBLE_HOST_KEY_CHECKING: False
+            ANSIBLE_INVALID_TASK_ATTRIBUTE_FAILED: False
           volumes:
             - { get_input: container_volume }
           volumes_mapping:
