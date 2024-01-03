@@ -16,22 +16,27 @@ imports:
 inputs:
 
   subscription_id:
+    display_label: Subscription Id
     type: string
     default: { get_secret: azure_subscription_id }
 
   tenant_id:
+    display_label: Tenant Id
     type: string
     default: { get_secret: azure_tenant_id }
 
   client_id:
+    display_label: Client Id
     type: string
     default: { get_secret: azure_client_id }
 
   client_secret:
+    display_label: Client Secret
     type: string
     default: { get_secret: azure_client_secret }
 
   location:
+    display_label: Location
     type: string
     description: Your Azure Region.
     default: westeurope
@@ -57,10 +62,12 @@ inputs:
     default: centos
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: 10.10.0.0/24
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -102,7 +109,6 @@ node_types:
         default: { get_input: location }
       storage_endpoint:
         default: core.windows.net
-
 
   kube-master: *k8s-cluster
 
@@ -260,7 +266,6 @@ node_templates:
       - type: cloudify.relationships.depends_on
         target: agent_key
 
-
   kube-master-ip:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
@@ -333,7 +338,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
+      type: cloudify.nodes.keys.RSAKey
       properties:
         resource_config:
           key_name: { get_input: agent_key_name }

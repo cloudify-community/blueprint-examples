@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint uses the AWS plugin discovery type to discover AWS EKS clusters and expose them as services in Cloudify.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-aws-plugin?version= >=2.12.3
@@ -8,14 +10,17 @@ imports:
 inputs:
 
   aws-access-key-id-secret:
+    display_label: Aws-Access-Key-Id-Secret
     type: string
     default: aws_access_key_id
 
   aws-secret-access-key-secret:
+    display_label: Aws-Secret-Access-Key-Secret
     type: string
     default: aws_secret_access_key
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: { get_secret: aws_region_name }
 

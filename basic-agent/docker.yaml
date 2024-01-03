@@ -11,6 +11,7 @@ imports:
 inputs:
 
   docker_ip:
+    display_label: Docker Ip
     type: string
 
   docker_endpoint:

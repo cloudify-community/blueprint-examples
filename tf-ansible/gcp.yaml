@@ -1,5 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint deploys some GCP infrastructure using Terraform and installs some app using Ansible.
 
 imports:
   - cloudify/types/types.yaml
@@ -8,6 +9,7 @@ imports:
 
 inputs:
   gcp_region_name:
+    display_label: Gcp Region Name
     type: string
     description: GCP Region to deploy instances into
     default: us-east1
@@ -42,36 +44,43 @@ inputs:
         - us-west2
         - us-west3
         - us-west4
-  
+
   zone:
+    display_label: Zone
     type: string
     description: The GCP zone to deploy the instance into
     default: { concat: [ { get_input: gcp_region_name }, "-b" ] }
 
   prefix:
+    display_label: Prefix
     type: string
     description: A prefix to add to names of deployed resources
     default: cfy
 
   project:
+    display_label: Project
     type: string
     description: Name of the GCP project to deploy resources into
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: GCP instance type to deploy (e.g., e2-small)
     default: e2-small
 
   public_key_content:
+    display_label: Public Key Content
     type: string
     description: Contents of a public key. The corresponding private key must be in the secret store.
 
   admin_user:
+    display_label: Admin User
     type: string
     description: User created on GCP instance
     default: centos
 
   website_message:
+    display_label: Website Message
     type: string
     description: A message to display on the home page of the deployed web server
     default: Welcome to NGINX, deployed by Cloudify
@@ -83,7 +92,7 @@ node_templates:
     properties:
       resource_config:
         installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
-  
+
   shared_resources:
     type: cloudify.nodes.terraform.Module
     properties:

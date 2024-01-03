@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint is included in other blueprints in order to set up a RSA key
+  and create a Cloud Init instruction to put that key on a VM.
+
 imports:
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 
@@ -22,7 +26,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-      type: cloudify.keys.nodes.RSAKey
+      type: cloudify.nodes.keys.RSAKey
       properties:
         resource_config:
           key_name: { get_input: agent_key_name }
@@ -35,8 +39,6 @@ node_templates:
             implementation: keys.cloudify_ssh_key.operations.create
             inputs:
               store_private_key_material: true
-
-
 
 #          - name: prometheus-node-exporter
 #            sudo:

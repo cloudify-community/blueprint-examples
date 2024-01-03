@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a network and VM in Azure.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-azure-plugin
@@ -8,58 +10,70 @@ imports:
 inputs:
 
   retry_after:
+    display_label: Retry After
     type: integer
     default: 5
 
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: Prefix of every resource created at this deployment on Azure.
     default: { get_secret: resource_prefix }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     description: Suffix of every resource created at this deployment on Azure.
     default: { get_secret: resource_suffix }
 
   azure_network_deployment_name:
+    display_label: Azure Network Deployment Name
     type: string
     default: VNFM-Networking-Prov-Azure-networks
 
   vm_size:
+    display_label: Vm Size
     type: string
     required: true
     default: Standard_B2s
 
   vm_os_family:
+    display_label: Vm Os Family
     type: string
     required: true
     default: linux
 
   vm_image_publisher:
+    display_label: Vm Image Publisher
     type: string
     required: true
     default: fortinet
 
   vm_image_offer:
+    display_label: Vm Image Offer
     type: string
     required: true
     default: fortinet_fortigate-vm_v5
 
   vm_image_sku:
+    display_label: Vm Image Sku
     type: string
     required: true
     default: fortinet_fg-vm
 
   vm_image_version:
+    display_label: Vm Image Version
     type: string
     required: true
     default: 6.0.7
 
   vnf_vm_name:
+    display_label: Vnf Vm Name
     type: string
     default: fortigate
 
   fortigate_license_filename:
+    display_label: Fortigate License Filename
     type: string
     description: Name of the Fortigate license file
       (It will be uploaded to Fortigate VM with this name).

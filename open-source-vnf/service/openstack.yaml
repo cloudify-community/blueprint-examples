@@ -1,5 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint composes and application from the blueprint IDs:
+  haproxy-openstack, pfsense-openstack, and httpd-openstack.
+
 imports:
   - haproxy--blueprint:haproxy-openstack
   - pfsense--blueprint:pfsense-openstack

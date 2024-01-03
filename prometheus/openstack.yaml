@@ -12,55 +12,68 @@ imports:
 inputs:
 
   auth_url:
+    display_label: Auth Url
     type: string
     default: { get_secret: openstack_auth_url }
 
   username:
+    display_label: Username
     type: string
     default: { get_secret: openstack_username }
 
   password:
+    display_label: Password
     type: string
     default: { get_secret: openstack_password }
 
   project_name:
+    display_label: Project Name
     type: string
     default: { get_secret: openstack_tenant_name }
 
   region_name:
+    display_label: Region Name
     type: string
 
   external_network_id:
+    display_label: External Network Id
     type: string
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: 10.10.1.0/24
 
   image_id:
+    display_label: Image Id
     type: string
 
   flavor_id:
+    display_label: Flavor Id
     type: string
 
   agent_user:
+    display_label: Agent User
     type: string
     default: centos
 
   user_domain_name:
+    display_label: User Domain Name
     description: Openstack user domain name.
     type: string
-    default:  default
+    default: default
 
   project_domain_name:
+    display_label: Project Domain Name
     description: The name of your OpenStack project.
     type: string
-    default:  default
+    default: default
 
   prometheus_scrape_jobs:
     description: a list of jobs.
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 

@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a VM in Vsphere.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-vsphere-plugin
@@ -7,75 +9,93 @@ imports:
 inputs:
 
   vsphere_port:
+    display_label: Vsphere Port
     type: string
     default: '443'
 
   vsphere_allow_insecure:
+    display_label: Vsphere Allow Insecure
     type: string
     default: true
 
   env_name:
+    display_label: Env Name
     type: string
     description: Control parameters for names in resources.
     default: '1'
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     default: { get_input: env_name }
 
   server_name:
+    display_label: Server Name
     type: string
     default: { concat: [ 'example-vm-1', { get_input: resource_suffix } ] }
 
   template_name:
+    display_label: Template Name
     type: string
     default: CentOS-7.8.2003-tmpl
 
   cpus:
+    display_label: Cpus
     type: string
     default: 1
 
   memory:
+    display_label: Memory
     type: string
     default: 1024
 
   domain:
+    display_label: Domain
     type: string
     default: localdom
 
   dns_servers:
+    display_label: Dns Servers
     type: list
     default: ['8.8.8.8']
 
   network_name:
+    display_label: Network Name
     type: string
     default: Internal
 
   switch_distributed:
+    display_label: Switch Distributed
     type: boolean
     default: false
 
   use_dhcp:
+    display_label: Use Dhcp
     type: boolean
     default: true
 
   network_cidr:
+    display_label: Network Cidr
     type: string
     default: 172.16.168.0/24
 
   gateway:
+    display_label: Gateway
     type: string
     default: 172.16.168.1
 
   ip:
+    display_label: Ip
     type: string
     default: 172.16.168.201
 
   agent_user:
+    display_label: Agent User
     type: string
     default: centos
 
   agent_key_private:
+    display_label: Agent Key Private
     type: string
     default: { get_secret: vsphere_private_key }
 

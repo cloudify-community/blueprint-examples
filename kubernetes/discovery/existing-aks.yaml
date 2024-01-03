@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint exposes an AKS cluster as a service in Cloudify.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-azure-plugin
@@ -7,32 +9,39 @@ imports:
 inputs:
 
   subscription-id-secret:
+    display_label: Subscription-Id-Secret
     type: string
     required: false
     default: azure_subscription_id
 
   tenant-id-secret:
+    display_label: Tenant-Id-Secret
     type: string
     required: false
     default: azure_tenant_id
 
   client-id-secret:
+    display_label: Client-Id-Secret
     type: string
     required: false
     default: azure_client_id
 
   client-secret-secret:
+    display_label: Client-Secret-Secret
     type: string
     required: false
     default: azure_client_secret
 
   resource_group_name:
+    display_label: Resource Group Name
     type: string
 
   managed_cluster_name:
+    display_label: Managed Cluster Name
     type: string
 
   env_name:
+    display_label: Env Name
     type: string
     default: { get_input: managed_cluster_name}
 

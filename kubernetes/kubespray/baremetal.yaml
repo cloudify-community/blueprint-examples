@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint installs Kubernetes using kubespray ansible role on some machine accessible at master_ip.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-ansible-plugin?version= >=2.10.0
@@ -8,7 +10,6 @@ imports:
   - includes/kube-config.yaml
 
 inputs:
-
 
   master_ip:
     description: >
@@ -30,7 +31,6 @@ inputs:
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
-
 node_types:
 
   k8s-cluster: &k8s-cluster
@@ -42,7 +42,6 @@ node_types:
           user: { get_input: agent_user }
           port: 22
           key: { get_input: agent_key_private }
-
 
   kube-master: *k8s-cluster
 
@@ -59,7 +58,6 @@ node_templates:
     type: kube-node
     properties:
       ip: { get_input: node_ip }
-
 
 groups:
 

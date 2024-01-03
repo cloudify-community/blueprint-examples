@@ -1,7 +1,9 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint deploys some Azure infrastructure using Terraform.
+
 imports:
-  - https://cloudify.co/spec/cloudify/6.2.0/types.yaml
+  - cloudify/types/types.yaml
   - plugin:cloudify-terraform-plugin?version= >=0.15.0
   - https://raw.githubusercontent.com/cloudify-community/eaas-example/master/utils/custom_types.yaml
 
@@ -12,6 +14,7 @@ labels:
 
 inputs:
   resource_prefix:
+    display_label: Resource Prefix
     type: string
     description: |
       If not provided, it will be auto-generated.
@@ -19,9 +22,9 @@ inputs:
     constraints:
       - pattern: '(^ *$)|(^[a-zA-Z][a-zA-Z0-9]+$)'
   region_name:
+    display_label: Region Name
     type: string
     default: 'westus'
-
 
 node_templates:
   prefix:

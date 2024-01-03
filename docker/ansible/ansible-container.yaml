@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint builds a docker image with Ansible and then runs a container using that image.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
@@ -7,36 +9,44 @@ imports:
 inputs:
 
   docker_host:
+    display_label: Docker Host
     type: string
     required: true
 
   docker_user:
+    display_label: Docker User
     type: string
     required: true
 
   ansible_host:
+    display_label: Ansible Host
     type: string
     required: true
 
   ansible_user:
+    display_label: Ansible User
     type: string
     required: true
 
   playbook_path:
+    display_label: Playbook Path
     type: string
     default: 'apache2/playbook.yaml'
 
   container_volume:
+    display_label: Container Volume
     description: volume that will be mapped to container
     type: string
     default: "/ansible-playbooks"
 
   ansible_version:
+    display_label: Ansible Version
     description: Ansible version to prepare image for
     type: string
     default: "2.9.5"
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "ansible:"

@@ -11,6 +11,7 @@ imports:
 inputs:
 
   kubernetes_master_configuration:
+    display_label: Kubernetes Master Configuration
     type: dict
     default:
       host: { get_secret: openshift_master_endpoint }
@@ -24,31 +25,37 @@ inputs:
     default: { get_input: kubernetes_master_configuration }
 
   app_name:
+    display_label: App Name
     type: string
     description: Prefix to use for application service / deployment names
     default: exampleapp
 
   namespace:
+    display_label: Namespace
     type: string
     description: OpenShift namespace to use
     default: { get_secret: openshift_namespace }
 
   fqdn_suffix:
+    display_label: Fqdn Suffix
     description: Domain name to append to form the final service endpoint URL.
     type: string
     default: apps.us-west-1.starter.openshift-online.com
 
   endpoint:
+    display_label: Endpoint
     description: Final service endpoint
     type: string
     default: { concat: [{ get_input: app_name }, '-', { get_input: namespace }, '.', { get_input: fqdn_suffix }] }
 
   container:
+    display_label: Container
     description: Standard container reference
     type: string
     default: jcornutt/cloudify:latest
 
   container_port:
+    display_label: Container Port
     description: Exposed container port to reference
     type: integer
     default: 8080

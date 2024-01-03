@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint is a Cloudify utilities plugin example.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
@@ -7,29 +9,34 @@ imports:
 inputs:
 
   terminal_ip:
+    display_label: Terminal Ip
     type: string
     description: >
        terminal server ip
     default: 127.0.0.1
 
   terminal_user:
+    display_label: Terminal User
     type: string
     description: >
        terminal server user
     default: terminal
   terminal_password:
+    display_label: Terminal Password
     type: string
     description: >
        terminal server user password
     default: terminal
 
   terminal_key_content:
+    display_label: Terminal Key Content
     type: string
     description: >
        terminal server user rsa key content, can be used instead password
     default: ""
 
   terminal_port:
+    display_label: Terminal Port
     type: integer
     description: >
        terminal server port, for fortigate ssh by default 22

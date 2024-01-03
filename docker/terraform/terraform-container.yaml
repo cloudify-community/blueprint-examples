@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint builds a docker image and runs terraform in a container using that docker image.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
@@ -7,51 +9,62 @@ imports:
 inputs:
 
   docker_host:
+    display_label: Docker Host
     type: string
     required: true
 
   docker_user:
+    display_label: Docker User
     type: string
     required: true
 
   terraform_source:
+    display_label: Terraform Source
     type: string
     default: https://github.com/cloudify-community/terraform-example.git
 
   container_volume:
+    display_label: Container Volume
     description: volume that will be mapped to container
     type: string
     default: "/terraform"
 
   terraform_version:
+    display_label: Terraform Version
     description: Terraform version to prepare image for
     type: string
     default: "0.11.7"
 
   terraform_plugins:
+    display_label: Terraform Plugins
     description: List of Plugins URLs to install on terraform container
     type: list
     default:
       - https://releases.hashicorp.com/terraform-provider-aws/2.49.0/terraform-provider-aws_2.49.0_linux_amd64.zip
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "terraform:"
 
   aws_access_key_id:
+    display_label: Aws Access Key Id
     type: string
     default: { get_secret: aws_access_key_id }
 
   aws_secret_access_key:
+    display_label: Aws Secret Access Key
     type: string
     default: { get_secret: aws_secret_access_key }
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: us-east-1
 
   public_key:
+    display_label: Public Key
     type: string
     default: { get_secret: agent_key_public }
 

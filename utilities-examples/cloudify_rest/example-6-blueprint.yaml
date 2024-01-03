@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint is a utilities plugin REST example.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
@@ -7,6 +9,7 @@ imports:
 inputs:
 
   rest_endpoint:
+    display_label: Rest Endpoint
     type: string
     description: >
       REST API endpoint

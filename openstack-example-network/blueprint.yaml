@@ -15,81 +15,98 @@ labels:
 inputs:
 
   external_network_id:
+    display_label: External Network Id
     type: string
     description: Openstack tenant external network name.
 
   username:
+    display_label: Username
     type: string
     description: OS_USERNAME as specified in Openstack RC file.
     default: { get_secret: openstack_username }
 
   password:
+    display_label: Password
     type: string
     description: Openstack user password.
     default: { get_secret: openstack_password }
 
   project_name:
+    display_label: Project Name
     type: string
     description: OS_TENANT_NAME as specified in Openstack RC file.
     default: { get_secret: openstack_tenant_name }
 
   auth_url:
+    display_label: Auth Url
     type: string
     description: OS_AUTH_URL as specified in Openstack RC file.
     default: { get_secret: openstack_auth_url }
 
   region:
+    display_label: Region
     type: string
     description: OS_REGION_NAME as specified in Openstack RC file.
     default: { get_secret: openstack_region }
 
   nameservers:
+    display_label: Nameservers
     type: list
     default: [8.8.4.4, 8.8.8.8]
 
   public_cidr:
+    display_label: Public Cidr
     type: string
     default: "0"
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: { concat: [ "10.10.", { get_input: public_cidr }, ".0/24" ] }
 
   public_subnet_allocation_pools:
+    display_label: Public Subnet Allocation Pools
     type: list
     default:
       - start: { concat: [ "10.10.", { get_input: public_cidr }, ".2" ] }
         end: { concat: [ "10.10.", { get_input: public_cidr }, ".254" ] }
 
   private_cidr:
+    display_label: Private Cidr
     type: string
     default: "1"
 
   private_subnet_cidr:
+    display_label: Private Subnet Cidr
     type: string
     default: { concat: [ "10.10.", { get_input: private_cidr }, ".0/24" ] }
 
   private_subnet_allocation_pools:
+    display_label: Private Subnet Allocation Pools
     type: string
     default:
       - start: { concat: [ "10.10.", { get_input: private_cidr }, ".2" ] }
         end: { concat: [ "10.10.", { get_input: private_cidr }, ".254" ] }
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     default: '-1'
 
   user_domain_name:
+    display_label: User Domain Name
     description: Openstack user domain name.
     type: string
     default: default
 
   project_domain_name:
+    display_label: Project Domain Name
     description: The name of your OpenStack project.
     type: string
     default: default
 
   client_config_dict:
+    display_label: Client Config Dict
     type: dict
     description: A dictionary containing the client configuration for Openstack.
       Default is for keystone v3. Provide an alternate input for keystone v2.

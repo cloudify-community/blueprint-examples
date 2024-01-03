@@ -194,7 +194,7 @@ Nodes:
 |  install_infra_playbook | scaling-example | scaling-example |         |         cloudify.nodes.Root          |   tenant   | default_tenant |          1          |              1              |   admin    |
 | install_eni_vm_playbook | scaling-example | scaling-example |         |         cloudify.nodes.Root          |   tenant   | default_tenant |          1          |              1              |   admin    |
 |        cloud_init       | scaling-example | scaling-example |         | cloudify.nodes.CloudInit.CloudConfig |   tenant   | default_tenant |          1          |              1              |   admin    |
-|        agent_key        | scaling-example | scaling-example |         |      cloudify.keys.nodes.RSAKey      |   tenant   | default_tenant |          1          |              1              |   admin    |
+|        agent_key        | scaling-example | scaling-example |         |      cloudify.nodes.keys.RSAKey      |   tenant   | default_tenant |          1          |              1              |   admin    |
 +-------------------------+-----------------+-----------------+---------+--------------------------------------+------------+----------------+---------------------+-----------------------------+------------+
 
 Showing 4 of 4 nodes
@@ -230,7 +230,7 @@ Nodes:
 |  install-infra-playbook | scaling-example | scaling-example |         |         cloudify.nodes.Root          |   tenant   | default_tenant |          1          |              1              |   admin    |
 | install_eni_vm-playbook | scaling-example | scaling-example |         |         cloudify.nodes.Root          |   tenant   | default_tenant |          2          |              2              |   admin    |
 |        cloud_init       | scaling-example | scaling-example |         | cloudify.nodes.CloudInit.CloudConfig |   tenant   | default_tenant |          1          |              1              |   admin    |
-|        agent_key        | scaling-example | scaling-example |         |      cloudify.keys.nodes.RSAKey      |   tenant   | default_tenant |          1          |              1              |   admin    |
+|        agent_key        | scaling-example | scaling-example |         |      cloudify.nodes.keys.RSAKey      |   tenant   | default_tenant |          1          |              1              |   admin    |
 +-------------------------+-----------------+-----------------+---------+--------------------------------------+------------+----------------+---------------------+-----------------------------+------------+
 
 Showing 4 of 4 nodes

@@ -1,5 +1,8 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: >
+  This blueprint installs an application using Cloudify on Vsphere.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-vsphere-plugin
@@ -115,7 +118,7 @@ node_templates:
             ip: { get_input: ip }
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

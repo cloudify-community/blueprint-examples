@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint configures a VM with cloud init capability to install prometheus service.
+
 imports:
   - plugin:cloudify-utilities-plugin?version= >=1.22.1
 

@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a VM in Vcloud.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-vcloud-plugin
@@ -8,51 +10,63 @@ imports:
 inputs:
 
   vcloud_user:
+    display_label: Vcloud User
     type: string
     default: { get_secret: vcloud_user }
 
   vcloud_password:
+    display_label: Vcloud Password
     type: string
     default: { get_secret: vcloud_password }
 
   vcloud_org:
+    display_label: Vcloud Org
     type: string
     default: { get_secret: vcloud_org }
 
   vcloud_uri:
+    display_label: Vcloud Uri
     type: string
     default: { get_secret: vcloud_uri }
 
   vcloud_vdc:
+    display_label: Vcloud Vdc
     type: string
     default: { get_secret: vcloud_vdc }
 
   vcloud_gateway:
+    display_label: Vcloud Gateway
     type: string
     default: { get_secret: vcloud_gateway }
 
   env_name:
+    display_label: Env Name
     type: string
     description: Control parameters for names in resources.
     default: '1'
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     default: { get_input: env_name }
 
   catalog:
+    display_label: Catalog
     type: string
     default: defaultcatalogue
 
   template:
+    display_label: Template
     type: string
     default: Centos7-GenericCloud
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   agent_user:
+    display_label: Agent User
     type: string
     default: centos
 
@@ -156,7 +170,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

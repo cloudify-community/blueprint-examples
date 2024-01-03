@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint makes some rest calls defined in templates/alice.yaml.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
@@ -7,16 +9,19 @@ imports:
 inputs:
 
   rest_endpoint:
+    display_label: Rest Endpoint
     type: string
     description: >
       REST API endpoint
 
   rest_endpoint_cert:
+    display_label: Rest Endpoint Cert
     type: string
     description: >
       REST API endpoint CA_BUNDLE
 
   rest_client_cert:
+    display_label: Rest Client Cert
     type: string
     description: >
       REST API client certificate

@@ -10,18 +10,22 @@ imports:
 inputs:
 
   database_name:
+    display_label: Database Name
     type: string
     default: drupal
 
   database_user:
+    display_label: Database User
     type: string
     default: drupal
 
   database_password:
+    display_label: Database Password
     type: string
     default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
 
   load_balancer_deployment:
+    display_label: Load Balancer Deployment
     type: string
     default: lb
 
@@ -53,8 +57,8 @@ node_templates:
             sources: { get_attribute: [ SELF, sources ] }
             run_data:
               drupal_database: { get_input: database_name }
-              drupal_username:  { get_input: database_user }
-              drupal_password:  { get_input: database_password }
+              drupal_username: { get_input: database_user }
+              drupal_password: { get_input: database_password }
               drupal_database_host: { get_capability: [ { get_input: load_balancer_deployment }, endpoint ] }
 
 outputs:

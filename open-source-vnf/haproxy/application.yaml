@@ -13,10 +13,12 @@ imports:
 inputs:
 
   host_string:
+    display_label: Host String
     type: string
     description: The host of the HAProxy.
 
   user:
+    display_label: User
     type: string
     description: User name used when SSH-ing into the started HAProxy machine.
     default: centos

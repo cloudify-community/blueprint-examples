@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a VM and network in Azure.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-azure-plugin
@@ -352,7 +354,7 @@ node_templates:
       azure_config: *azure_config
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

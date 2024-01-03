@@ -12,11 +12,13 @@ imports:
 inputs:
 
   user_domain_name:
+    display_label: User Domain Name
     description: Openstack user domain name.
     type: string
     default: default
 
   project_domain_name:
+    display_label: Project Domain Name
     description: The name of your OpenStack project.
     type: string
     default: default

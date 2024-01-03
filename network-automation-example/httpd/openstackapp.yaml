@@ -9,6 +9,7 @@ imports:
 inputs:
 
   webserver_vm_deployment_name:
+    display_label: Webserver Vm Deployment Name
     type: string
     description: Name of webserver Provisioning deployment
     default: VNFM-webserver-Prov-Openstack-vm

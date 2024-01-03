@@ -12,43 +12,52 @@ imports:
 inputs:
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: 'us-east-1'
 
   availability_zone:
+    display_label: Availability Zone
     type: string
     description: The availability zone in the AWS Region.
     default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   ami_owner_filter:
+    display_label: Ami Owner Filter
     type: string
     description: The AWS AMI owner number.
     default: '263721492972'
 
   ami_name_filter:
+    display_label: Ami Name Filter
     type: string
     description: The name of the AWS AMI in the AWS region.
     default: 'CentOS7-cloudify-examples-image'
 
   instance_type:
+    display_label: Instance Type
     type: string
     default: t2.micro
 
   agent_user:
+    display_label: Agent User
     type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'ec2-user'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   resource_suffix:
+    display_label: Resource Suffix
     type: string
     default: { get_input: env_name }
 
   env_name:
+    display_label: Env Name
     type: string
     description: Control parameters for names in resources.
     default: 'example'
@@ -144,7 +153,7 @@ node_templates:
         target: agent_key
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

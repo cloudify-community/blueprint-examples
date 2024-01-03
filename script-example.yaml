@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint demonstrates how to use the script plugin with no compute node to emit a log message.
+
 imports:
   - cloudify/types/types.yaml
 

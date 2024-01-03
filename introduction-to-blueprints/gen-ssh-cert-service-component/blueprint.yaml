@@ -13,7 +13,7 @@ inputs:
 node_templates:
 
   ssh_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: key_name }

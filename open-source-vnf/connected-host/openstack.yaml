@@ -13,19 +13,23 @@ imports:
 inputs:
 
   image:
+    display_label: Image
     description: An OpenStack Image ID.
     type: string
 
   flavor:
+    display_label: Flavor
     type: string
     description: An OpenStack Flavor ID.
 
   private_key_name:
+    display_label: Private Key Name
     type: string
     description: Private key pair name on OpenStack.
     default: agent_key_public
 
   region:
+    display_label: Region
     type: string
     default: ''
 

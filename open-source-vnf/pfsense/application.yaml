@@ -13,16 +13,19 @@ imports:
 inputs:
 
   rest_endpoint:
+    display_label: Rest Endpoint
     type: string
     description: >
       REST API endpoint of the pfSense instance
 
   api_key:
+    display_label: Api Key
     type: string
     description: >
       The api key for the REST service
 
   api_secret:
+    display_label: Api Secret
     type: string
     description: >
       The api secret for the REST service

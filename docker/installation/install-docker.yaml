@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint installs Docker on some VM at IP or hostname docker_host.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
@@ -7,10 +9,12 @@ imports:
 inputs:
 
   docker_host:
+    display_label: Docker Host
     type: string
     required: true
 
   docker_user:
+    display_label: Docker User
     type: string
     required: true
 

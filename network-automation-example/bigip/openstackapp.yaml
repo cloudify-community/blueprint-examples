@@ -10,6 +10,7 @@ imports:
 inputs:
 
   f5_vm_deployment_name:
+    display_label: F5 Vm Deployment Name
     type: string
     description: Name of BIG IP Provisioning deployment
     default: VNFM-F5-Prov-Openstack-vm

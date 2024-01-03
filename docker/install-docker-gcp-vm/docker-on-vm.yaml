@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a VM and network in GCP. It then installs docker on it. Then it builds a docker image on that vm. Finally, it creates a docker container from that image.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
@@ -9,44 +11,53 @@ imports:
 inputs:
 
   region:
+    display_label: Region
     type: string
     description: The GCP region to deploy the application in, such as europe-west1.
     default: 'europe-west1'
 
   zone:
+    display_label: Zone
     type: string
     description: The GCP zone to deploy the application in, such as europe-west1-b.
     default: 'europe-west1-b'
 
   image:
+    display_label: Image
     type: string
     description: Centos image.
     default: https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-7-v20191210
 
   agent_user:
+    display_label: Agent User
     type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   docker_user:
+    display_label: Docker User
     type: string
     description: Control parameters for names in resources.
     default: 'centos'
 
   centos_version:
+    display_label: Centos Version
     type: string
     default: "7"
 
   container_volume:
+    display_label: Container Volume
     type: string
     default: "/mnt/vol1"
 
   image_tag:
+    display_label: Image Tag
     type: string
     default: "centos:"
 
@@ -203,7 +214,7 @@ node_templates:
       auto_subnets: false
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

@@ -1,6 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
-description: Install Kubernetes using Kubespray on AWS.
+description: This blueprint creates a VM and network in AWS and installs prometheus on it.
 
 imports:
   - cloudify/types/types.yaml
@@ -12,57 +12,70 @@ imports:
 inputs:
 
   aws_access_key_id:
+    display_label: Aws Access Key Id
     type: string
     description: YOUR AWS ACCESS KEY ID
     default: { get_secret: aws_access_key_id }
 
   aws_secret_access_key:
+    display_label: Aws Secret Access Key
     type: string
     description: YOUR AWS SECRET ACCESS KEY
     default: { get_secret: aws_secret_access_key }
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: 'us-east-1'
 
   availability_zone:
+    display_label: Availability Zone
     type: string
     description: The availability zone in the AWS Region.
     default: { concat: [ { get_input: aws_region_name }, 'b' ] }
 
   ec2_region_endpoint:
+    display_label: Ec2 Region Endpoint
     type: string
     default: { concat: [ 'ec2.', { get_input: aws_region_name}, '.amazonaws.com' ] }
 
   vpc_cidr:
+    display_label: Vpc Cidr
     type: string
     default: 10.10.0.0/16
 
   public_subnet_cidr:
+    display_label: Public Subnet Cidr
     type: string
     default: 10.10.0.0/24
 
   private_subnet_cidr:
+    display_label: Private Subnet Cidr
     type: string
     default: 10.10.1.0/24
 
   ebs_volume_attachment_device:
+    display_label: Ebs Volume Attachment Device
     type: string
     default: /dev/sdh
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: The AWS instance type.
 
   agent_user:
+    display_label: Agent User
     type: string
     description: The name of the linux user.
 
   prometheus_scrape_jobs:
+    display_label: Prometheus Scrape Jobs
     type: list
     description: a list of jobs.
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -223,24 +236,24 @@ node_templates:
   security_group_rules:
     type: cloudify.nodes.aws.ec2.SecurityGroupRuleIngress
     properties:
-     client_config: *client_config
-     resource_config:
-      IpPermissions:
-        - IpProtocol: icmp
-          FromPort: -1
-          ToPort: -1
-          IpRanges:
-            - CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 0
-          ToPort: 65535
-          IpRanges:
-            - CidrIp: 0.0.0.0/0
-        - IpProtocol: udp
-          FromPort: 0
-          ToPort: 65535
-          IpRanges:
-            - CidrIp: 0.0.0.0/0
+      client_config: *client_config
+      resource_config:
+        IpPermissions:
+          - IpProtocol: icmp
+            FromPort: -1
+            ToPort: -1
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: tcp
+            FromPort: 0
+            ToPort: 65535
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
+          - IpProtocol: udp
+            FromPort: 0
+            ToPort: 65535
+            IpRanges:
+              - CidrIp: 0.0.0.0/0
     relationships:
       - type: cloudify.relationships.contained_in
         target: security_group
@@ -304,12 +317,12 @@ node_templates:
       resource_config:
         kwargs:
           Filters:
-          - Name: owner-id
-            Values:
-            - "263721492972"
-          - Name: name
-            Values:
-            - "CentOS7-cloudify-examples-image"
+            - Name: owner-id
+              Values:
+                - "263721492972"
+            - Name: name
+              Values:
+                - "CentOS7-cloudify-examples-image"
 
   prometheus-host:
     type: cloudify.nodes.aws.ec2.Instances

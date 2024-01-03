@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint sets up monitoring using the cloudify-web-monitoring-plugin.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-web-monitoring-plugin
@@ -7,6 +9,7 @@ imports:
 inputs:
 
   cluster_deployment_name:
+    display_label: Cluster Deployment Name
     type: string
 
 node_templates:
@@ -16,7 +19,7 @@ node_templates:
     properties:
       resource_config:
         deployment:
-          id: { get_input : cluster_deployment_name }
+          id: { get_input: cluster_deployment_name }
 
   monitor:
     type: cloudify.nodes.monitoring.Monitor

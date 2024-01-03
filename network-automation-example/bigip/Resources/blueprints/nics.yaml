@@ -55,7 +55,7 @@ node_templates:
   mgmt_ip_address:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
-      azure_config:  *client_config
+      azure_config: *client_config
       use_external_resource: false
       name: { concat: [ { get_input: resource_prefix }, 'bigip_mgmt_ia', { get_input: resource_suffix } ] }
       location: { get_secret: azure_location }
@@ -105,7 +105,7 @@ node_templates:
   public_ip_address:
     type: cloudify.azure.nodes.network.PublicIPAddress
     properties:
-      azure_config:  *client_config
+      azure_config: *client_config
       use_external_resource: false
       name: { concat: [ { get_input: resource_prefix }, 'bigip_public_ia', { get_input: resource_suffix } ] }
       location: { get_secret: azure_location }

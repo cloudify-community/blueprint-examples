@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a network in AWS and deploys an EKS cluster.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-aws-plugin?version= >=3.1.3
@@ -794,7 +796,7 @@ node_templates:
         postdelete: {}
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

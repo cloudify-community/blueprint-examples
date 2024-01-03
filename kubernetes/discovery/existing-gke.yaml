@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint exposes A GKE cluster as a service in Cloudify.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-gcp-plugin
@@ -7,17 +9,21 @@ imports:
 inputs:
 
   gcp-credentials-secret:
+    display_label: Gcp-Credentials-Secret
     type: string
     required: false
     default: gcp_credentials
 
   zone:
+    display_label: Zone
     type: string
 
   kubernetes_cluster_name:
+    display_label: Kubernetes Cluster Name
     type: string
 
   env_name:
+    display_label: Env Name
     type: string
     default: { get_input: kubernetes_cluster_name }
 

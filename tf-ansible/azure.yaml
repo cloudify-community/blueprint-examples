@@ -1,5 +1,6 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint deploys some Azure infrastructure using Terraform and installs some app using Ansible.
 
 imports:
   - cloudify/types/types.yaml
@@ -8,6 +9,7 @@ imports:
 
 inputs:
   azure_region_name:
+    display_label: Azure Region Name
     type: string
     description: Azure Region to deploy resources into
     default: eastus2
@@ -55,32 +57,38 @@ inputs:
           - australiacentral2
 
   instance_type:
+    display_label: Instance Type
     type: string
     description: Azure instance type to deploy (e.g., Standard_B1s)
     default: Standard_B1s
 
   network_cidr:
+    display_label: Network Cidr
     type: list
     description: A list of CIDR networks for the deployed Azure network
     default:
       - "10.0.0.0/16"
 
   subnet_cidr:
+    display_label: Subnet Cidr
     type: list
     description: A list of CIDR subnets for the deployed Azure subnet. Must fall within the network CIDR.
     default:
       - "10.0.1.0/24"
 
   prefix:
+    display_label: Prefix
     type: string
     description: A prefix to add to names of deployed resources
     default: cfy
 
   public_key_content:
+    display_label: Public Key Content
     type: string
     description: Contents of a public key. The corresponding private key must be in the secret store.
 
   website_message:
+    display_label: Website Message
     type: string
     description: A message to display on the home page of the deployed web server
     default: Welcome to NGINX, deployed by Cloudify
@@ -92,7 +100,7 @@ node_templates:
     properties:
       resource_config:
         installation_source: https://releases.hashicorp.com/terraform/1.1.4/terraform_1.1.4_linux_amd64.zip
-  
+
   shared_resources:
     type: cloudify.nodes.terraform.Module
     properties:

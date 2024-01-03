@@ -10,14 +10,17 @@ imports:
 inputs:
 
   database_name:
+    display_label: Database Name
     type: string
     default: drupal
 
   database_user:
+    display_label: Database User
     type: string
     default: drupal
 
   database_password:
+    display_label: Database Password
     type: string
     default: 'U2FsdGVkX19VxMEA6AdZt5fccsn/JsFU4eGpttt13JI='
 

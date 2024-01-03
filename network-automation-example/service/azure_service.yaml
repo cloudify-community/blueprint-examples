@@ -9,26 +9,31 @@ imports:
 
 inputs:
   f5_prov_deployment_name:
+    display_label: F5 Prov Deployment Name
     type: string
     description: Name of BIG IP Provisioning deployment, used to get managemnt and Public IPs from BIG IP
     default: VNFM-F5-Prov-Azure-vm
 
   fg_prov_deployment_name:
+    display_label: Fg Prov Deployment Name
     type: string
     default: VNFM-Fortigate-Prov-Azure-vm
 
   webserver_prov_deployment_name:
+    display_label: Webserver Prov Deployment Name
     type: string
     description: Name of webserver Provisioning deployment, used to fetch webserver LAN interface IP
     default: VNFM-webserver-Prov-Azure-vm
 
   lb_public_port:
+    display_label: Lb Public Port
     description: >
       Load balancer public network port on which service is exposed
     type: integer
     default: 8080
 
   wan_port:
+    display_label: Wan Port
     type: string
     description: >
       Port on which service is going to be exposed

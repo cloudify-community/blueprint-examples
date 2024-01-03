@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint executes Ansible in a docker container.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-docker-plugin
@@ -7,6 +9,7 @@ imports:
 inputs:
 
   image_tag:
+    display_label: Image Tag
     description: Tag for the image to build
     type: string
     default: "ansible_local:0.1"
@@ -17,7 +20,6 @@ dsl_definitions:
     docker_sock_file: /var/run/docker.sock
 
 node_templates:
-
 
   docker_ansible_container:
     type: cloudify.nodes.docker.container

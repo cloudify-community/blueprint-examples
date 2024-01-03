@@ -14,10 +14,12 @@ imports:
 inputs:
 
   network_deployment_name:
+    display_label: Network Deployment Name
     type: string
     description: Deployment name of the VNF network
 
   region:
+    display_label: Region
     type: string
     default: ''
 

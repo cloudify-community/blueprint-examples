@@ -11,12 +11,14 @@ imports:
 inputs:
 
   agent_user:
+    display_label: Agent User
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'centos'
 
   aws_region_name:
+    display_label: Aws Region Name
     type: string
     default: 'us-east-1'
     constraints:
@@ -46,18 +48,22 @@ inputs:
           - sa-east-1
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   location:
+    display_label: Location
     type: string
     default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
 
   source_path:
+    display_label: Source Path
     type: string
     default: template/modules/public_vm
 
   env_name:
+    display_label: Env Name
     type: string
     default: 'example'
 
@@ -89,7 +95,7 @@ node_templates:
         type: cloudify.relationships.depends_on
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint is a utilities plugin example.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
@@ -7,24 +9,28 @@ imports:
 inputs:
 
   ftp_ip:
+    display_label: Ftp Ip
     type: string
     description: >
        ftp server ip
     default: 127.0.0.1
 
   ftp_user:
+    display_label: Ftp User
     type: string
     description: >
        ftp server user
     default: clouduser
 
   ftp_password:
+    display_label: Ftp Password
     type: string
     description: >
        ftp server user password
     default: clouduser
 
   ftp_port:
+    display_label: Ftp Port
     type: integer
     description: >
        ftp server port, by default 21

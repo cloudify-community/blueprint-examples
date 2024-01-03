@@ -10,6 +10,7 @@ imports:
 inputs:
 
   auth_url:
+    display_label: Auth Url
     type: string
     description: |
       OpenStack authentication URL (Keystone v3 endpoint).
@@ -17,13 +18,15 @@ inputs:
     default: { get_secret: openstack_auth_url }
 
   application_credential_id:
+    display_label: Application Credential Id
     type: string
     description: >-
       OpenStack application credential ID (v3).
       See https://docs.openstack.org/keystone/latest/user/application_credentials.html
     default: { get_secret: openstack_application_credential_id }
-  
+
   application_credential_secret:
+    display_label: Application Credential Secret
     type: string
     description: >-
       OpenStack application credential secret (v3).
@@ -31,16 +34,19 @@ inputs:
     default: { get_secret: openstack_application_credential_secret }
 
   region:
+    display_label: Region
     description: OpenStack region name.
     type: string
     default: { get_secret: openstack_region_name }
 
   external_network_name:
+    display_label: External Network Name
     description: External OpenStack network (floating IP pool) to use.
     type: string
     default: { get_secret: openstack_external_network_name }
 
   flavor:
+    display_label: Flavor
     description: |
       Compute flavor name to use.
       Example: t1.small
@@ -48,35 +54,42 @@ inputs:
     type: string
 
   image:
+    display_label: Image
     description: |
       Glance image name to use.
       Command: `openstack image list`
     type: string
 
   insecure:
+    display_label: Insecure
     description: Skip TLS validation on the authentication endpoint.
     type: boolean
     default: false
 
   agent_user:
+    display_label: Agent User
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'ubuntu'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   location:
+    display_label: Location
     type: string
     default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
 
   source_path:
+    display_label: Source Path
     type: string
     default: template/modules/openstack/public_vm
 
   prefix:
+    display_label: Prefix
     type: string
     default: cfy
 
@@ -112,7 +125,7 @@ node_templates:
         type: cloudify.relationships.depends_on
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }

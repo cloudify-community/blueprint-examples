@@ -1,5 +1,7 @@
 tosca_definitions_version: cloudify_dsl_1_5
 
+description: This blueprint creates a Cloud Init configuration YAML.
+
 imports:
   - cloudify/types/types.yaml
   - plugin:cloudify-utilities-plugin
@@ -7,18 +9,22 @@ imports:
 inputs:
 
   user:
+    display_label: User
     type: string
     default: centos
 
   group:
+    display_label: Group
     type: string
     default: wheel
 
   shell:
+    display_label: Shell
     type: string
     default: /bin/bash
 
   sudo:
+    display_label: Sudo
     type: list
     default: ['ALL=(ALL) NOPASSWD:ALL']
 

@@ -10,44 +10,52 @@ imports:
 inputs:
 
   credentials_json:
+    display_label: Credentials Json
     description: Contents of a GCP JSON credentials file
     type: string
     default: { get_secret: gcp_credentials }
 
   project_id:
+    display_label: Project Id
     description: GCP project ID
     type: string
     default: { get_secret: gcp_project_id }
 
   agent_user:
+    display_label: Agent User
     description: >
       The username of the agent running on the instance created from the image.
     type: string
     default: 'ubuntu'
 
   zone_name:
+    display_label: Zone Name
     type: string
     default: { get_secret: gcp_zone }
 
   image:
     description: GCP Image reference
-    default: 
+    default:
       project: ubuntu-os-cloud
       family: ubuntu-1804-lts
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
   location:
+    display_label: Location
     type: string
     default: https://github.com/cloudify-community/tf-source/archive/refs/heads/main.zip
 
   source_path:
+    display_label: Source Path
     type: string
     default: template/modules/gcp/public_vm
 
   prefix:
+    display_label: Prefix
     type: string
     default: cfy
 
@@ -77,7 +85,7 @@ node_templates:
         type: cloudify.relationships.depends_on
 
   agent_key:
-    type: cloudify.keys.nodes.RSAKey
+    type: cloudify.nodes.keys.RSAKey
     properties:
       resource_config:
         key_name: { get_input: agent_key_name }
