@@ -17,9 +17,11 @@ imports:
 inputs:
 
   security_group_id:
+    display_label: Security Group Id
     type: string
 
   subnet_id:
+    display_label: Subnet Id
     type: string
 
   aws_region_name:
@@ -53,6 +55,7 @@ inputs:
           - sa-east-1
 
   instance_type:
+    display_label: Instance Type
     type: string
     default: t2.large
     constraints:
@@ -65,12 +68,14 @@ inputs:
           - t2.2xlarge
 
   agent_user:
+    display_label: Agent User
     type: string
     description: >
       The username of the agent running on the instance created from the image.
     default: 'centos'
 
   agent_key_name:
+    display_label: Agent Key Name
     type: string
     default: agent_key
 
@@ -168,4 +173,3 @@ node_templates:
           implementation: keys.cloudify_ssh_key.operations.create
           inputs:
             store_private_key_material: true
-
